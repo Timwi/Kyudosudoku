@@ -1,0 +1,6 @@
+TODO
+
+• Front page:
+    • show random puzzles (perhaps with difficulty filter)
+    • show some puzzles that you haven’t solved (login required)
+• PUZZLE SOLVED should show time taken
