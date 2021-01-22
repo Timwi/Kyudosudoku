@@ -20,7 +20,7 @@ namespace KyudosudokuWebsite
 
             var puzzleIdStr = req.Url.Path.Length == 0 ? "" : req.Url.Path.Substring(1);
             if (!int.TryParse(puzzleIdStr, out int puzzleId) || puzzleId < 0)
-                return Page404(req);
+                return page404(req);
 
             Kyudosudoku puzzle;
 
@@ -72,8 +72,9 @@ namespace KyudosudokuWebsite
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 
-            return RenderPageTagSoup($"#{puzzleId}", session.User, isPuzzlePage: true,
-                new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }.Data("progress", userPuzzle.NullOr(up => up.Progess))._(
+            return RenderPageTagSoup($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true },
+                session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
+                new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }.Data("progress", userPuzzle.NullOr(up => up.Progess)).Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")._(
                     new RawTag($@"<svg viewBox='-.5 -.5 24 13.75' stroke='black' text-anchor='middle' font-family='Bitter' font-size='.65'>
                         <defs>
                             <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
@@ -81,26 +82,7 @@ namespace KyudosudokuWebsite
                                 <stop style='stop-color:#0daa00;stop-opacity:1' offset='1' /> 
                             </linearGradient>
                         </defs>
-                        {Enumerable.Range(0, 4).Select(corner => $@"
-                            <rect class='solve-glow frame' id='p-{puzzleId}-kyudo-{corner}-frame' x='{6.75 * (corner % 2)}' y='{6.75 * (corner / 2)}' width='6' height='6' stroke-width='.2' fill='none' filter='blur(.1)' />
-                            {Enumerable.Range(0, 36).Select(cell => $@"
-                                <rect class='clickable kyudo-cell' id='p-{puzzleId}-kyudo-{corner}-cell-{cell}' x='{cell % 6 + 6.75 * (corner % 2)}' y='{cell / 6 + 6.75 * (corner / 2)}' width='1' height='1' stroke-width='.005' />
-                                <text id='p-{puzzleId}-kyudo-{corner}-text-{cell}' x='{cell % 6 + 6.75 * (corner % 2) + .5}' y='{cell / 6 + 6.75 * (corner / 2) + .725}' stroke='none'>{puzzle.Grids[corner][cell]}</text>
-                                <g opacity='0' id='p-{puzzleId}-kyudo-{corner}-circle-{cell}'>
-                                    <circle cx='{cell % 6 + 6.75 * (corner % 2) + .5}' cy='{cell / 6 + 6.75 * (corner / 2) + .5}' r='.38' stroke='#000000' stroke-width='.15' fill='none' />
-                                    <circle cx='{cell % 6 + 6.75 * (corner % 2) + .5}' cy='{cell / 6 + 6.75 * (corner / 2) + .5}' r='.38' stroke='#00aa00' stroke-width='.075' fill='none' />
-                                </g>
-                                <g opacity='0' id='p-{puzzleId}-kyudo-{corner}-x-{cell}'>
-                                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .3}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .7}' stroke='#000000' stroke-width='.2' fill='none' stroke-linecap='square' />
-                                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .7}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .3}' stroke='#000000' stroke-width='.2' fill='none' stroke-linecap='square' />
-                                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .3}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .7}' stroke='#df1f1f' stroke-width='.1' fill='none' stroke-linecap='square' />
-                                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .7}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .3}' stroke='#df1f1f' stroke-width='.1' fill='none' stroke-linecap='square' />
-                                </g>
-                            ").JoinString()}
-                            <rect x='{6.75 * (corner % 2)}' y='{6.75 * (corner / 2)}' width='6' height='6' stroke-width='.05' fill='none' />
-                            <line x1='{3 + 6.75 * (corner % 2)}' y1='{6.75 * (corner / 2)}' x2='{3 + 6.75 * (corner % 2)}' y2='{6 + 6.75 * (corner / 2)}' stroke-width='.03' />
-                            <line x1='{6.75 * (corner % 2)}' y1='{3 + 6.75 * (corner / 2)}' x2='{6 + 6.75 * (corner % 2)}' y2='{3 + 6.75 * (corner / 2)}' stroke-width='.03' />
-                        ").JoinString()}
+                        {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                         <rect class='solve-glow frame' id='p-{puzzleId}-sudoku-frame' x='{SudokuX}' y='{SudokuY}' width='9' height='9' stroke-width='.2' fill='none' filter='blur(.1)' />
                         {Enumerable.Range(0, 81).Select(cell => $@"
                             <rect class='clickable sudoku-cell' id='p-{puzzleId}-sudoku-cell-{cell}' x='{cell % 9 + SudokuX}' y='{cell / 9 + SudokuY}' width='1' height='1' stroke-width='.005' />
@@ -140,6 +122,30 @@ namespace KyudosudokuWebsite
                         </g>
                     </svg>")));
         }
+
+        private static readonly string[] _cellColors = "white;hsl(0, 100%, 94%);white;hsl(52, 100%, 89%);hsl(0, 0%, 94%);hsl(226, 100%, 94%);white;hsl(103, 84%, 95%);white".Split(';');
+        private static readonly string[] _highlightedCellColors = "#aaa;hsl(0, 70%, 50%);#aaa;hsl(52, 80%, 40%);#999;hsl(226, 60%, 50%);#aaa;hsl(103, 50%, 50%);#aaa".Split(';');
+
+        private static string kyudokuGridSvg(int corner, int puzzleId, int[] grid, bool setColors = false, int[] highlight = null, int[] circled = null, int[] xed = null, bool glowRed = false) => $@"
+            <rect class='solve-glow frame{(glowRed ? " invalid-glow" : null)}' id='p-{puzzleId}-kyudo-{corner}-frame' x='{6.75 * (corner % 2)}' y='{6.75 * (corner / 2)}' width='6' height='6' stroke-width='.2' fill='none' filter='blur(.1)' />
+            {Enumerable.Range(0, 36).Select(cell => $@"
+                <rect class='clickable kyudo-cell' id='p-{puzzleId}-kyudo-{corner}-cell-{cell}' x='{cell % 6 + 6.75 * (corner % 2)}' y='{cell / 6 + 6.75 * (corner / 2)}' width='1' height='1' stroke-width='.005'{(setColors ? $" fill='{(highlight == null || !highlight.Contains(cell) ? _cellColors : _highlightedCellColors)[((cell % 6) / 3 + corner % 2) + 3 * ((cell / 6) / 3 + corner / 2)]}'" : null)} />
+                <text id='p-{puzzleId}-kyudo-{corner}-text-{cell}' x='{cell % 6 + 6.75 * (corner % 2) + .5}' y='{cell / 6 + 6.75 * (corner / 2) + .725}' stroke='none'{(setColors ? $" fill='{(highlight == null || !highlight.Contains(cell) ? "black" : "white")}'" : null)}>{grid[cell]}</text>
+                <g opacity='{(circled == null || !circled.Contains(cell) ? "0" : "1")}' id='p-{puzzleId}-kyudo-{corner}-circle-{cell}'>
+                    <circle cx='{cell % 6 + 6.75 * (corner % 2) + .5}' cy='{cell / 6 + 6.75 * (corner / 2) + .5}' r='.38' stroke='#000000' stroke-width='.15' fill='none' />
+                    <circle cx='{cell % 6 + 6.75 * (corner % 2) + .5}' cy='{cell / 6 + 6.75 * (corner / 2) + .5}' r='.38' stroke='#00aa00' stroke-width='.075' fill='none' />
+                </g>
+                <g opacity='{(xed == null || !xed.Contains(cell) ? "0" : "1")}' id='p-{puzzleId}-kyudo-{corner}-x-{cell}'>
+                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .3}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .7}' stroke='#000000' stroke-width='.2' fill='none' stroke-linecap='square' />
+                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .7}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .3}' stroke='#000000' stroke-width='.2' fill='none' stroke-linecap='square' />
+                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .3}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .7}' stroke='#df1f1f' stroke-width='.1' fill='none' stroke-linecap='square' />
+                    <line x1='{cell % 6 + 6.75 * (corner % 2) + .3}' y1='{cell / 6 + 6.75 * (corner / 2) + .7}' x2='{cell % 6 + 6.75 * (corner % 2) + .7}' y2='{cell / 6 + 6.75 * (corner / 2) + .3}' stroke='#df1f1f' stroke-width='.1' fill='none' stroke-linecap='square' />
+                </g>
+            ").JoinString()}
+            <rect x='{6.75 * (corner % 2)}' y='{6.75 * (corner / 2)}' width='6' height='6' stroke-width='.05' fill='none' />
+            <line x1='{3 + 6.75 * (corner % 2)}' y1='{6.75 * (corner / 2)}' x2='{3 + 6.75 * (corner % 2)}' y2='{6 + 6.75 * (corner / 2)}' stroke-width='.03' />
+            <line x1='{6.75 * (corner % 2)}' y1='{3 + 6.75 * (corner / 2)}' x2='{6 + 6.75 * (corner % 2)}' y2='{3 + 6.75 * (corner / 2)}' stroke-width='.03' />
+        ";
 
         private HttpResponse dbUpdate(HttpRequest req, DbSession session, Db db, int puzzleId)
         {

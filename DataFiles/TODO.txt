@@ -1,6 +1,7 @@
 TODO
 
 • Front page:
-    • show random puzzles (perhaps with difficulty filter)
-    • show some puzzles that you haven’t solved (login required)
+    • filter random puzzles by average time
 • PUZZLE SOLVED should show time taken
+• Drag & drop selection
+• Halt timer when tab inactive

@@ -5,6 +5,7 @@ using System.Transactions;
 using KyudosudokuWebsite.Database;
 using RT.PropellerApi;
 using RT.Servers;
+using RT.TagSoup;
 using RT.Util;
 using RT.Util.ExtensionMethods;
 
@@ -34,11 +35,18 @@ namespace KyudosudokuWebsite
                 new UrlMapping(path: "/css", specificPath: true, handler: req => HttpResponse.Css(Resources.Css)),
 #endif
 
-                new UrlMapping(path: "/", specificPath: true, handler: MainPage),
+                new UrlMapping(path: "/", specificPath: true, handler: mainPage),
+                new UrlMapping(path: "/help", specificPath: true, handler: helpPage),
                 new UrlMapping(path: "/auth", handler: getAuthResolver().Handle),
                 new UrlMapping(path: "/puzzle", handler: req => withSession(req, (session, db) => PuzzlePage(req, session, db))),
-                new UrlMapping(path: "/logo", handler: req => HttpResponse.Create(Resources.Logo, "image/png")));
+                new UrlMapping(path: "/logo", handler: req => HttpResponse.Create(Resources.Logo, "image/png")),
+
+                // Catch-all 404
+                new UrlMapping(path: null, handler: page404));
         }
+
+        private HttpResponse page404(HttpRequest req) => withSession(req, (session, db) =>
+            RenderPageTagSoup("Not found — Kyudosudoku", session.User, new PageOptions { StatusCode = HttpStatusCode._404_NotFound }, new H1("404 — Not Found")));
 
         private UrlResolver getAuthResolver()
         {

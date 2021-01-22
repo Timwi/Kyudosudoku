@@ -103,8 +103,8 @@
     <Compile Include="Kyudosudoku.cs" />
     <Compile Include="KyudosudokuPropellerModule.cs" />
     <Compile Include="KyudosudokuSettings.cs" />
-    <Compile Include="Page404.cs" />
     <Compile Include="AuthPages.cs" />
+    <Compile Include="HelpPage.cs" />
     <Compile Include="Pages.cs" />
     <Compile Include="PuzzlePage.cs" />
     <Compile Include="MainPage.cs" />

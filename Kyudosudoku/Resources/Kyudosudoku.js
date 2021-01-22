@@ -247,7 +247,8 @@
             {
                 case false:
                     isSolved = false;
-                    document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.add('invalid-glow');
+                    if (puzzleDiv.dataset.showerrors === '1')
+                        document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.add('invalid-glow');
                     break;
 
                 case true:
@@ -266,7 +267,8 @@
                 {
                     case false:
                         isSolved = false;
-                        document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.add('invalid-glow');
+                        if (puzzleDiv.dataset.showerrors === '1')
+                            document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.add('invalid-glow');
                         break;
 
                     case true:
@@ -503,6 +505,7 @@
         puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo>rect`).onclick = handler(undo);
         puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`).onclick = handler(redo);
 
+        let keepMove = false;
         puzzleDiv.addEventListener("keydown", ev => 
         {
             let str = ev.code;
@@ -515,7 +518,7 @@
 
             let anyFunction = true;
 
-            function ArrowMovement(dx, dy, additive)
+            function ArrowMovement(dx, dy, mode)
             {
                 highlightedDigit = null;
                 if (selectedCells.length === 0)
@@ -526,15 +529,24 @@
                     let newX = ((lastCell % 9) + 9 + dx) % 9;
                     let newY = (((lastCell / 9) | 0) + 9 + dy) % 9;
                     let coord = newX + 9 * newY;
-                    if (additive)
+                    if (mode === 'clear')
+                    {
+                        selectedCells = [coord];
+                        keepMove = false;
+                    }
+                    else if (mode === 'add' || (mode === 'move' && keepMove))
                     {
                         let ix = selectedCells.indexOf(coord);
                         if (ix !== -1)
                             selectedCells.splice(ix, 1);
                         selectedCells.push(coord);
+                        keepMove = false;
                     }
-                    else
-                        selectedCells = [coord];
+                    else    // mode === 'move' && !keepMove
+                    {
+                        selectedCells.pop();
+                        selectedCells.push(coord);
+                    }
                 }
                 updateVisuals();
             }
@@ -599,14 +611,33 @@
                     mode = 'center';
                     break;
 
-                case 'ArrowUp': ArrowMovement(0, -1); break;
-                case 'ArrowDown': ArrowMovement(0, 1); break;
-                case 'ArrowLeft': ArrowMovement(-1, 0); break;
-                case 'ArrowRight': ArrowMovement(1, 0); break;
-                case 'Shift+ArrowUp': case 'Ctrl+ArrowUp': ArrowMovement(0, -1, true); break;
-                case 'Shift+ArrowDown': case 'Ctrl+ArrowDown': ArrowMovement(0, 1, true); break;
-                case 'Shift+ArrowLeft': case 'Ctrl+ArrowLeft': ArrowMovement(-1, 0, true); break;
-                case 'Shift+ArrowRight': case 'Ctrl+ArrowRight': ArrowMovement(1, 0, true); break;
+                case 'ArrowUp': ArrowMovement(0, -1, 'clear'); break;
+                case 'ArrowDown': ArrowMovement(0, 1, 'clear'); break;
+                case 'ArrowLeft': ArrowMovement(-1, 0, 'clear'); break;
+                case 'ArrowRight': ArrowMovement(1, 0, 'clear'); break;
+                case 'Shift+ArrowUp': ArrowMovement(0, -1, 'add'); break;
+                case 'Shift+ArrowDown': ArrowMovement(0, 1, 'add'); break;
+                case 'Shift+ArrowLeft': ArrowMovement(-1, 0, 'add'); break;
+                case 'Shift+ArrowRight': ArrowMovement(1, 0, 'add'); break;
+                case 'Ctrl+ArrowUp': ArrowMovement(0, -1, 'move'); break;
+                case 'Ctrl+ArrowDown': ArrowMovement(0, 1, 'move'); break;
+                case 'Ctrl+ArrowLeft': ArrowMovement(-1, 0, 'move'); break;
+                case 'Ctrl+ArrowRight': ArrowMovement(1, 0, 'move'); break;
+                case 'Ctrl+ControlLeft': case 'Ctrl+ControlRight': keepMove = true; console.log('yeah'); break;
+                case 'Ctrl+Space':
+                    if (highlightedDigit !== null)
+                    {
+                        selectedCells = [];
+                        for (let cell = 0; cell < 81; cell++)
+                            if (getDisplayedSudokuDigit(cell) === highlightedDigit)
+                                selectedCells.push(cell);
+                        highlightedDigit = null;
+                    }
+                    else if (selectedCells.length >= 2 && selectedCells[selectedCells.length - 2] === selectedCells[selectedCells.length - 1])
+                        selectedCells.splice(selectedCells.length - 1, 1);
+                    else
+                        keepMove = !keepMove;
+                    break;
                 case 'Escape': selectedCells = []; highlightedDigit = null; break;
 
                 // Undo/redo
@@ -681,6 +712,9 @@
             puzzleSvg.style.width = '100%';
             let puzzleHeight = puzzleDiv.offsetHeight;
             let availableHeight = window.innerHeight - document.querySelector('.top-bar').offsetHeight;
+            let warning = document.querySelector('.warning');
+            if (warning !== null)
+                availableHeight -= warning.offsetHeight;
             if (puzzleHeight > availableHeight)
             {
                 puzzleDiv.style.display = 'none';

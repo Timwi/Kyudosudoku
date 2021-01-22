@@ -9,5 +9,8 @@ namespace KyudosudokuWebsite.Database
         public string Username { get; set; }
         public string PasswordHash { get; set; }
         public string EmailAddress { get; set; }
+
+        // Game options
+        public bool ShowErrors { get; set; }
     }
 }

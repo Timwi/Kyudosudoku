@@ -49,7 +49,8 @@ namespace KyudosudokuWebsite
             {
                 Username = username,
                 EmailAddress = string.IsNullOrWhiteSpace(req.Post["email"].Value) ? null : req.Post["email"].Value,
-                PasswordHash = createPasswordHash(password)
+                PasswordHash = createPasswordHash(password),
+                ShowErrors = true
             });
             db.SaveChanges();
             session.User = newUser;
@@ -87,7 +88,7 @@ namespace KyudosudokuWebsite
                     return userPage(req, redirectTo, session.User, db, updateUserError: "I’m afraid that username is already taken!");
 
                 session.User.Username = newUsername;
-                messages.Add("Username changed.");
+                messages.Add("Username updated.");
             }
 
             var newEmail = req.Post["email"].Value;
@@ -97,13 +98,24 @@ namespace KyudosudokuWebsite
                     return userPage(req, redirectTo, session.User, db, updateUserError: "I’m afraid that email address is already taken!");
 
                 session.User.EmailAddress = newEmail;
-                messages.Add("Email address changed.");
+                messages.Add("Email address updated.");
             }
             if (changingPassword)
             {
                 session.User.PasswordHash = createPasswordHash(req.Post["password1"].Value);
-                messages.Add("Password changed.");
+                messages.Add("Password updated.");
             }
+
+            var changingGameOptions = false;
+            if (session.User.ShowErrors != (req.Post["opt-show-errors"].Value == "1"))
+            {
+                session.User.ShowErrors = (req.Post["opt-show-errors"].Value == "1");
+                changingGameOptions = true;
+            }
+            if (changingGameOptions)
+                messages.Add("Game options updated.");
+
+
             if (messages.Count == 0)
                 messages.Add("No changes were made.");
 
