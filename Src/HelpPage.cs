@@ -30,7 +30,7 @@ namespace KyudosudokuWebsite
                 new H1("Rules of Kyudosudoku"),
                 new P("Kyudosudoku is a logic puzzle that combines Kyudoku with Sudoku."),
                 new P("Each puzzle consists of four 6×6 grids filled with digits 1–9, which we will call the ", new CITE("Kyudoku grids"), ", and a blank 9×9 grid, the ", new CITE("Sudoku grid"), "."),
-                new P("In each Kyudoku grid, exactly one of each digit 1–9 must be circled in such a way that no row or column adds up to more than 9."),
+                new P("In each Kyudoku grid, exactly one of each digit 1–9 must be circled in such a way that the circled digits in each row or column never add up to more than 9."),
                 new TABLE { style = "width:100%", class_ = "puzzle examples" }._(
                     new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 14, 23, 28, 30, 31 })), new TD(new P("Invalid: two 2’s are circled."))),
                     new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 23, 28, 30, 31 })), new TD(new P("Invalid: none of the 4’s are circled."))),
@@ -41,8 +41,8 @@ namespace KyudosudokuWebsite
                 new P("Each Kyudoku grid in isolation may not have a unique solution, but there is only one way to solve the entire puzzle."),
 
                 new H1("Controls"),
-                new P("The following keyboard commands are available:"),
-                new TABLE(
+                new H2("Keyboard"),
+                new TABLE { class_ = "controls" }._(
                     new TR(new TH("Arrow keys"), new TD("Moves the selection within the Sudoku grid.")),
                     new TR(new TH("Shift+Arrow keys"), new TD("Extends the selection within the Sudoku grid.")),
                     new TR(new TH("Ctrl+Arrow keys, Ctrl+Space"), new TD("Can be used to select multiple cells that may not be contiguous.")),
@@ -55,6 +55,12 @@ namespace KyudosudokuWebsite
                     new TR(new TH("Digits"), new TD("When one or multiple cells in the Sudoku grid are selected, the digit is entered into the cell according to the current mode (normal, corner or center). When no cell is selected, all occurrences of the digit in all grids (except for those crossed out in Kyudoku grids) are highlighted.")),
                     new TR(new TH("Ctrl+Digits"), new TD("Enters a digit in center notation.")),
                     new TR(new TH("Shift+Digits"), new TD("Enters a digit in corner notation."))),
+                new H2("Mouse"),
+                new TABLE { class_ = "controls" }._(
+                    new TR(new TH("Click (Kyudoku cell)"), new TD("Cycle unmarked → crossed out → circled")),
+                    new TR(new TH("Shift+Click (Kyudoku cell)"), new TD("Cycle unmarked → circled → crossed out")),
+                    new TR(new TH("Click and drag (Sudoku cell)"), new TD("Select any number of cells.")),
+                    new TR(new TH("Shift+Click and drag (Sudoku cell)"), new TD("Add any number of cells to the selection."))),
 
                 new H1("Common strategies"),
                 new P("To get started, here are some common deductions that can help you get started on a Kyudosudoku puzzle:"),

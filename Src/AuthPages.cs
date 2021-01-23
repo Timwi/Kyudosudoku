@@ -25,9 +25,9 @@ namespace KyudosudokuWebsite
             new FORM { action = url.WithPath("/register").ToHref(), method = method.post }._(
                 new TABLE(
                     new TR(new TD(new LABEL { for_ = "register-username", accesskey = "s" }._("Username: ".Accel('s'))), new TD(new INPUT { id = "register-username", name = "username", type = itype.text, value = req?.Post["username"].Value })),
-                    new TR(new TD(new LABEL { for_ = "register-password-1", accesskey = "1" }._("Password 1: ".Accel('1'))), new TD(new INPUT { id = "register-password-1", name = "password1", type = itype.password, value = req?.Post["password1"].Value })),
-                    new TR(new TD(new LABEL { for_ = "register-password-2", accesskey = "2" }._("Password 2: ".Accel('2'))), new TD(new INPUT { id = "register-password-2", name = "password2", type = itype.password, value = req?.Post["password2"].Value })),
-                    new TR(new TD(new LABEL { for_ = "register-email", accesskey = "e" }._("Email address: ".Accel('E'))), new TD(new INPUT { id = "register-email", name = "email", type = itype.text, value = req?.Post["email"].Value })),
+                    new TR(new TD(new LABEL { for_ = "register-password-1", accesskey = "a" }._("Password: ".Accel('a'))), new TD(new INPUT { id = "register-password-1", name = "password1", type = itype.password, value = req?.Post["password1"].Value })),
+                    new TR(new TD(new LABEL { for_ = "register-password-2", accesskey = "o" }._("Confirm password: ".Accel('o'))), new TD(new INPUT { id = "register-password-2", name = "password2", type = itype.password, value = req?.Post["password2"].Value })),
+                    new TR(new TD(new LABEL { for_ = "register-email", accesskey = "e" }._("Email address: ".Accel('E'))), new TD(new INPUT { id = "register-email", name = "email", type = itype.text, value = req?.Post["email"].Value }, " (this is not used for anything right now, no emails are sent to this)")),
                     new TR(new TD(new BUTTON { type = btype.submit, accesskey = "r" }._("Register".Accel('R')))))));
 
         private HttpResponse userPage(HttpRequest req, IHttpUrl url, User user, Db db, string updateUserError = null, IEnumerable<string> updateUserSuccess = null, string teamError = null) => RenderPageTagSoup(

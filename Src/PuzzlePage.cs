@@ -169,6 +169,13 @@ namespace KyudosudokuWebsite
             already.Progess = req.Post["progress"].Value;
             already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
             db.SaveChanges();
+
+            if (req.Post["getdata"].Value == "1")
+            {
+                var average = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => up.Time);
+                var count = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Count();
+            }
+
             return HttpResponse.Empty(HttpStatusCode._200_OK);
         }
     }

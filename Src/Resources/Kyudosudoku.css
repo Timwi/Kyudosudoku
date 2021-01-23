@@ -211,6 +211,10 @@ table {
         padding: .2cm .5cm;
     }
 
+    table.controls th {
+        white-space: nowrap;
+    }
+
 h1 {
     margin-top: 2cm;
 }

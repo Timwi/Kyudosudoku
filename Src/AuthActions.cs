@@ -54,12 +54,12 @@ namespace KyudosudokuWebsite
             });
             db.SaveChanges();
             session.User = newUser;
-            if (!string.IsNullOrWhiteSpace(email) && email.Contains('@'))
-                sendMail($"Kyudosudoku registration",
-                    $"<p style='font-weight: bold'>Thank you for registering for Kyudosudoku!</p>" +
-                    $"<p>Your username is {username}.</p>" +
-                    $"<p>You can <a href='{redirectTo.ToFull()}'>log in</a> at any time.",
-                    new MailAddress(email, username));
+            //if (!string.IsNullOrWhiteSpace(email) && email.Contains('@'))
+            //    sendMail($"Kyudosudoku registration",
+            //        $"<p style='font-weight: bold'>Thank you for registering for Kyudosudoku!</p>" +
+            //        $"<p>Your username is {username}.</p>" +
+            //        $"<p>You can <a href='{redirectTo.ToFull()}'>log in</a> at any time.",
+            //        new MailAddress(email, username));
             return HttpResponse.Redirect(redirectTo);
         });
 

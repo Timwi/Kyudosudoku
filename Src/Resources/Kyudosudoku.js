@@ -25,6 +25,10 @@
     let invalidCellColor = '#f00';
 
     let first = true;
+    let isDragging = false;
+    let hasDragged = false;
+    document.body.onmouseup = handler(function() { isDragging = false; });
+
     Array.from(document.getElementsByClassName('puzzle')).forEach(puzzleDiv =>
     {
         let match = /^puzzle-(\d+)$/.exec(puzzleDiv.id);
@@ -81,7 +85,9 @@
             let req = new XMLHttpRequest();
             req.open('POST', `db-update/${puzzleId}`, true);
             req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            req.send(`progress=${encodeURIComponent(JSON.stringify(state))}${isSolved ? `&time=${((new Date() - timeLastDbUpdate) / 1000) | 0}` : ''}`);
+            req.send(`progress=${encodeURIComponent(JSON.stringify(state))}${isSolved ? `&time=${((new Date() - timeLastDbUpdate) / 1000) | 0}&getdata=1` : ''}`);
+            req.onload = function() { console.log(req); };
+
             timeLastDbUpdate = new Date();
             if (isSolved)
                 clearInterval(dbUpdater);
@@ -329,15 +335,15 @@
 
             let corner = parseInt(match[1]);
             let cell = parseInt(match[2]);
-            cellRect.onclick = handler(function()
+            cellRect.onclick = handler(function(ev)
             {
                 saveUndo();
                 if (state.circledDigits[corner][cell] === null)
-                    state.circledDigits[corner][cell] = false;
+                    state.circledDigits[corner][cell] = (ev.shiftKey ? true : false);
                 else if (state.circledDigits[corner][cell] === false)
-                    state.circledDigits[corner][cell] = true;
+                    state.circledDigits[corner][cell] = (ev.shiftKey ? null : true);
                 else
-                    state.circledDigits[corner][cell] = null;
+                    state.circledDigits[corner][cell] = (ev.shiftKey ? false : null);
                 updateVisuals();
             });
         });
@@ -352,23 +358,22 @@
             }
 
             let cell = parseInt(match[1]);
-            cellRect.onclick = handler(function(ev)
+            cellRect.onclick = handler(function() { });
+            cellRect.onmousedown = handler(function(ev)
             {
+                isDragging = true;
                 highlightedDigit = null;
-                if (ev.ctrlKey || ev.shiftKey)
-                {
-                    if (selectedCells.includes(cell))
-                        selectedCells.splice(selectedCells.indexOf(cell), 1);
-                    else
-                        selectedCells.push(cell);
-                }
-                else
-                {
-                    if (selectedCells.length === 1 && selectedCells.includes(cell))
-                        selectedCells = [];
-                    else
-                        selectedCells = [cell];
-                }
+                selectCell(cell, (ev.ctrlKey || ev.shiftKey) ? 'add' : 'toggle');
+                updateVisuals();
+            });
+            cellRect.onmousemove = handler(function()
+            {
+                if (!isDragging)
+                    return;
+                let oldLength = selectedCells.length;
+                selectCell(cell, 'add');
+                if (selectedCells.length !== oldLength)
+                    hasDragged = true;
                 updateVisuals();
             });
         });
@@ -505,6 +510,35 @@
         puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo>rect`).onclick = handler(undo);
         puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`).onclick = handler(redo);
 
+        function selectCell(cell, mode)
+        {
+            if (mode === 'toggle')
+            {
+                if (selectedCells.length === 1 && selectedCells.includes(cell))
+                    selectedCells = [];
+                else
+                    selectedCells = [cell];
+            }
+            else if (mode === 'clear')
+            {
+                selectedCells = [cell];
+                keepMove = false;
+            }
+            else if (mode === 'add' || (mode === 'move' && keepMove))
+            {
+                let ix = selectedCells.indexOf(cell);
+                if (ix !== -1)
+                    selectedCells.splice(ix, 1);
+                selectedCells.push(cell);
+                keepMove = false;
+            }
+            else    // mode === 'move' && !keepMove
+            {
+                selectedCells.pop();
+                selectedCells.push(cell);
+            }
+        }
+
         let keepMove = false;
         puzzleDiv.addEventListener("keydown", ev => 
         {
@@ -529,24 +563,7 @@
                     let newX = ((lastCell % 9) + 9 + dx) % 9;
                     let newY = (((lastCell / 9) | 0) + 9 + dy) % 9;
                     let coord = newX + 9 * newY;
-                    if (mode === 'clear')
-                    {
-                        selectedCells = [coord];
-                        keepMove = false;
-                    }
-                    else if (mode === 'add' || (mode === 'move' && keepMove))
-                    {
-                        let ix = selectedCells.indexOf(coord);
-                        if (ix !== -1)
-                            selectedCells.splice(ix, 1);
-                        selectedCells.push(coord);
-                        keepMove = false;
-                    }
-                    else    // mode === 'move' && !keepMove
-                    {
-                        selectedCells.pop();
-                        selectedCells.push(coord);
-                    }
+                    selectCell(coord, mode);
                 }
                 updateVisuals();
             }
@@ -623,7 +640,7 @@
                 case 'Ctrl+ArrowDown': ArrowMovement(0, 1, 'move'); break;
                 case 'Ctrl+ArrowLeft': ArrowMovement(-1, 0, 'move'); break;
                 case 'Ctrl+ArrowRight': ArrowMovement(1, 0, 'move'); break;
-                case 'Ctrl+ControlLeft': case 'Ctrl+ControlRight': keepMove = true; console.log('yeah'); break;
+                case 'Ctrl+ControlLeft': case 'Ctrl+ControlRight': keepMove = true; break;
                 case 'Ctrl+Space':
                     if (highlightedDigit !== null)
                     {
@@ -651,42 +668,9 @@
                     redo();
                     break;
 
-                // Check
-                case 'KeyH':
-                    function getDisplayedDigit(cell)
-                    {
-                        let kyCells = [0, 1, 2, 3]
-                            .filter(c => cell % 9 >= 3 * (c % 2) && cell % 9 < 6 + 3 * (c % 2) && cell / 9 >= 3 * ((c / 2) | 0) && cell / 9 < 6 + 3 * ((c / 2) | 0))
-                            .map(c => ({ corner: c, kyCell: cell % 9 - 3 * (c % 2) + 6 * (((cell / 9) | 0) - 3 * ((c / 2) | 0)) }))
-                            .filter(inf => state.circledDigits[inf.corner][inf.kyCell] === true);
-                        if (kyCells.length > 1 && kyCells.some(inf => kyudokuGrids[inf.corner][inf.kyCell] !== kyudokuGrids[kyCells[0].corner][kyCells[0].kyCell]))
-                            return null;
-                        else if (kyCells.length >= 1)
-                            return parseInt(kyudokuGrids[kyCells[0].corner][kyCells[0].kyCell]);
-                        else if (state.enteredDigits[cell] !== null)
-                            return parseInt(state.enteredDigits[cell]);
-                        return null;
-                    }
-                    for (let i = 0; i < 9; i++)
-                    {
-                        for (let colA = 0; colA < 9; colA++)
-                            for (let colB = colA + 1; colB < 9; colB++)
-                                if (getDisplayedDigit(colA + 9 * i) !== null && getDisplayedDigit(colA + 9 * i) === getDisplayedDigit(colB + 9 * i))
-                                    console.log(`In row ${i + 1}, cells ${colA + 1} and ${colB + 1} have the same value.`);
-                        for (let rowA = 0; rowA < 9; rowA++)
-                            for (let rowB = rowA + 1; rowB < 9; rowB++)
-                                if (getDisplayedDigit(i + 9 * rowA) !== null && getDisplayedDigit(i + 9 * rowA) === getDisplayedDigit(i + 9 * rowB))
-                                    console.log(`In column ${i + 1}, cells ${rowA + 1} and ${rowB + 1} have the same value.`);
-                        for (let cellA = 0; cellA < 9; cellA++)
-                            for (let cellB = cellA + 1; cellB < 9; cellB++)
-                                if (getDisplayedDigit(cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) !== null && getDisplayedDigit(cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) === getDisplayedDigit(cellB % 3 + 3 * (i % 3) + 9 * (((cellB / 3) | 0) + 3 * ((i / 3) | 0))))
-                                    console.log(`In region ${i + 1}, cells ${cellA + 1} and ${cellB + 1} have the same value.`);
-                    }
-                    break;
-
                 default:
                     anyFunction = false;
-                    console.log(str, ev.code);
+                    //console.log(str, ev.code);
                     break;
             }
 
@@ -701,6 +685,11 @@
 
         puzzleDiv.onclick = handler(function()
         {
+            if (hasDragged)
+            {
+                hasDragged = false;
+                return;
+            }
             selectedCells = [];
             updateVisuals();
         });

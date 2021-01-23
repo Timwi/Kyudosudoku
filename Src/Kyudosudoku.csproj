@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -16,67 +16,72 @@
     <LangVersion>latest</LangVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <OutputPath>..\builds\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>..\builds\$(Configuration)\obj-$(AssemblyName)\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\builds\$(Configuration)\obj-$(AssemblyName)\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="PropellerApi, Version=1.0.19.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\PropellerApi.1.0.19\lib\net472\PropellerApi.dll</HintPath>
+      <HintPath>..\packages\PropellerApi.1.0.19\lib\net472\PropellerApi.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Json, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Json.2.0.1680\lib\netstandard2.0\RT.Json.dll</HintPath>
+    <Reference Include="RT.Json, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Json.2.0.1681\lib\netstandard2.0\RT.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RT.PostBuild, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.PostBuild.2.0.1680\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
+    <Reference Include="RT.PostBuild, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.PostBuild.2.0.1681\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RT.Serialization, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.2.0.1680\lib\netstandard2.0\RT.Serialization.dll</HintPath>
+    <Reference Include="RT.Serialization, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.2.0.1681\lib\netstandard2.0\RT.Serialization.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RT.Serialization.Binary, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.Binary.2.0.1680\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
+    <Reference Include="RT.Serialization.Binary, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Binary.2.0.1681\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RT.Serialization.Json, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.Json.2.0.1680\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
+    <Reference Include="RT.Serialization.Json, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Json.2.0.1681\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RT.Serialization.Xml, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.Xml.2.0.1680\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
+    <Reference Include="RT.Serialization.Xml, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Xml.2.0.1681\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="RT.Servers, Version=1.0.1660.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Servers.1.0.1660\lib\net472\RT.Servers.dll</HintPath>
+      <HintPath>..\packages\RT.Servers.1.0.1660\lib\net472\RT.Servers.dll</HintPath>
     </Reference>
     <Reference Include="RT.TagSoup, Version=1.0.1625.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.TagSoup.1.0.1625\lib\net472\RT.TagSoup.dll</HintPath>
+      <HintPath>..\packages\RT.TagSoup.1.0.1625\lib\net472\RT.TagSoup.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Util, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Util.2.0.1680\lib\net472\RT.Util.dll</HintPath>
+    <Reference Include="RT.Util, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.2.0.1681\lib\net472\RT.Util.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RT.Util.Core, Version=2.0.1680.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Util.Core.2.0.1680\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
+    <Reference Include="RT.Util.Core, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.Core.2.0.1681\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -150,8 +155,8 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
   </Target>
-  <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
 </Project>
