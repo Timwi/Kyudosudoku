@@ -54,7 +54,8 @@ namespace KyudosudokuWebsite
                     new TR(new TH("Escape"), new TD("Removes the selection highlight.")),
                     new TR(new TH("Digits"), new TD("When one or multiple cells in the Sudoku grid are selected, the digit is entered into the cell according to the current mode (normal, corner or center). When no cell is selected, all occurrences of the digit in all grids (except for those crossed out in Kyudoku grids) are highlighted.")),
                     new TR(new TH("Ctrl+Digits"), new TD("Enters a digit in center notation.")),
-                    new TR(new TH("Shift+Digits"), new TD("Enters a digit in corner notation."))),
+                    new TR(new TH("Shift+Digits"), new TD("Enters a digit in corner notation.")),
+                    new TR(new TH("F"), new TD("Replaces center-notated digits with all those that aren’t excluded by other digits in the same row, column or 3×3 box."))),
                 new H2("Mouse"),
                 new TABLE { class_ = "controls" }._(
                     new TR(new TH("Click (Kyudoku cell)"), new TD("Cycle unmarked → crossed out → circled")),
@@ -84,6 +85,7 @@ namespace KyudosudokuWebsite
                         highlight: new[] { new[] { 27 }, null, new[] { 9 }, null })), new TD(new P("However, these 6’s cannot be crossed out (", new EM("nor"), " circled) as they correspond to the exact same cell in the Sudoku grid. Transferring the same digit into the same Sudoku cell multiple times is allowed.")))),
 
                 new P("These strategies should get you through some of the easiest puzzles. For some of the harder puzzles, many more advanced strategies can be discovered."),
+                new P("Send feedback and suggestions to Timwi#0551 on Discord, or submit a pull request to ", new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."),
                 new P("Enjoy!"));
         });
     }

@@ -50,7 +50,10 @@ namespace KyudosudokuWebsite
                 new DIV { class_ = "choice" }._(randomPuzzleIds.Select(puzzleBox)),
                 unfinishedPuzzleIds.Length == 0 ? null : Ut.NewArray<object>(
                     new H1("Finish these puzzles:"),
-                    new DIV { class_ = "choice" }._(unfinishedPuzzleIds.Select(puzzleBox))));
+                    new DIV { class_ = "choice" }._(unfinishedPuzzleIds.Select(puzzleBox))),
+                new HR(),
+                new P("Send feedback and suggestions to Timwi#0551 on Discord, or submit a pull request to ", new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."),
+                new P(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")));
         });
     }
 }

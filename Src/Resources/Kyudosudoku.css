@@ -32,7 +32,7 @@ th, td {
     height: 2cm;
 }
 
-    .top-bar a {
+    .top-bar a, .top-bar .puzzle-id {
         display: inline-block;
         text-decoration: none;
         color: black;
@@ -66,7 +66,11 @@ th, td {
 
     .top-bar .right {
         float: right;
+    }
+
+    .top-bar .right, .top-bar .puzzle-id {
         padding: .725cm 1cm 0;
+        vertical-align: bottom;
     }
 
 .main {
@@ -231,4 +235,10 @@ div.warning {
     border-right: none;
     padding: .2cm .4cm;
     font-size: 12pt;
+}
+
+hr {
+    margin-top: 2cm;
+    border: none;
+    border-top: 1px solid hsl(220, 40%, 75%);
 }

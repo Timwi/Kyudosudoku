@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using KyudosudokuWebsite.Database;
+using RT.Json;
 using RT.Servers;
 using RT.TagSoup;
 using RT.Util;
@@ -72,14 +73,14 @@ namespace KyudosudokuWebsite
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 
-            return RenderPageTagSoup($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true },
+            return RenderPageTagSoup($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true, PuzzleID = puzzleId },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
                 new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }.Data("progress", userPuzzle.NullOr(up => up.Progess)).Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")._(
                     new RawTag($@"<svg viewBox='-.5 -.5 24 13.75' stroke='black' text-anchor='middle' font-family='Bitter' font-size='.65'>
                         <defs>
                             <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
-                                <stop style='stop-color:#6cff59;stop-opacity:1' offset='0' /> 
-                                <stop style='stop-color:#0daa00;stop-opacity:1' offset='1' /> 
+                                <stop style='stop-color:white;stop-opacity:1' offset='0'></stop> 
+                                <stop style='stop-color:hsl(216, 70%, 75%);stop-opacity:1' offset='1'></stop> 
                             </linearGradient>
                         </defs>
                         {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
@@ -116,9 +117,17 @@ namespace KyudosudokuWebsite
                             </g>
                         ").JoinString()}
 
-                        <g transform='translate(11.5, 6) rotate(-30)'>
-                            <rect class='solve-glow' x='-8' y='-1' width='16' height='2' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
-                            <text class='solve-glow' x='0' y='.72' text-anchor='middle' font-size='2' stroke='none' font-weight='bold'>PUZZLE SOLVED</text>
+                        <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow'>
+                            <rect x='-8' y='-1' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
+                            <text x='0' y='.72' text-anchor='middle' font-size='2' stroke='none' font-weight='bold'>PUZZLE SOLVED</text>
+                            <g font-size='.45' transform='translate(0, 1.3)'>
+                                <text text-anchor='start' stroke='none' x='-7.7' y='0'>Solved:</text>
+                                <text class='inf-count' text-anchor='start' stroke='none' x='-6.1' y='0' font-weight='bold'></text>
+                                <text text-anchor='start' stroke='none' x='-4.25' y='0'>Your time:</text>
+                                <text class='inf-time' text-anchor='start' stroke='none' x='-1.95' y='0' font-weight='bold'></text>
+                                <text text-anchor='start' stroke='none' x='2' y='0'>Average:</text>
+                                <text class='inf-avg' text-anchor='start' stroke='none' x='3.95' y='0' font-weight='bold'></text>
+                            </g>
                         </g>
                     </svg>")));
         }
@@ -162,18 +171,19 @@ namespace KyudosudokuWebsite
                 return HttpResponse.Empty(HttpStatusCode._200_OK);
             }
 
-            if (already.Solved)
-                return HttpResponse.Empty(HttpStatusCode._200_OK);
-
-            already.Solved = puzzle.IsSolved(req.Post["progress"].Value);
-            already.Progess = req.Post["progress"].Value;
-            already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
-            db.SaveChanges();
+            if (!already.Solved)
+            {
+                already.Solved = puzzle.IsSolved(req.Post["progress"].Value);
+                already.Progess = req.Post["progress"].Value;
+                already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
+                db.SaveChanges();
+            }
 
             if (req.Post["getdata"].Value == "1")
             {
-                var average = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => up.Time);
+                var average = (int) db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => up.Time);
                 var count = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Count();
+                return HttpResponse.Json(new JsonDict { { "time", already.Time }, { "avg", average }, { "count", count } });
             }
 
             return HttpResponse.Empty(HttpStatusCode._200_OK);

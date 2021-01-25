@@ -25,9 +25,9 @@
     let invalidCellColor = '#f00';
 
     let first = true;
-    let isDragging = false;
+    let draggingMode = null;
     let hasDragged = false;
-    document.body.onmouseup = handler(function() { isDragging = false; });
+    document.body.onmouseup = handler(function() { draggingMode = null; });
 
     Array.from(document.getElementsByClassName('puzzle')).forEach(puzzleDiv =>
     {
@@ -86,7 +86,16 @@
             req.open('POST', `db-update/${puzzleId}`, true);
             req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             req.send(`progress=${encodeURIComponent(JSON.stringify(state))}${isSolved ? `&time=${((new Date() - timeLastDbUpdate) / 1000) | 0}&getdata=1` : ''}`);
-            req.onload = function() { console.log(req); };
+            req.onload = function()
+            {
+                var json = JSON.parse(req.responseText);
+                if (json && json.time)
+                    puzzleDiv.querySelector('text.inf-time').textContent = (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`);
+                if (json && json.avg)
+                    puzzleDiv.querySelector('text.inf-avg').textContent = (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`);
+                if (json && json.count)
+                    puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count} times`;
+            };
 
             timeLastDbUpdate = new Date();
             if (isSolved)
@@ -361,17 +370,18 @@
             cellRect.onclick = handler(function() { });
             cellRect.onmousedown = handler(function(ev)
             {
-                isDragging = true;
+                let shift = ev.ctrlKey || ev.shiftKey;
+                draggingMode = shift && selectedCells.includes(cell) ? 'remove' : 'add';
                 highlightedDigit = null;
-                selectCell(cell, (ev.ctrlKey || ev.shiftKey) ? 'add' : 'toggle');
+                selectCell(cell, shift ? draggingMode : 'toggle');
                 updateVisuals();
             });
             cellRect.onmousemove = handler(function()
             {
-                if (!isDragging)
+                if (draggingMode === null)
                     return;
                 let oldLength = selectedCells.length;
-                selectCell(cell, 'add');
+                selectCell(cell, draggingMode);
                 if (selectedCells.length !== oldLength)
                     hasDragged = true;
                 updateVisuals();
@@ -519,6 +529,12 @@
                 else
                     selectedCells = [cell];
             }
+            else if (mode === 'remove')
+            {
+                let ix = selectedCells.indexOf(cell);
+                if (ix !== -1)
+                    selectedCells.splice(ix, 1);
+            }
             else if (mode === 'clear')
             {
                 selectedCells = [cell];
@@ -615,6 +631,22 @@
                         state.centerNotation[selectedCell] = [];
                         state.cornerNotation[selectedCell] = [];
                     });
+                    break;
+
+                case 'KeyF':
+                    saveUndo();
+                    for (let cell of selectedCells)
+                        if (getDisplayedSudokuDigit(cell) === null)
+                        {
+                            let poss = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                            for (let otherCell = 0; otherCell < 81; otherCell++)
+                            {
+                                let dd = getDisplayedSudokuDigit(otherCell);
+                                if (dd !== null && poss.includes(dd) && (cell % 9 === otherCell % 9 || ((cell / 9) | 0) === ((otherCell / 9) | 0) || ((((cell % 9) / 3) | 0) === (((otherCell % 9) / 3) | 0) && ((((cell / 9) | 0) / 3) | 0) === ((((otherCell / 9) | 0) / 3) | 0))))
+                                    poss.splice(poss.indexOf(dd), 1);
+                            }
+                            state.centerNotation[cell] = poss;
+                        }
                     break;
 
                 // Navigation
