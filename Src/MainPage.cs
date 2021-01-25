@@ -52,7 +52,7 @@ namespace KyudosudokuWebsite
                     new H1("Finish these puzzles:"),
                     new DIV { class_ = "choice" }._(unfinishedPuzzleIds.Select(puzzleBox))),
                 new HR(),
-                new P("Send feedback and suggestions to Timwi#0551 on Discord, or submit a pull request to ", new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."),
+                new P("Send feedback and suggestions to Timwi#0551 or Goofy#1262 on Discord, or submit a pull request to ", new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."),
                 new P(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")));
         });
     }
