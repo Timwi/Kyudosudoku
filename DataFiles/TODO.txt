@@ -5,4 +5,3 @@ TODO
     • enter specific puzzle number
 • Halt timer when tab inactive
 • List of puzzles solved
-• Fix the thing with the center/corner notation when a fill-in cell is also selected

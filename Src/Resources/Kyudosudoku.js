@@ -534,7 +534,7 @@
         function enterCenterNotation(digit)
         {
             saveUndo();
-            let allHaveDigit = selectedCells.every(c => state.centerNotation[c].includes(digit));
+            let allHaveDigit = selectedCells.filter(c => getDisplayedSudokuDigit(state, c) === null).every(c => state.centerNotation[c].includes(digit));
             selectedCells.forEach(cell =>
             {
                 if (allHaveDigit)
@@ -550,7 +550,7 @@
         function enterCornerNotation(digit)
         {
             saveUndo();
-            let allHaveDigit = selectedCells.every(c => state.cornerNotation[c].includes(digit));
+            let allHaveDigit = selectedCells.filter(c => getDisplayedSudokuDigit(state, c) === null).every(c => state.cornerNotation[c].includes(digit));
             selectedCells.forEach(cell =>
             {
                 if (allHaveDigit)
