@@ -165,7 +165,7 @@ namespace KyudosudokuWebsite
             var already = db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
             if (already == null)
             {
-                already = new UserPuzzle { PuzzleID = puzzleId, UserID = session.User.UserID, Progess = req.Post["progress"].Value, Solved = puzzle.IsSolved(req.Post["progress"].Value), Time = 10 };
+                already = new UserPuzzle { PuzzleID = puzzleId, UserID = session.User.UserID, Progess = req.Post["progress"].Value, Solved = puzzle.IsSolved(req.Post["progress"].Value), Time = 10, SolveTime = DateTime.UtcNow };
                 db.UserPuzzles.Add(already);
                 db.SaveChanges();
                 return HttpResponse.Empty(HttpStatusCode._200_OK);
@@ -174,6 +174,7 @@ namespace KyudosudokuWebsite
             if (!already.Solved)
             {
                 already.Solved = puzzle.IsSolved(req.Post["progress"].Value);
+                already.SolveTime = DateTime.UtcNow;
                 already.Progess = req.Post["progress"].Value;
                 already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
                 db.SaveChanges();

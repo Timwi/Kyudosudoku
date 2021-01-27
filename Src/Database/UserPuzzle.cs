@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KyudosudokuWebsite.Database
@@ -13,5 +14,6 @@ namespace KyudosudokuWebsite.Database
         public string Progess { get; set; }
         public bool Solved { get; set; }
         public int Time { get; set; }
+        public DateTime SolveTime { get; set; }
     }
 }

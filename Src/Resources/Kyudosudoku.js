@@ -53,12 +53,119 @@
             centerNotation: Array(81).fill(null).map(_ => []),
             enteredDigits: Array(81).fill(null)
         };
-        let undoBuffer = [JSON.stringify(state)];
+        let undoBuffer = [JSON.parse(JSON.stringify(state))];
         let redoBuffer = [];
 
         let mode = 'normal';
         let selectedCells = [];
         let highlightedDigit = null;
+
+        function encodeState(st)
+        {
+            let val = 0n;
+
+            // Encode the Sudoku grid
+            for (let cell = 0; cell < 81; cell++)
+            {
+                // Skip cells that are fully defined by a circled Kyudoku digit
+                if (getKyudokuCircledDigit(st, cell) !== null)
+                    continue;
+
+                // Compact representation of an entered digit or a completely empty cell
+                if (st.enteredDigits[cell] !== null)
+                    val = (val * 11n) + BigInt(st.enteredDigits[cell]);
+                else if (st.cornerNotation[cell].length === 0 && st.centerNotation[cell].length === 0)
+                    val = (val * 11n);
+                else
+                {
+                    // corner notation
+                    for (let digit = 1; digit <= 9; digit++)
+                        val = (val * 2n) + (st.cornerNotation[cell].includes(digit) ? 1n : 0n);
+
+                    // center notation
+                    for (let digit = 1; digit <= 9; digit++)
+                        val = (val * 2n) + (st.centerNotation[cell].includes(digit) ? 1n : 0n);
+
+                    val = (val * 11n) + 10n;
+                }
+            }
+            for (let corner = 0; corner < 4; corner++)
+                for (let cell = 0; cell < 36; cell++)
+                    val = (val * 3n) + (st.circledDigits[corner][cell] === true ? 2n : st.circledDigits[corner][cell] === false ? 1n : 0n);
+
+            // Safe characters to use: 0x21 - 0xD7FF and 0xE000 - 0xFFFD
+            // (0x20 will later be used as a separator)
+            let maxValue = BigInt(0xfffd - 0xe000 + 1 + 0xd7ff - 0x21 + 1);
+            function getChar(v) { return String.fromCharCode(v > 0xd7ff - 0x21 + 1 ? 0xe000 + (v - (0xd7ff - 0x21 + 1)) : 0x21 + v); }
+
+            let str = '';
+            while (val > 0n)
+            {
+                str += getChar(Number(val % maxValue));
+                val = val / maxValue;
+            }
+            return str;
+        }
+
+        function decodeState(str)
+        {
+            // Safe characters to use: 0x21 - 0xD7FF and 0xE000 - 0xFFFD
+            // (0x20 will later be used as a separator)
+            let maxValue = BigInt(0xfffd - 0xe000 + 1 + 0xd7ff - 0x21 + 1);
+            function charToVal(ch) { return ch >= 0xe000 ? ch - 0xe000 + 0xd7ff - 0x21 + 1 : ch - 0x21; }
+
+            let val = 0n;
+            for (let ix = str.length - 1; ix >= 0; ix--)
+                val = (val * maxValue) + BigInt(charToVal(str.charCodeAt(ix)));
+
+            let st = {
+                circledDigits: Array(4).fill(null).map(_ => Array(36).fill(null)),
+                cornerNotation: Array(81).fill(null).map(_ => []),
+                centerNotation: Array(81).fill(null).map(_ => []),
+                enteredDigits: Array(81).fill(null)
+            };
+
+            // Decode Kyudoku grid
+            for (let corner = 4 - 1; corner >= 0; corner--)
+                for (let cell = 36 - 1; cell >= 0; cell--)
+                {
+                    st.circledDigits[corner][cell] = (val % 3n === 0n ? null : val % 3n === 1n ? false : true);
+                    val = val / 3n;
+                }
+
+            // Decode Sudoku grid
+            for (let cell = 81 - 1; cell >= 0; cell--)
+            {
+                // Skip cells that are fully defined by a circled Kyudoku digit
+                if (getKyudokuCircledDigit(st, cell) !== null)
+                    continue;
+
+                let code = val % 11n;
+                val = val / 11n;
+                // Complex case: center notation and corner notation
+                if (code === 10n)
+                {
+                    // Center notation
+                    for (let digit = 9; digit >= 1; digit--)
+                    {
+                        if (val % 2n === 1n)
+                            st.centerNotation[cell].unshift(digit);
+                        val = val / 2n;
+                    }
+
+                    // Corner notation
+                    for (let digit = 9; digit >= 1; digit--)
+                    {
+                        if (val % 2n === 1n)
+                            st.cornerNotation[cell].unshift(digit);
+                        val = val / 2n;
+                    }
+                }
+                else if (code > 0n)
+                    st.enteredDigits[cell] = Number(code);
+            }
+            return st;
+        }
 
         try
         {
@@ -66,12 +173,20 @@
             if (puzzleDiv.dataset.progress)
                 item = JSON.parse(puzzleDiv.dataset.progress);
             else
-                item = JSON.parse(localStorage.getItem(`ky${puzzleId}`));
+            {
+                str = localStorage.getItem(`ky${puzzleId}`);
+                if (str !== null)
+                    try { item = JSON.parse(localStorage.getItem(`ky${puzzleId}`)); }
+                    catch { item = decodeState(str); }
+            }
             if (item && item.circledDigits && item.cornerNotation && item.centerNotation && item.enteredDigits)
                 state = item;
 
-            undoBuffer = /*JSON.parse(localStorage.getItem(`ky${puzzleId}-undo`)) ||*/[JSON.stringify(state)];
-            redoBuffer = /*JSON.parse(localStorage.getItem(`ky${puzzleId}-redo`)) ||*/[];
+            let undoB = localStorage.getItem(`ky${puzzleId}-undo`);
+            let redoB = localStorage.getItem(`ky${puzzleId}-redo`);
+
+            undoBuffer = undoB ? undoB.split(' ').map(decodeState) : [JSON.parse(JSON.stringify(state))];
+            redoBuffer = redoB ? redoB.split(' ').map(decodeState) : [];
         }
         catch
         {
@@ -88,13 +203,16 @@
             req.send(`progress=${encodeURIComponent(JSON.stringify(state))}${isSolved ? `&time=${((new Date() - timeLastDbUpdate) / 1000) | 0}&getdata=1` : ''}`);
             req.onload = function()
             {
-                var json = JSON.parse(req.responseText);
-                if (json && json.time)
-                    puzzleDiv.querySelector('text.inf-time').textContent = (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`);
-                if (json && json.avg)
-                    puzzleDiv.querySelector('text.inf-avg').textContent = (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`);
-                if (json && json.count)
-                    puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count} times`;
+                if (req.responseText)
+                {
+                    var json = JSON.parse(req.responseText);
+                    if (json && json.time)
+                        puzzleDiv.querySelector('text.inf-time').textContent = (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`);
+                    if (json && json.avg)
+                        puzzleDiv.querySelector('text.inf-avg').textContent = (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`);
+                    if (json && json.count)
+                        puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count} times`;
+                }
             };
 
             timeLastDbUpdate = new Date();
@@ -123,19 +241,29 @@
             puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Restart';
         }
 
-        function getDisplayedSudokuDigit(cell)
+        /// Returns:
+        /// • “false” if multiple equivalent Kyudoku cells are circled with *different* digits
+        /// • “null” if no corresponding Kyudoku cell is circled
+        /// • the circled digit otherwise
+        function getKyudokuCircledDigit(st, cell)
         {
             let kyCells = [0, 1, 2, 3]
                 .filter(c => cell % 9 >= 3 * (c % 2) && cell % 9 < 6 + 3 * (c % 2) && cell / 9 >= 3 * ((c / 2) | 0) && cell / 9 < 6 + 3 * ((c / 2) | 0))
                 .map(c => ({ corner: c, kyCell: cell % 9 - 3 * (c % 2) + 6 * (((cell / 9) | 0) - 3 * ((c / 2) | 0)) }))
-                .filter(inf => state.circledDigits[inf.corner][inf.kyCell] === true);
+                .filter(inf => st.circledDigits[inf.corner][inf.kyCell] === true);
             if (kyCells.length > 1 && kyCells.some(inf => kyudokuGrids[inf.corner][inf.kyCell] !== kyudokuGrids[kyCells[0].corner][kyCells[0].kyCell]))
-                return null;
+                return false;
             else if (kyCells.length >= 1)
                 return parseInt(kyudokuGrids[kyCells[0].corner][kyCells[0].kyCell]);
-            else if (state.enteredDigits[cell] !== null)
-                return parseInt(state.enteredDigits[cell]);
             return null;
+        }
+
+        function getDisplayedSudokuDigit(st, cell)
+        {
+            let kyu = getKyudokuCircledDigit(st, cell);
+            if (kyu === null && st.enteredDigits[cell] !== null)
+                return st.enteredDigits[cell];
+            return kyu === false ? null : kyu;
         }
 
         function isSudokuValid()
@@ -145,21 +273,21 @@
             {
                 for (let colA = 0; colA < 9; colA++)
                     for (let colB = colA + 1; colB < 9; colB++)
-                        if (getDisplayedSudokuDigit(colA + 9 * i) !== null && getDisplayedSudokuDigit(colA + 9 * i) === getDisplayedSudokuDigit(colB + 9 * i))
+                        if (getDisplayedSudokuDigit(state, colA + 9 * i) !== null && getDisplayedSudokuDigit(state, colA + 9 * i) === getDisplayedSudokuDigit(state, colB + 9 * i))
                             return false;
                 for (let rowA = 0; rowA < 9; rowA++)
                     for (let rowB = rowA + 1; rowB < 9; rowB++)
-                        if (getDisplayedSudokuDigit(i + 9 * rowA) !== null && getDisplayedSudokuDigit(i + 9 * rowA) === getDisplayedSudokuDigit(i + 9 * rowB))
+                        if (getDisplayedSudokuDigit(state, i + 9 * rowA) !== null && getDisplayedSudokuDigit(state, i + 9 * rowA) === getDisplayedSudokuDigit(state, i + 9 * rowB))
                             return false;
                 for (let cellA = 0; cellA < 9; cellA++)
                     for (let cellB = cellA + 1; cellB < 9; cellB++)
-                        if (getDisplayedSudokuDigit(cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) !== null && getDisplayedSudokuDigit(cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) === getDisplayedSudokuDigit(cellB % 3 + 3 * (i % 3) + 9 * (((cellB / 3) | 0) + 3 * ((i / 3) | 0))))
+                        if (getDisplayedSudokuDigit(state, cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) !== null && getDisplayedSudokuDigit(state, cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) === getDisplayedSudokuDigit(state, cellB % 3 + 3 * (i % 3) + 9 * (((cellB / 3) | 0) + 3 * ((i / 3) | 0))))
                             return false;
             }
 
             // Check that all cells in the Sudoku grid have a digit
             for (let cell = 0; cell < 81; cell++)
-                if (getDisplayedSudokuDigit(cell) === null)
+                if (getDisplayedSudokuDigit(state, cell) === null)
                     return null;
 
             return true;
@@ -193,9 +321,9 @@
         {
             if (localStorage)
             {
-                localStorage.setItem(`ky${puzzleId}`, JSON.stringify(state));
-                //localStorage.setItem(`ky${puzzleId}-undo`, JSON.stringify(undoBuffer));
-                //localStorage.setItem(`ky${puzzleId}-redo`, JSON.stringify(redoBuffer));
+                localStorage.setItem(`ky${puzzleId}`, encodeState(state));
+                localStorage.setItem(`ky${puzzleId}-undo`, undoBuffer.map(encodeState).join(' '));
+                localStorage.setItem(`ky${puzzleId}-redo`, redoBuffer.map(encodeState).join(' '));
             }
             resetRestartButton();
             for (let corner = 0; corner < 4; corner++)
@@ -214,7 +342,8 @@
             let digitCounts = Array(9).fill(0);
             for (let cell = 0; cell < 81; cell++)
             {
-                let digit = getDisplayedSudokuDigit(cell);
+                let kyDigit = getKyudokuCircledDigit(state, cell);
+                let digit = getDisplayedSudokuDigit(state, cell);
                 digitCounts[digit - 1]++;
 
                 let sudokuCell = document.getElementById(`p-${puzzleId}-sudoku-cell-${cell}`);
@@ -228,19 +357,11 @@
 
                 sudokuCell.setAttribute('fill', cellColor(cell, selectedCells.includes(cell) || (highlightedDigit !== null && digit === highlightedDigit)));
                 sudokuText.setAttribute('fill', textColor(cell, selectedCells.includes(cell) || (highlightedDigit !== null && digit === highlightedDigit)));
-                let kyCells = [0, 1, 2, 3]
-                    .filter(c => cell % 9 >= 3 * (c % 2) && cell % 9 < 6 + 3 * (c % 2) && cell / 9 >= 3 * ((c / 2) | 0) && cell / 9 < 6 + 3 * ((c / 2) | 0))
-                    .map(c => ({ corner: c, kyCell: cell % 9 - 3 * (c % 2) + 6 * (((cell / 9) | 0) - 3 * ((c / 2) | 0)) }))
-                    .filter(inf => state.circledDigits[inf.corner][inf.kyCell] === true);
-                if (kyCells.length > 1 && kyCells.some(inf => kyudokuGrids[inf.corner][inf.kyCell] !== kyudokuGrids[kyCells[0].corner][kyCells[0].kyCell]))
-                {
+                if (kyDigit === false)
                     // Two equivalent Kyudoku cells with different numbers have been circled: mark the Sudoku cell red
                     sudokuCell.setAttribute('fill', invalidCellColor);
-                }
-                else if (kyCells.length >= 1)
-                    intendedText = kyudokuGrids[kyCells[0].corner][kyCells[0].kyCell];
-                else if (state.enteredDigits[cell] !== null)
-                    intendedText = state.enteredDigits[cell];
+                else if (digit !== null)
+                    intendedText = digit;
                 else
                 {
                     intendedCenterDigits = state.centerNotation[cell].join('');
@@ -329,7 +450,7 @@
 
         function saveUndo()
         {
-            undoBuffer.push(JSON.stringify(state));
+            undoBuffer.push(JSON.parse(JSON.stringify(state)));
             redoBuffer = [];
         }
 
@@ -392,9 +513,9 @@
         {
             if (undoBuffer.length > 0)
             {
-                redoBuffer.push(JSON.stringify(state));
+                redoBuffer.push(state);
                 var item = undoBuffer.pop();
-                state = JSON.parse(item);
+                state = item;
                 updateVisuals();
             }
         }
@@ -403,9 +524,9 @@
         {
             if (redoBuffer.length > 0)
             {
-                undoBuffer.push(JSON.stringify(state));
+                undoBuffer.push(state);
                 var item = redoBuffer.pop();
-                state = JSON.parse(item);
+                state = item;
                 updateVisuals();
             }
         }
@@ -460,7 +581,7 @@
                 {
                     case 'normal':
                         saveUndo();
-                        let allHaveDigit = selectedCells.every(c => getDisplayedSudokuDigit(c) === digit);
+                        let allHaveDigit = selectedCells.every(c => getDisplayedSudokuDigit(state, c) === digit);
                         if (allHaveDigit)
                             selectedCells.forEach(selectedCell => { state.enteredDigits[selectedCell] = null; });
                         else
@@ -636,12 +757,12 @@
                 case 'KeyF':
                     saveUndo();
                     for (let cell of selectedCells)
-                        if (getDisplayedSudokuDigit(cell) === null)
+                        if (getDisplayedSudokuDigit(state, cell) === null)
                         {
                             let poss = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                             for (let otherCell = 0; otherCell < 81; otherCell++)
                             {
-                                let dd = getDisplayedSudokuDigit(otherCell);
+                                let dd = getDisplayedSudokuDigit(state, otherCell);
                                 if (dd !== null && poss.includes(dd) && (cell % 9 === otherCell % 9 || ((cell / 9) | 0) === ((otherCell / 9) | 0) || ((((cell % 9) / 3) | 0) === (((otherCell % 9) / 3) | 0) && ((((cell / 9) | 0) / 3) | 0) === ((((otherCell / 9) | 0) / 3) | 0))))
                                     poss.splice(poss.indexOf(dd), 1);
                             }
@@ -678,7 +799,7 @@
                     {
                         selectedCells = [];
                         for (let cell = 0; cell < 81; cell++)
-                            if (getDisplayedSudokuDigit(cell) === highlightedDigit)
+                            if (getDisplayedSudokuDigit(state, cell) === highlightedDigit)
                                 selectedCells.push(cell);
                         highlightedDigit = null;
                     }
