@@ -206,12 +206,12 @@
                 if (req.responseText)
                 {
                     var json = JSON.parse(req.responseText);
-                    if (json && json.time)
-                        puzzleDiv.querySelector('text.inf-time').textContent = (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`);
-                    if (json && json.avg)
-                        puzzleDiv.querySelector('text.inf-avg').textContent = (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`);
-                    if (json && json.count)
-                        puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count} times`;
+                    if (json)
+                    {
+                        puzzleDiv.querySelector('text.inf-time').textContent = json.time ? (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`) : 'not recorded';
+                        puzzleDiv.querySelector('text.inf-avg').textContent = json.avg ? (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`) : 'unknown';
+                        puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count | 0} times`;
+                    }
                 }
             };
 
@@ -319,6 +319,7 @@
 
         function updateVisuals()
         {
+            // Update localStorage
             if (localStorage)
             {
                 localStorage.setItem(`ky${puzzleId}`, encodeState(state));
@@ -326,58 +327,8 @@
                 localStorage.setItem(`ky${puzzleId}-redo`, redoBuffer.map(encodeState).join(' '));
             }
             resetRestartButton();
-            for (let corner = 0; corner < 4; corner++)
-            {
-                for (let cell = 0; cell < 36; cell++)
-                {
-                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-circle-${cell}`).setAttribute('opacity', state.circledDigits[corner][cell] === true ? '1' : '0');
-                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-x-${cell}`).setAttribute('opacity', state.circledDigits[corner][cell] === false ? '1' : '0');
-                    let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
-                    let isHighlighted = (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (state.circledDigits[corner][cell] !== false);
-                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-cell-${cell}`).setAttribute('fill', cellColor(sudokuCell, isHighlighted));
-                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-text-${cell}`).setAttribute('fill', textColor(sudokuCell, isHighlighted));
-                }
-            }
 
-            let digitCounts = Array(9).fill(0);
-            for (let cell = 0; cell < 81; cell++)
-            {
-                let kyDigit = getKyudokuCircledDigit(state, cell);
-                let digit = getDisplayedSudokuDigit(state, cell);
-                digitCounts[digit - 1]++;
-
-                let sudokuCell = document.getElementById(`p-${puzzleId}-sudoku-cell-${cell}`);
-                let sudokuText = document.getElementById(`p-${puzzleId}-sudoku-text-${cell}`);
-                let sudokuCenterText = document.getElementById(`p-${puzzleId}-sudoku-center-text-${cell}`);
-                let sudokuCornerTexts = Array(8).fill(null).map((_, ix) => document.getElementById(`p-${puzzleId}-sudoku-corner-text-${cell}-${ix}`));
-
-                let intendedText = null;
-                let intendedCenterDigits = null;
-                let intendedCornerDigits = null;
-
-                sudokuCell.setAttribute('fill', cellColor(cell, selectedCells.includes(cell) || (highlightedDigit !== null && digit === highlightedDigit)));
-                sudokuText.setAttribute('fill', textColor(cell, selectedCells.includes(cell) || (highlightedDigit !== null && digit === highlightedDigit)));
-                if (kyDigit === false)
-                    // Two equivalent Kyudoku cells with different numbers have been circled: mark the Sudoku cell red
-                    sudokuCell.setAttribute('fill', invalidCellColor);
-                else if (digit !== null)
-                    intendedText = digit;
-                else
-                {
-                    intendedCenterDigits = state.centerNotation[cell].join('');
-                    intendedCornerDigits = state.cornerNotation[cell];
-                }
-
-                sudokuText.textContent = intendedText !== null ? intendedText : '';
-                sudokuCenterText.textContent = intendedCenterDigits !== null ? intendedCenterDigits : '';
-                sudokuCenterText.setAttribute('fill', notationColor(cell, selectedCells.includes(cell)));
-                for (var i = 0; i < 8; i++)
-                {
-                    sudokuCornerTexts[i].textContent = intendedCornerDigits !== null && i < intendedCornerDigits.length ? intendedCornerDigits[i] : '';
-                    sudokuCornerTexts[i].setAttribute('fill', notationColor(cell, selectedCells.includes(cell)));
-                }
-            }
-
+            // Check if there are any conflicts (red glow) and/or the puzzle is solved
             let isSolved = true;
             switch (isSudokuValid())
             {
@@ -426,6 +377,62 @@
             else
                 puzzleDiv.classList.remove('solved');
 
+            // Kyudoku grids (digits, highlights, X’s/O’s — not red glow, that’s done further up)
+            for (let corner = 0; corner < 4; corner++)
+            {
+                for (let cell = 0; cell < 36; cell++)
+                {
+                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-circle-${cell}`).setAttribute('opacity', state.circledDigits[corner][cell] === true ? '1' : '0');
+                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-x-${cell}`).setAttribute('opacity', (state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && isSolved)) ? '1' : '0');
+                    let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
+                    let isHighlighted = (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (state.circledDigits[corner][cell] !== false) && !isSolved;
+                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-cell-${cell}`).setAttribute('fill', cellColor(sudokuCell, isHighlighted));
+                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-text-${cell}`).setAttribute('fill', textColor(sudokuCell, isHighlighted));
+                }
+            }
+
+            // Sudoku grid (digits, highlights — not red glow, that’s done further up)
+            let digitCounts = Array(9).fill(0);
+            for (let cell = 0; cell < 81; cell++)
+            {
+                let kyDigit = getKyudokuCircledDigit(state, cell);
+                let digit = getDisplayedSudokuDigit(state, cell);
+                digitCounts[digit - 1]++;
+
+                let sudokuCell = document.getElementById(`p-${puzzleId}-sudoku-cell-${cell}`);
+                let sudokuText = document.getElementById(`p-${puzzleId}-sudoku-text-${cell}`);
+                let sudokuCenterText = document.getElementById(`p-${puzzleId}-sudoku-center-text-${cell}`);
+                let sudokuCornerTexts = Array(8).fill(null).map((_, ix) => document.getElementById(`p-${puzzleId}-sudoku-corner-text-${cell}-${ix}`));
+
+                let intendedText = null;
+                let intendedCenterDigits = null;
+                let intendedCornerDigits = null;
+
+                let isHighlighted = (selectedCells.includes(cell) || (highlightedDigit !== null && digit === highlightedDigit)) && !isSolved;
+                sudokuCell.setAttribute('fill', cellColor(cell, isHighlighted));
+                sudokuText.setAttribute('fill', textColor(cell, isHighlighted));
+                if (kyDigit === false)
+                    // Two equivalent Kyudoku cells with different numbers have been circled: mark the Sudoku cell red
+                    sudokuCell.setAttribute('fill', invalidCellColor);
+                else if (digit !== null)
+                    intendedText = digit;
+                else
+                {
+                    intendedCenterDigits = state.centerNotation[cell].join('');
+                    intendedCornerDigits = state.cornerNotation[cell];
+                }
+
+                sudokuText.textContent = intendedText !== null ? intendedText : '';
+                sudokuCenterText.textContent = intendedCenterDigits !== null ? intendedCenterDigits : '';
+                sudokuCenterText.setAttribute('fill', notationColor(cell, isHighlighted));
+                for (var i = 0; i < 8; i++)
+                {
+                    sudokuCornerTexts[i].textContent = intendedCornerDigits !== null && i < intendedCornerDigits.length ? intendedCornerDigits[i] : '';
+                    sudokuCornerTexts[i].setAttribute('fill', notationColor(cell, isHighlighted));
+                }
+            }
+
+            // Button highlights
             "normal,center,corner".split(',').forEach(btn =>
             {
                 if (mode === btn)

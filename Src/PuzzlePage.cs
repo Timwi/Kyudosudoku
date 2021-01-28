@@ -16,7 +16,7 @@ namespace KyudosudokuWebsite
         private HttpResponse PuzzlePage(HttpRequest req, DbSession session, Db db)
         {
             Match m;
-            if ((m = Regex.Match(req.Url.Path, @"^/db-update/(\d+)$")).Success && req.Method == HttpMethod.Post && session.User != null)
+            if ((m = Regex.Match(req.Url.Path, @"^/db-update/(\d+)$")).Success && req.Method == HttpMethod.Post)
                 return dbUpdate(req, session, db, int.Parse(m.Groups[1].Value));
 
             var puzzleIdStr = req.Url.Path.Length == 0 ? "" : req.Url.Path.Substring(1);
@@ -162,29 +162,33 @@ namespace KyudosudokuWebsite
             if (puzzle == null)
                 return HttpResponse.Empty(HttpStatusCode._500_InternalServerError);
 
-            var already = db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
-            if (already == null)
+            UserPuzzle already = null;
+            if (session.User != null)
             {
-                already = new UserPuzzle { PuzzleID = puzzleId, UserID = session.User.UserID, Progess = req.Post["progress"].Value, Solved = puzzle.IsSolved(req.Post["progress"].Value), Time = 10, SolveTime = DateTime.UtcNow };
-                db.UserPuzzles.Add(already);
-                db.SaveChanges();
-                return HttpResponse.Empty(HttpStatusCode._200_OK);
-            }
+                already = db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
+                if (already == null)
+                {
+                    already = new UserPuzzle { PuzzleID = puzzleId, UserID = session.User.UserID, Progess = req.Post["progress"].Value, Solved = puzzle.IsSolved(req.Post["progress"].Value), Time = 10, SolveTime = DateTime.UtcNow };
+                    db.UserPuzzles.Add(already);
+                    db.SaveChanges();
+                    return HttpResponse.Empty(HttpStatusCode._200_OK);
+                }
 
-            if (!already.Solved)
-            {
-                already.Solved = puzzle.IsSolved(req.Post["progress"].Value);
-                already.SolveTime = DateTime.UtcNow;
-                already.Progess = req.Post["progress"].Value;
-                already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
-                db.SaveChanges();
+                if (!already.Solved)
+                {
+                    already.Solved = puzzle.IsSolved(req.Post["progress"].Value);
+                    already.SolveTime = DateTime.UtcNow;
+                    already.Progess = req.Post["progress"].Value;
+                    already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
+                    db.SaveChanges();
+                }
             }
 
             if (req.Post["getdata"].Value == "1")
             {
-                var average = (int) db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => up.Time);
+                var average = (int?) db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => (double?) up.Time);
                 var count = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Count();
-                return HttpResponse.Json(new JsonDict { { "time", already.Time }, { "avg", average }, { "count", count } });
+                return HttpResponse.Json(new JsonDict { { "time", already?.Time }, { "avg", average }, { "count", count } });
             }
 
             return HttpResponse.Empty(HttpStatusCode._200_OK);
