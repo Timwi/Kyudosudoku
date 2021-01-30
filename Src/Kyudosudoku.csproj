@@ -99,12 +99,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
+    <Compile Include="Constraints\KyuRegionConstraint.cs" />
+    <Compile Include="Constraints\RenbanCage.cs" />
+    <Compile Include="Constraints\NoConsecutive.cs" />
+    <Compile Include="Constraints\AntiKing.cs" />
+    <Compile Include="Constraints\AntiKnight.cs" />
+    <Compile Include="Constraints\KyuRowColConstraint.cs" />
+    <Compile Include="Constraints\KyuCellConstraint.cs" />
+    <Compile Include="Constraints\AntiBishop.cs" />
+    <Compile Include="Constraints\KillerCage.cs" />
+    <Compile Include="Constraints\Sandwich.cs" />
+    <Compile Include="Constraints\OddEven.cs" />
+    <Compile Include="Constraints\Arrow.cs" />
+    <Compile Include="Constraints\Palindrome.cs" />
+    <Compile Include="Constraints\Thermometer.cs" />
     <Compile Include="Database\Configuration.cs" />
     <Compile Include="Database\Db.cs" />
     <Compile Include="Database\Session.cs" />
     <Compile Include="Database\UserPuzzle.cs" />
     <Compile Include="Database\Puzzle.cs" />
     <Compile Include="DbSession.cs" />
+    <Compile Include="Constraints\KyuConstraint.cs" />
     <Compile Include="Kyudosudoku.cs" />
     <Compile Include="KyudosudokuPropellerModule.cs" />
     <Compile Include="KyudosudokuSettings.cs" />

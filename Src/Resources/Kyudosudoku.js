@@ -1,16 +1,5 @@
 ﻿window.addEventListener('DOMContentLoaded', function()
 {
-    function handler(fnc)
-    {
-        return function(ev)
-        {
-            fnc(ev);
-            ev.stopPropagation();
-            ev.preventDefault();
-            return false;
-        };
-    }
-
     let colors = [
         ["white", "#aaa"],
         ["hsl(0, 100%, 94%)", "hsl(0, 70%, 50%)"],
@@ -23,6 +12,114 @@
         ["white", "#aaa"]
     ];
     let invalidCellColor = '#f00';
+
+    function validateConstraint(grid, constr)
+    {
+        switch (constr[':type'])
+        {
+            case 'AntiBishop': {
+                if (grid[constr.Cell] === null)
+                    return null;
+                let diagonals = Array(81).fill(null).map((_, c) => c).filter(c => c != constr.Cell && Math.abs(c % 9 - constr.Cell % 9) === Math.abs(((c / 9) | 0) - ((constr.Cell / 9) | 0)));
+                return diagonals.some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
+                    diagonals.some(c => grid[c] === null) ? null : true;
+            }
+
+            case 'AntiKnight': {
+                let x = constr.Cell % 9;
+                let y = (constr.Cell / 9) | 0;
+                let toroidal = false;
+                let knightsMoves = [];
+                for (let dx of [-2, -1, 1, 2])
+                    if (toroidal || (x + dx >= 0 && x + dx < 9))
+                        for (let dy of (dx === 1 || dx === -1) ? [-2, 2] : [-1, 1])
+                            if (toroidal || (y + dy >= 0 && y + dy < 9))
+                                knightsMoves.push((x + dx + 9) % 9 + 9 * ((y + dy + 9) % 9));
+                return knightsMoves.some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
+                    knightsMoves.some(c => grid[c] === null) ? null : true;
+            }
+
+            case 'AntiKing': {
+                let x = constr.Cell % 9;
+                let y = (constr.Cell / 9) | 0;
+                let kingsMoves = [];
+                for (let dx of [-1, 0, 1])
+                    if (x + dx >= 0 && x + dx < 9)
+                        for (let dy of [-1, 0, 1])
+                            if ((dx !== 0 || dy !== 0) && y + dy >= 0 && y + dy < 9)
+                                kingsMoves.push(x + dx + 9 * (y + dy));
+                return kingsMoves.some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
+                    kingsMoves.some(c => grid[c] === null) ? null : true;
+            }
+
+            case 'NoConsecutive': {
+                let x = constr.Cell % 9;
+                let y = (constr.Cell / 9) | 0;
+                let adjCells = [];
+                for (let dx of [-1, 0, 1])
+                    if (x + dx >= 0 && x + dx < 9)
+                        for (let dy of [-1, 0, 1])
+                            if ((dx !== 0 || dy !== 0) && (dx === 0 || dy === 0) && y + dy >= 0 && y + dy < 9)
+                                adjCells.push(x + dx + 9 * (y + dy));
+                return adjCells.some(c => grid[c] !== null && Math.abs(grid[c] - grid[constr.Cell]) === 1) ? false :
+                    adjCells.some(c => grid[c] === null) ? null : true;
+            }
+
+            case 'OddEven':
+                return grid[constr.Cell] === null ? null : grid[constr.Cell] % 2 === (constr.Odd ? 1 : 0);
+
+            case 'Sandwich': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * x) : (x + 9 * constr.RowCol)]);
+                let p1 = numbers.indexOf(constr.Digit1);
+                let p2 = numbers.indexOf(constr.Digit2);
+                if (p1 === -1 || p2 === -1)
+                    return numbers.some(n => n === null) ? null : false;
+                let sandwich = numbers.slice(Math.min(p1, p2) + 1, Math.max(p1, p2));
+                return sandwich.some(n => n === null) ? null : sandwich.reduce((p, n) => p + n, 0) === constr.Sum;
+            }
+
+            case 'Thermometer': {
+                for (let i = 0; i < constr.Cells.length; i++)
+                    for (let j = i + 1; j < constr.Cells.length; j++)
+                        if (grid[constr.Cells[i]] !== null && grid[constr.Cells[j]] !== null && grid[constr.Cells[i]] >= grid[constr.Cells[j]])
+                            return false;
+                return constr.Cells.some(c => grid[c] === null) ? null : true;
+            }
+
+            case 'Arrow':
+                return constr.Cells.some(c => grid[c] === null) ? null : grid[constr.Cells[0]] === constr.Cells.slice(1).reduce((sum, cell) => sum + grid[cell], 0);
+
+            case 'Palindrome':
+                for (let i = 0; i < (constr.Cells.length / 2) | 0; i++)
+                    if (grid[constr.Cells[i]] !== null && grid[constr.Cells[constr.Cells.length - 1 - i]] !== null && grid[constr.Cells[i]] !== grid[constr.Cells[constr.Cells.length - 1 - i]])
+                        return false;
+                return constr.Cells.some(c => grid[c] === null) ? null : true;
+
+            case 'KillerCage': {
+                for (let i = 0; i < constr.Cells.length; i++)
+                    for (let j = i + 1; j < constr.Cells.length; j++)
+                        if (grid[constr.Cells[i]] !== null && grid[constr.Cells[j]] !== null && grid[constr.Cells[i]] === grid[constr.Cells[j]])
+                            return false;
+                return constr.Cells.some(c => grid[c] === null) ? null : (constr.Sum === null || constr.Cells.reduce((p, n) => p + grid[n], 0) === constr.Sum);
+            }
+
+            case 'RenbanCage': {
+                let numbers = constr.Cells.map(c => grid[c]);
+                return numbers.some(n => n === null) ? null : numbers.filter(n => !numbers.includes(n + 1)).length === 1;
+            }
+        }
+    }
+
+    function handler(fnc)
+    {
+        return function(ev)
+        {
+            fnc(ev);
+            ev.stopPropagation();
+            ev.preventDefault();
+            return false;
+        };
+    }
 
     let first = true;
     let draggingMode = null;
@@ -46,6 +143,7 @@
         }
 
         let kyudokuGrids = [0, 1, 2, 3].map(corner => Array(36).fill(null).map((_, cell) => parseInt(document.getElementById(`p-${puzzleId}-kyudo-${corner}-text-${cell}`).textContent)));
+        let constraints = JSON.parse(puzzleDiv.dataset.constraints) || [];
 
         let state = {
             circledDigits: Array(4).fill(null).map(_ => Array(36).fill(null)),
@@ -201,6 +299,7 @@
             req.open('POST', `db-update/${puzzleId}`, true);
             req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             req.send(`progress=${encodeURIComponent(JSON.stringify(state))}${isSolved ? `&time=${((new Date() - timeLastDbUpdate) / 1000) | 0}&getdata=1` : ''}`);
+            let reqStart = new Date();
             req.onload = function()
             {
                 if (req.responseText)
@@ -212,10 +311,10 @@
                         puzzleDiv.querySelector('text.inf-avg').textContent = json.avg ? (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`) : 'unknown';
                         puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count | 0} times`;
                     }
+                    timeLastDbUpdate = reqStart;
                 }
             };
 
-            timeLastDbUpdate = new Date();
             if (isSolved)
                 clearInterval(dbUpdater);
         }
@@ -268,29 +367,33 @@
 
         function isSudokuValid()
         {
+            let grid = Array(81).fill(null).map((_, c) => getDisplayedSudokuDigit(state, c)).map(x => x === false ? null : x);
+
             // Check the Sudoku rules (rows, columns and regions)
             for (let i = 0; i < 9; i++)
             {
                 for (let colA = 0; colA < 9; colA++)
                     for (let colB = colA + 1; colB < 9; colB++)
-                        if (getDisplayedSudokuDigit(state, colA + 9 * i) !== null && getDisplayedSudokuDigit(state, colA + 9 * i) === getDisplayedSudokuDigit(state, colB + 9 * i))
+                        if (grid[colA + 9 * i] !== null && grid[colA + 9 * i] === getDisplayedSudokuDigit(state, colB + 9 * i))
                             return false;
                 for (let rowA = 0; rowA < 9; rowA++)
                     for (let rowB = rowA + 1; rowB < 9; rowB++)
-                        if (getDisplayedSudokuDigit(state, i + 9 * rowA) !== null && getDisplayedSudokuDigit(state, i + 9 * rowA) === getDisplayedSudokuDigit(state, i + 9 * rowB))
+                        if (grid[i + 9 * rowA] !== null && grid[i + 9 * rowA] === getDisplayedSudokuDigit(state, i + 9 * rowB))
                             return false;
                 for (let cellA = 0; cellA < 9; cellA++)
                     for (let cellB = cellA + 1; cellB < 9; cellB++)
-                        if (getDisplayedSudokuDigit(state, cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) !== null && getDisplayedSudokuDigit(state, cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))) === getDisplayedSudokuDigit(state, cellB % 3 + 3 * (i % 3) + 9 * (((cellB / 3) | 0) + 3 * ((i / 3) | 0))))
+                        if (grid[cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))] !== null &&
+                            grid[cellA % 3 + 3 * (i % 3) + 9 * (((cellA / 3) | 0) + 3 * ((i / 3) | 0))] === grid[cellB % 3 + 3 * (i % 3) + 9 * (((cellB / 3) | 0) + 3 * ((i / 3) | 0))])
                             return false;
             }
 
-            // Check that all cells in the Sudoku grid have a digit
-            for (let cell = 0; cell < 81; cell++)
-                if (getDisplayedSudokuDigit(state, cell) === null)
-                    return null;
+            // Check if any constraints are violated
+            for (let constr of constraints)
+                if (validateConstraint(grid, constr) === false)
+                    return false;
 
-            return true;
+            // Check that all cells in the Sudoku grid have a digit
+            return grid.some(c => c === null) ? null : true;
         }
 
         function isKyudokuValid(corner)
@@ -317,10 +420,10 @@
             return true;
         }
 
-        function updateVisuals()
+        function updateVisuals(udpateStorage)
         {
-            // Update localStorage
-            if (localStorage)
+            // Update localStorage (only do this when necessary because encodeState() is relatively slow on Firefox)
+            if (localStorage && udpateStorage)
             {
                 localStorage.setItem(`ky${puzzleId}`, encodeState(state));
                 localStorage.setItem(`ky${puzzleId}-undo`, undoBuffer.map(encodeState).join(' '));
@@ -453,7 +556,7 @@
                     btn.classList.add('success');
             });
         }
-        updateVisuals();
+        updateVisuals(true);
 
         function saveUndo()
         {
@@ -481,7 +584,7 @@
                     state.circledDigits[corner][cell] = (ev.shiftKey ? null : true);
                 else
                     state.circledDigits[corner][cell] = (ev.shiftKey ? false : null);
-                updateVisuals();
+                updateVisuals(true);
             });
         });
 
@@ -523,7 +626,7 @@
                 redoBuffer.push(state);
                 var item = undoBuffer.pop();
                 state = item;
-                updateVisuals();
+                updateVisuals(true);
             }
         }
 
@@ -534,7 +637,7 @@
                 undoBuffer.push(state);
                 var item = redoBuffer.pop();
                 state = item;
-                updateVisuals();
+                updateVisuals(true);
             }
         }
 
@@ -552,6 +655,7 @@
                     state.centerNotation[cell].sort();
                 }
             });
+            updateVisuals(true);
         }
 
         function enterCornerNotation(digit)
@@ -568,6 +672,7 @@
                     state.cornerNotation[cell].sort();
                 }
             });
+            updateVisuals(true);
         }
 
         function pressDigit(digit)
@@ -580,6 +685,7 @@
                     highlightedDigit = null;
                 else
                     highlightedDigit = digit;
+                updateVisuals();
             }
             else
             {
@@ -593,6 +699,7 @@
                             selectedCells.forEach(selectedCell => { state.enteredDigits[selectedCell] = null; });
                         else
                             selectedCells.forEach(selectedCell => { state.enteredDigits[selectedCell] = digit; });
+                        updateVisuals(true);
                         break;
                     case 'center':
                         enterCenterNotation(digit);
@@ -604,14 +711,7 @@
             }
         }
 
-        Array(9).fill(null).forEach((_, btn) =>
-        {
-            puzzleDiv.querySelector(`#p-${puzzleId}-num-${btn + 1}`).onclick = handler(function()
-            {
-                pressDigit(btn + 1);
-                updateVisuals();
-            });
-        });
+        Array(9).fill(null).forEach((_, btn) => { puzzleDiv.querySelector(`#p-${puzzleId}-num-${btn + 1}`).onclick = handler(function() { pressDigit(btn + 1); }); });
 
         "normal,corner,center".split(',').forEach(btn =>
         {
@@ -641,7 +741,7 @@
                     centerNotation: Array(81).fill(null).map(_ => []),
                     enteredDigits: Array(81).fill(null)
                 };
-                updateVisuals();
+                updateVisuals(true);
             }
         });
 
@@ -684,7 +784,7 @@
         }
 
         let keepMove = false;
-        puzzleDiv.addEventListener("keydown", ev => 
+        puzzleDiv.addEventListener("keydown", ev =>
         {
             let str = ev.code;
             if (ev.shiftKey)
@@ -695,6 +795,7 @@
                 str = `Ctrl+${str}`;
 
             let anyFunction = true;
+            let anyChanges = false;
 
             function ArrowMovement(dx, dy, mode)
             {
@@ -759,6 +860,7 @@
                         state.centerNotation[selectedCell] = [];
                         state.cornerNotation[selectedCell] = [];
                     });
+                    updateVisuals(true);
                     break;
 
                 case 'KeyF':
@@ -775,18 +877,13 @@
                             }
                             state.centerNotation[cell] = poss;
                         }
+                    updateVisuals(true);
                     break;
 
                 // Navigation
-                case 'KeyZ':
-                    mode = 'normal';
-                    break;
-                case 'KeyX':
-                    mode = 'corner';
-                    break;
-                case 'KeyC':
-                    mode = 'center';
-                    break;
+                case 'KeyZ': mode = 'normal'; updateVisuals(); break;
+                case 'KeyX': mode = 'corner'; updateVisuals(); break;
+                case 'KeyC': mode = 'center'; updateVisuals(); break;
 
                 case 'ArrowUp': ArrowMovement(0, -1, 'clear'); break;
                 case 'ArrowDown': ArrowMovement(0, 1, 'clear'); break;
@@ -814,8 +911,9 @@
                         selectedCells.splice(selectedCells.length - 1, 1);
                     else
                         keepMove = !keepMove;
+                    updateVisuals();
                     break;
-                case 'Escape': selectedCells = []; highlightedDigit = null; break;
+                case 'Escape': selectedCells = []; highlightedDigit = null; updateVisuals(); break;
 
                 // Undo/redo
                 case 'Backspace':
@@ -836,7 +934,6 @@
 
             if (anyFunction)
             {
-                updateVisuals();
                 ev.stopPropagation();
                 ev.preventDefault();
                 return false;

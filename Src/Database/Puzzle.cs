@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using RT.Json;
+using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
 
@@ -13,11 +14,14 @@ namespace KyudosudokuWebsite.Database
         public int PuzzleID { get; set; }
         public string KyudokuGrids { get; set; }
         public bool Invalid { get; set; }
+        public string Constraints { get; set; }             // ClassifyJson of KyuConstraint[]
+        public string ConstraintNames { get; set; }     // for searching/filtering
 
         public bool IsSolved(string json)
         {
             var state = JsonValue.Parse(json);
             var kyudokuGrids = KyudokuGrids.Split(36).Select(grid => grid.Select(ch => ch - '0').ToArray()).ToArray();
+            var constraints = Constraints == null ? new KyuConstraint[0] : ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(Constraints));
 
             // Check that all cells in the Sudoku grid have a digit
             var sudokuDigits = new int[81];
@@ -54,6 +58,11 @@ namespace KyudosudokuWebsite.Database
                         if (sudokuDigits[cellA % 3 + 3 * (i % 3) + 9 * ((cellA / 3) + 3 * (i / 3))] == sudokuDigits[cellB % 3 + 3 * (i % 3) + 9 * ((cellB / 3) + 3 * (i / 3))])
                             return false;
             }
+
+            // Check the Sudoku constraints
+            foreach (var constr in constraints)
+                if (!constr.Verify(sudokuDigits))
+                    return false;
 
             // Check all of the Kyudokus
             for (var corner = 0; corner < 4; corner++)

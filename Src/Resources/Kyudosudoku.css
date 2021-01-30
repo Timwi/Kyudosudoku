@@ -118,6 +118,8 @@ th, td {
 
     .puzzle svg .button > rect {
         fill: white;
+        stroke: black;
+        stroke-width: 0.025;
     }
 
     .puzzle svg .button > text {
