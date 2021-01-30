@@ -61,7 +61,7 @@ namespace KyudosudokuWebsite
                 }
                 dbPuzzle.KyudokuGrids = puzzle.Grids.Select(grid => grid.Select(i => (char) (i + '0')).JoinString()).JoinString();
                 dbPuzzle.Constraints = ClassifyJson.Serialize(puzzle.Constraints).ToString();
-                dbPuzzle.ConstraintNames = puzzle.Constraints.Select(c => $"<{c.Name}>").Distinct().Order().JoinString();
+                dbPuzzle.ConstraintNames = puzzle.Constraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString();
                 db.SaveChanges();
             }
             else
@@ -99,10 +99,11 @@ namespace KyudosudokuWebsite
                             <text id='p-{puzzleId}-sudoku-corner-text-{cell}-6' x='{cell % 9 + Kyudosudoku.SudokuX + .5}' y='{cell / 9 + Kyudosudoku.SudokuY + .9}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
                             <text id='p-{puzzleId}-sudoku-corner-text-{cell}-7' x='{cell % 9 + Kyudosudoku.SudokuX + .1}' y='{cell / 9 + Kyudosudoku.SudokuY + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
                         ").JoinString()}
-                        {puzzle.Constraints.Select(c => c.Svg).JoinString()}
+                        {puzzle.Constraints.Where(c => !c.SvgAboveLines).Select(c => c.Svg).JoinString()}
                         {Enumerable.Range(0, 8).Select(i => $@"<line x1='{Kyudosudoku.SudokuX + i + 1}' y1='{Kyudosudoku.SudokuY}' x2='{Kyudosudoku.SudokuX + i + 1}' y2='{Kyudosudoku.SudokuY + 9}' stroke='black' stroke-width='{(i % 3 == 2 ? ".03" : ".01")}' />").JoinString()}
                         {Enumerable.Range(0, 8).Select(i => $@"<line x1='{Kyudosudoku.SudokuX}' y1='{Kyudosudoku.SudokuY + i + 1}' x2='{Kyudosudoku.SudokuX + 9}' y2='{Kyudosudoku.SudokuY + i + 1}' stroke='black' stroke-width='{(i % 3 == 2 ? ".03" : ".01")}' />").JoinString()}
                         <rect x='{Kyudosudoku.SudokuX}' y='{Kyudosudoku.SudokuY}' width='9' height='9' stroke='black' stroke-width='.05' fill='none' />
+                        {puzzle.Constraints.Where(c => c.SvgAboveLines).Select(c => c.Svg).JoinString()}
                                 
                         {Enumerable.Range(0, 9).Select(btn => $@"
                             <g class='button' id='p-{puzzleId}-num-{btn + 1}' transform='translate({Kyudosudoku.ControlsX + (.8 + 9 * .2 / 8) * btn}, {Kyudosudoku.ControlsY})'>

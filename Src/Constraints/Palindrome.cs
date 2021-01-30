@@ -32,7 +32,7 @@ namespace KyudosudokuWebsite
             return true;
         }
 
-        protected override bool ClashesWith(KyuConstraint other) => other switch
+        public override bool ClashesWith(KyuConstraint other) => other switch
         {
             KyuCellConstraint cc => Cells.Contains(cc.Cell),
             Thermometer th => Cells.Intersect(th.Cells).Any(),

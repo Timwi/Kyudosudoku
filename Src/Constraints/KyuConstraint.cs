@@ -11,6 +11,7 @@ namespace KyudosudokuWebsite
         public abstract string Description { get; }
         protected abstract Constraint getConstraint();
         public abstract string Svg { get; }
+        public virtual bool SvgAboveLines => false;
         public abstract bool Verify(int[] grid);
 
         public virtual double ExtraTop => 0;
@@ -21,7 +22,7 @@ namespace KyudosudokuWebsite
         public Constraint GetConstraint() => _cachedConstraint ??= getConstraint();
 
         /// <summary>Determines whether a constraint visually clashes with another (overlaps in an undesirable way).</summary>
-        protected abstract bool ClashesWith(KyuConstraint other);
+        public abstract bool ClashesWith(KyuConstraint other);
 
         protected KyuConstraint() { }    // for Classify
 

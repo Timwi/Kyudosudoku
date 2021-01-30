@@ -31,7 +31,7 @@ namespace KyudosudokuWebsite
             return Sum == null || Cells.Sum(c => grid[c]) == Sum.Value;
         }
 
-        protected override bool ClashesWith(KyuConstraint other) => other is KyuRegionConstraint kc && kc.Cells.Intersect(Cells).Any();
+        public override bool ClashesWith(KyuConstraint other) => other is KyuRegionConstraint kc && kc.Cells.Intersect(Cells).Any();
 
         public override string Svg => $"<path d='{GenerateSvgPath(.06, .06, Sum.NullOr(s => .275), Sum.NullOr(s => .25))}' fill='none' stroke='black' stroke-width='.025' stroke-dasharray='.09,.07' />"
             + Sum.NullOr(s => $"<text x='{svgX(Cells.Min()) - .46}' y='{svgY(Cells.Min()) - .25}' text-anchor='start' font-size='.25'>{s}</text>");

@@ -38,7 +38,7 @@ namespace KyudosudokuWebsite
 
         public override bool Verify(int[] grid) => Cells.Skip(1).Sum(c => grid[c]) == grid[Cells[0]];
 
-        protected override bool ClashesWith(KyuConstraint other) => other switch
+        public override bool ClashesWith(KyuConstraint other) => other switch
         {
             KyuCellConstraint cc => Cells[0] == cc.Cell,
             Thermometer th => Cells[0] == th.Cells[0],

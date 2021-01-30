@@ -16,10 +16,10 @@ namespace KyudosudokuWebsite
                 new[] { 8, 3, 8, 8, 1, 9, 6, 2, 9, 4, 3, 7, 1, 3, 5, 2, 9, 3, 5, 4, 3, 5, 2, 5, 9, 5, 8, 7, 1, 9, 2, 8, 7, 2, 7, 2 });
 
             static object kyudokuGrid(int[] grid, bool glowRed = false, int[] highlight = null, int[] circled = null, int[] xed = null, int corner = 0) =>
-                new RawTag($@"<svg style='width: 7cm' viewBox='{-.5 + 6.75 * (corner % 2)} {-.5 + 6.75 * (corner / 2)} 7 7' stroke='black' text-anchor='middle' font-family='Bitter' font-size='.65'>{kyudokuGridSvg(corner, 1, grid, true, highlight, circled, xed, glowRed)}</svg>");
+                new RawTag($@"<svg style='width: 7cm' viewBox='{-.5 + 6.75 * (corner % 2)} {-.5 + 6.75 * (corner / 2)} 7 7' text-anchor='middle' font-family='Bitter' font-size='.65'>{kyudokuGridSvg(corner, 1, grid, true, highlight, circled, xed, glowRed)}</svg>");
 
             object kyudokuGrids(int[][] highlight = null, int[][] circled = null, int[][] xed = null) =>
-                new RawTag($@"<svg style='width: 13.75cm' viewBox='-.5 -.5 13.75 13.75' stroke='black' text-anchor='middle' font-family='Bitter' font-size='.65'>
+                new RawTag($@"<svg style='width: 13.75cm' viewBox='-.5 -.5 13.75 13.75' text-anchor='middle' font-family='Bitter' font-size='.65'>
                     {kyudokuGridSvg(0, 1, kyudoExample[0], true, highlight?[0], circled?[0], xed?[0])}
                     {kyudokuGridSvg(1, 1, kyudoExample[1], true, highlight?[1], circled?[1], xed?[1])}
                     {kyudokuGridSvg(2, 1, kyudoExample[2], true, highlight?[2], circled?[2], xed?[2])}

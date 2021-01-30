@@ -24,7 +24,7 @@ namespace KyudosudokuWebsite
             return numbers.Count(c => !numbers.Contains(c + 1)) == 1;
         }
 
-        protected override bool ClashesWith(KyuConstraint other) => other is KyuRegionConstraint kc && kc.Cells.Intersect(Cells).Any();
+        public override bool ClashesWith(KyuConstraint other) => other is KyuRegionConstraint kc && kc.Cells.Intersect(Cells).Any();
 
         private enum Direction { Up, Right, Down, Left }
         public override string Svg

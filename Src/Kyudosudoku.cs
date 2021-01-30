@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using PuzzleSolvers;
-using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
 
@@ -111,12 +108,26 @@ namespace KyudosudokuWebsite
                     continue;
 
                 // Remove constraints that would be redundant. If the Sudoku was already unique to begin with, this will remove all of the constraints.
+                var attempts = 3;
+                tryRRagain:
                 var kyConstraints = Ut.ReduceRequiredSet(
                     Enumerable.Range(0, allKyConstraints.Length),
                     state => new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(state.SetToTest.Select(ix => allKyConstraints[ix].GetConstraint()), avoidColors: true).Solve().Take(2).Count() == 1,
                     skipConsistencyTest: true)
                     .Select(ix => allKyConstraints[ix])
                     .ToArray();
+
+                // Don’t allow combinations of constraints that would visually clash on the screen
+                for (var i = 0; i < kyConstraints.Length; i++)
+                    for (var j = i + 1; j < kyConstraints.Length; j++)
+                        if (kyConstraints[i].ClashesWith(kyConstraints[j]) || kyConstraints[j].ClashesWith(kyConstraints[i]))
+                        {
+                            attempts--;
+                            if (attempts == 0)
+                                goto busted2;
+                            allKyConstraints.Shuffle(rnd);
+                            goto tryRRagain;
+                        }
 
                 // Try up to 10 random fillings of the Kyudoku grids. If none of these results in a valid puzzle, we start again from scratch.
                 var kyudokus = new[] { topLeft, topRight, bottomLeft, bottomRight };
@@ -135,7 +146,7 @@ namespace KyudosudokuWebsite
                         kyudoku.AddConstraint(new Kyudoku6x6Constraint(grids[corner]));
                         allSolutions[corner] = kyudoku.Solve().Select(solution => solution.SelectIndexWhere(v => v == 0).ToArray()).ToArray();
                         if (!allSolutions[corner].Any(solution => solution.SequenceEqual(ixs)))
-                            goto busted;
+                            goto busted1;
                     }
 
                     // Now test every combination of Kyudoku solutions to make sure that all of them result in an unsolvable Sudoku, except for one, which needs to be unique
@@ -175,14 +186,15 @@ namespace KyudosudokuWebsite
                             numAmbiguous++;
 
                         if (numAmbiguous > 0 || numValids > 1)
-                            goto busted;
+                            goto busted1;
                         alright:;
                     }
 
                     return new Kyudosudoku(grids, kyConstraints);
 
-                    busted:;
+                    busted1:;
                 }
+                busted2:;
             }
             goto tryAgain;
         }
@@ -191,23 +203,28 @@ namespace KyudosudokuWebsite
         {
             var constraintGenerators = Ut.NewArray<(int num, Func<int[], IList<KyuConstraint>> generator)>(
                 // Cell constraints
-                (25, OddEven.Generate),
-                (25, AntiBishop.Generate),
-                (25, AntiKnight.Generate),
-                (25, AntiKing.Generate),
-                (25, NoConsecutive.Generate),
+                (5, OddEven.Generate),
+                (5, AntiBishop.Generate),
+                (5, AntiKnight.Generate),
+                (5, AntiKing.Generate),
+                (5, NoConsecutive.Generate),
 
                 // Row/column constraints
-                (25, Sandwich.Generate),
+                (5, Sandwich.Generate),
+                (5, Skyscraper.Generate),
+                (5, Battlefield.Generate),
+                (5, Binairo.Generate),
 
                 // Area constraints
-                (25, Thermometer.Generate),
-                (25, Arrow.Generate),
-                (25, Palindrome.Generate),
-                (25, KillerCage.Generate),
-                (25, RenbanCage.Generate)
+                (5, Thermometer.Generate),
+                (5, Arrow.Generate),
+                (5, Palindrome.Generate),
+                (5, KillerCage.Generate),
+                (5, RenbanCage.Generate),
 
-            // Other
+                // Other
+                (200, ConsecutiveNeighbors.Generate),
+                (200, DoubleNeighbors.Generate)
             );
 
             foreach (var (num, generator) in constraintGenerators)

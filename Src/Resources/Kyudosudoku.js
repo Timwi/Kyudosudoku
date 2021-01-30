@@ -17,6 +17,8 @@
     {
         switch (constr[':type'])
         {
+            // CELL CONSTRAINTS
+
             case 'AntiBishop': {
                 if (grid[constr.Cell] === null)
                     return null;
@@ -68,6 +70,8 @@
             case 'OddEven':
                 return grid[constr.Cell] === null ? null : grid[constr.Cell] % 2 === (constr.Odd ? 1 : 0);
 
+            // ROW/COLUMN CONSTRAINTS
+
             case 'Sandwich': {
                 let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * x) : (x + 9 * constr.RowCol)]);
                 let p1 = numbers.indexOf(constr.Digit1);
@@ -77,6 +81,54 @@
                 let sandwich = numbers.slice(Math.min(p1, p2) + 1, Math.max(p1, p2));
                 return sandwich.some(n => n === null) ? null : sandwich.reduce((p, n) => p + n, 0) === constr.Sum;
             }
+
+            case 'Skyscraper': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
+                if (numbers.some(n => n === null))
+                    return null;
+                let c = 0, p = 0;
+                for (let n of numbers)
+                    if (n > p)
+                    {
+                        p = n;
+                        c++;
+                    }
+                return c === constr.Clue;
+            }
+
+            case 'Battlefield': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * x) : (x + 9 * constr.RowCol)]);
+                if (numbers[0] === null || numbers[8] === null)
+                    return null;
+                let left = numbers[0];
+                let right = numbers[numbers.length - 1];
+                let sum = 0;
+                if (numbers.length - left - right >= 0)
+                    for (let ix = left; ix < numbers.length - right; ix++)
+                    {
+                        if (numbers[ix] === null)
+                            return null;
+                        sum += numbers[ix];
+                    }
+                else
+                    for (let ix = numbers.length - right; ix < left; ix++)
+                    {
+                        if (numbers[ix] === null)
+                            return null;
+                        sum += numbers[ix];
+                    }
+                return sum === constr.Clue;
+            }
+
+            case 'Binairo': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * x) : (x + 9 * constr.RowCol)]);
+                for (let i = 1; i < numbers.length - 1; i++)
+                    if (numbers[i - 1] !== null && numbers[i] !== null && numbers[i + 1] !== null && numbers[i - 1] % 2 === numbers[i] % 2 && numbers[i + 1] % 2 === numbers[i] % 2)
+                        return false;
+                return numbers.some(n => n === null) ? null : true;
+            }
+
+            // REGION CONSTRAINTS
 
             case 'Thermometer': {
                 for (let i = 0; i < constr.Cells.length; i++)
@@ -107,6 +159,14 @@
                 let numbers = constr.Cells.map(c => grid[c]);
                 return numbers.some(n => n === null) ? null : numbers.filter(n => !numbers.includes(n + 1)).length === 1;
             }
+
+            // OTHER CONSTRAINTS
+
+            case 'ConsecutiveNeighbors':
+                return grid[constr.Cell1] === null || grid[constr.Cell2] === null ? null : Math.abs(grid[constr.Cell1] - grid[constr.Cell2]) === 1;
+
+            case 'DoubleNeighbors':
+                return grid[constr.Cell1] === null || grid[constr.Cell2] === null ? null : grid[constr.Cell1] * 2 === grid[constr.Cell2] || grid[constr.Cell2] * 2 === grid[constr.Cell1];
         }
     }
 

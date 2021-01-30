@@ -99,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
+    <Compile Include="Constraints\Binairo.cs" />
+    <Compile Include="Constraints\DoubleNeighbors.cs" />
+    <Compile Include="Constraints\ConsecutiveNeighbors.cs" />
     <Compile Include="Constraints\KyuRegionConstraint.cs" />
     <Compile Include="Constraints\RenbanCage.cs" />
     <Compile Include="Constraints\NoConsecutive.cs" />
@@ -108,6 +111,8 @@
     <Compile Include="Constraints\KyuCellConstraint.cs" />
     <Compile Include="Constraints\AntiBishop.cs" />
     <Compile Include="Constraints\KillerCage.cs" />
+    <Compile Include="Constraints\Battlefield.cs" />
+    <Compile Include="Constraints\Skyscraper.cs" />
     <Compile Include="Constraints\Sandwich.cs" />
     <Compile Include="Constraints\OddEven.cs" />
     <Compile Include="Constraints\Arrow.cs" />
