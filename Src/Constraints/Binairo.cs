@@ -11,13 +11,22 @@ namespace KyudosudokuWebsite
         public override string Description => $"In this {(IsCol ? "column" : "row")}, no three adjacent digits can be all odd or all even.";
         public override bool ShownTopLeft => true;
         public override double ExtraTop => IsCol ? .5 : 0;
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Binairo(false, 0) },
+            Cells = { 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+            Good = { 1, 5, 4, 3, 7, 6, 8, 9, 2 },
+            Bad = { 1, 5, 4, 6, 7, 3, 9, 8, 2 },
+            Reason = "7/3/9 are three odd digits next to one another.",
+            Wide = true
+        };
 
         public Binairo(bool isCol, int rowCol) : base(isCol, rowCol) { }
         private Binairo() { }   // for Classify
 
         protected override Constraint getConstraint() => new BinairoRowConstraint(GetAffectedCells(false));
 
-        public override string Svg => $@"<g stroke='black' stroke-width='.075' fill='none' transform='translate({Kyudosudoku.SudokuX + (IsCol ? RowCol + .5 : -.5)}, {Kyudosudoku.SudokuY + (IsCol ? -.5 : RowCol + .5)}) scale(.7)'>
+        public override string Svg => $@"<g stroke='black' stroke-width='.075' fill='none' transform='translate({(IsCol ? RowCol + .5 : -.5)}, {(IsCol ? -.5 : RowCol + .5)}) scale(.7)'>
             <circle cx='-.25' cy='-.25' r='.2' />
             <circle cx='.25' cy='.25' r='.2' />
             <path d='M .25 -.45 v .4 M -.25 .05 v .4' />

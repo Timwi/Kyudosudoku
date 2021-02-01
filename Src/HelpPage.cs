@@ -1,4 +1,7 @@
-﻿using RT.Servers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using RT.Servers;
 using RT.TagSoup;
 using RT.Util;
 
@@ -27,20 +30,61 @@ namespace KyudosudokuWebsite
                 </svg>");
 
             return RenderPageTagSoup("How to play Kyudosudoku", session.User, null,
-                new H1("Rules of Kyudosudoku"),
-                new P("Kyudosudoku is a logic puzzle that combines Kyudoku with Sudoku."),
-                new P("Each puzzle consists of four 6×6 grids filled with digits 1–9, which we will call the ", new CITE("Kyudoku grids"), ", and a blank 9×9 grid, the ", new CITE("Sudoku grid"), "."),
+                new P { class_ = "jump" }._("Jump to: ", new A { href = "#rules" }._("Rules"), " | ",new A { href = "#constraints" }._("Constraints"), " | ",new A { href = "#controls" }._("Controls"), " | ",new A { href = "#strategies" }._("Common strategies")),
+                new H1 { id = "rules" }._("Rules of Kyudosudoku"),
+                new P("Kyudosudoku is a logic puzzle that combines Kyudoku with variety Sudoku."),
+                new P("Each puzzle consists of four 6×6 grids filled with digits 1–9, which we will call the ", new CITE("Kyudoku grids"), ", and a blank 9×9 grid, the ", new CITE("Sudoku grid"), ", usually with some extra graphics in or around it."),
+                new H2("The Kyudoku part"),
                 new P("In each Kyudoku grid, exactly one of each digit 1–9 must be circled in such a way that the circled digits in each row or column never add up to more than 9."),
                 new TABLE { style = "width:100%", class_ = "puzzle examples" }._(
                     new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 14, 23, 28, 30, 31 })), new TD(new P("Invalid: two 2’s are circled."))),
                     new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 23, 28, 30, 31 })), new TD(new P("Invalid: none of the 4’s are circled."))),
                     new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 29, 31 })), new TD(new P("Invalid: the last column has 2 and 8 circled, which add up to 10, which is more than 9."))),
                     new TR(new TD(kyudokuGrid(kyudoExampleGrid1, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 30, 31 })), new TD(new P("Valid example.")))),
+                new H2("The Sudoku part"),
                 new P("The Sudoku grid must be filled with digits 1–9 in such a way that every row, every column and every outlined 3×3 box contains the digits 1–9 exactly once."),
-                new P("Furthermore, each Kyudoku grid is linked with a 6×6 “corner” of the Sudoku grid. Every circled digit in a Kyudoku grid transfers that digit to the equivalent location on the Sudoku grid."),
+                new P("Furthermore, each Kyudoku grid is linked with a 6×6 “corner” of the Sudoku grid (the coloring helps to visualize this). Every circled digit in a Kyudoku grid transfers that digit to the equivalent location on the Sudoku grid."),
                 new P("Each Kyudoku grid in isolation may not have a unique solution, but there is only one way to solve the entire puzzle."),
+                new H2 { id = "constraints" }._("Variety Sudoku constraints"),
+                new P("Each puzzle may have additional graphics in the Sudoku grid. These represent additional constraints that must be followed in order to arrive at the correct solution."),
+                renderExamples(
+                    // Single cells
+                    OddEven.Example,
+                    AntiBishop.Example,
+                    AntiKnight.Example,
+                    AntiKing.Example,
+                    NoConsecutive.Example,
 
-                new H1("Controls"),
+                    // Two cells
+                    ConsecutiveNeighbors.Example,
+                    DoubleNeighbors.Example,
+
+                    // Four cells
+                    Clockface.Example,
+                    Inclusion.Example,
+                    Battenburg.Example,
+
+                    // Regions
+                    KillerCage.Example,
+                    RenbanCage.Example,
+                    Thermometer.Example,
+                    Arrow.Example,
+                    Palindrome.Example,
+                    Snowball.Example,
+
+                    // Rows/columns
+                    Sandwich.Example,
+                    ToroidalSandwich.Example,
+                    Skyscraper.Example,
+                    Battlefield.Example,
+                    Binairo.Example,
+                    XSum.Example,
+
+                    // Other
+                    LittleKiller.Example
+                ),
+
+                new H1 { id = "controls" }._("Controls"),
                 new H2("Keyboard"),
                 new TABLE { class_ = "controls" }._(
                     new TR(new TH("Arrow keys"), new TD("Moves the selection within the Sudoku grid.")),
@@ -63,7 +107,7 @@ namespace KyudosudokuWebsite
                     new TR(new TH("Click and drag (Sudoku cell)"), new TD("Select any number of cells.")),
                     new TR(new TH("Shift+Click and drag (Sudoku cell)"), new TD("Add any number of cells to the selection."))),
 
-                new H1("Common strategies"),
+                new H1 { id = "strategies" }._("Common strategies"),
                 new P("To get started, here are some common deductions that can help you get started on a Kyudosudoku puzzle:"),
                 new TABLE { class_ = "puzzle examples" }._(
                     new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, highlight: new[] { 6 })), new TD(new P("There is only a single 6 in this Kyudoku grid, so it must be circled."))),
@@ -88,5 +132,44 @@ namespace KyudosudokuWebsite
                 new P("Send feedback and suggestions to Timwi#0551 on Discord, or submit a pull request to ", new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."),
                 new P("Enjoy!"));
         });
+
+        private IEnumerable<object> renderExamples(params Example[] examples)
+        {
+            for (var exampleId = 0; exampleId < examples.Length; exampleId++)
+            {
+                var example = examples[exampleId];
+                var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(3 * exampleId + 1, example.Constraints, glow: false, givens: example.BadGivens, wide: example.Wide),
+                    new DIV(new SPAN("✗ Invalid", example.Reason == null ? "." : ":"), example.Reason.NullOr(r => new DIV(r))));
+                var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(3 * exampleId + 2, example.Constraints, glow: true, givens: example.GoodGivens, wide: example.Wide),
+                    new DIV(new SPAN("✓ Valid.")));
+                if (example.Wide)
+                    yield return new TABLE { class_ = "example" }._(
+                        new TR(
+                            new TD { rowspan = 2 }._(clippedSudokuGrid(3 * exampleId, example.Constraints)),
+                            new TD { rowspan = 2, class_ = "explanation" }._(new H4(example.Constraints.First().Name), example.Constraints.Select(c => new P(c.Description))),
+                            invalidTd),
+                        new TR(
+                            validTd));
+                else
+                    yield return new TABLE { class_ = "example" }._(
+                        new TR(
+                            new TD(clippedSudokuGrid(3 * exampleId, example.Constraints)),
+                            new TD { class_ = "explanation" }._(new H4(example.Constraints.First().Name), example.Constraints.Select(c => new P(c.Description))),
+                            invalidTd,
+                            validTd));
+                yield return new HR();
+            }
+        }
+
+        private object clippedSudokuGrid(int exampleId, IEnumerable<KyuConstraint> constraints, bool? glow = null, Dictionary<int, int?> givens = null, bool wide = false)
+        {
+            //return new RawTag($@"<svg viewBox='-1 {(wide ? -.25 : -1)} {(wide ? 10.25 : 5.5)} {(wide ? 1.75 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
+            //    <clipPath id='example-clip-{exampleId}' clipPathUnits='userSpaceOnUse'><path d='M-1 {(wide ? -.25 : -1)} h {(wide ? 10.25 : 5.5)} v {(wide ? 1.75 : 4.5)} h {(wide ? -10.25 : -5.5)} z' /></clipPath>
+            //    <g clip-path='url(#example-clip-{exampleId})'>{sudokuGrid(1, constraints, true, givens, glow)}</g>
+            //</svg>");
+            return new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
+                {sudokuGrid(1, constraints, true, givens, glow)}
+            </svg>");
+        }
     }
 }

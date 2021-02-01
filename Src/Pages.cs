@@ -24,7 +24,7 @@ namespace KyudosudokuWebsite
                     new TITLE($"{fullTitle}"),
                     new LINK { rel = "stylesheet", href = $"/css" },
                     new LINK { rel = "shortcut icon", type = "image/png", href = "/logo" },
-                    new SCRIPT { src = "/js" }),
+                    opt.IsPuzzlePage ? new SCRIPT { src = "/js" } : null),
                 new BODY { class_ = opt.IsPuzzlePage ? "is-puzzle" : null }._(
                     new DIV { class_ = "top-bar" }._(
                         new A { class_ = "home", href = "/" }._("Kyudosudoku"),

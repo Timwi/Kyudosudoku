@@ -10,9 +10,18 @@ namespace KyudosudokuWebsite
     sealed class ToroidalSandwich : KyuRowColConstraint
     {
         public override string Name => "Toroidal sandwich";
-        public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits after the {Digit1} and before the {Digit2}, wrapping around the edges of the grid, must add up to {Sum}.";
+        public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits after the {Digit1} and before the {Digit2}, wrapping around the edges of the grid if necessary, must add up to {Sum}.";
         public override double ExtraTop => IsCol ? .25 : 0;
         public override bool ShownTopLeft => true;
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new ToroidalSandwich(false, 0, 3, 7, 17) },
+            Cells = { 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+            Good = { 4, 1, 5, 3, 9, 8, 7, 6, 2 },
+            Bad = { 4, 1, 5, 7, 9, 8, 6, 3, 2 },
+            Reason = "The digits after the 3 and before the 7 are 2+4+1+5 = 12.",
+            Wide = true
+        };
 
         public ToroidalSandwich(bool isCol, int rowCol, int digit1, int digit2, int sum) : base(isCol, rowCol)
         {
@@ -45,7 +54,7 @@ namespace KyudosudokuWebsite
             return s == Sum;
         }
 
-        public override string Svg => $@"<g transform='translate({Kyudosudoku.SudokuX + (IsCol ? RowCol : -1.025)}, {Kyudosudoku.SudokuY + (IsCol ? -.85 : RowCol)}) scale(.01)' font-size='23'>
+        public override string Svg => $@"<g transform='translate({(IsCol ? RowCol : -1.025)}, {(IsCol ? -.85 : RowCol)}) scale(.01)' font-size='23'>
   <linearGradient id='d' x1='9.732' x2='74.285' y1='67.527' y2='67.527' gradientTransform='matrix(.429 0 0 .429 53.625 57.976)' gradientUnits='userSpaceOnUse'>
     <stop offset='0' stop-color='#ffc044'/>
     <stop offset='.849' stop-color='#d95f23'/>

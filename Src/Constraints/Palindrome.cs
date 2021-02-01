@@ -11,6 +11,14 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Palindrome";
         public override string Description => "The digits along the line must form a palindrome (same sequence of digits when read from either end).";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Palindrome(new[] { 19, 20, 12, 3 }) },
+            Cells = { 19, 20, 12, 3 },
+            Good = { 5, 2, 2, 5 },
+            Bad = { 5, 2, 2, 1 },
+            Reason = "The first and last digit are different."
+        };
 
         public int[] Cells { get; private set; }
 

@@ -30,8 +30,8 @@ namespace KyudosudokuWebsite
 
         protected KyuConstraint() { }    // for Classify
 
-        protected static double svgX(int cell) => Kyudosudoku.SudokuX + cell % 9 + .5;
-        protected static double svgY(int cell) => Kyudosudoku.SudokuY + cell / 9 + .5;
+        protected static double svgX(int cell) => cell % 9 + .5;
+        protected static double svgY(int cell) => cell / 9 + .5;
         protected static PointD svgP(int cell) => new PointD(svgX(cell), svgY(cell));
 
         public static IEnumerable<int> Adjacent(int cell)
@@ -76,15 +76,15 @@ namespace KyudosudokuWebsite
             {
                 path.Append("M");
                 var offset = outline.MinIndex(c => c.x + 9 * c.y) + outline.Length - 1;
-                textX = Kyudosudoku.SudokuX + outline[(offset + 1) % outline.Length].x + .03;
-                textY = Kyudosudoku.SudokuY + outline[(offset + 1) % outline.Length].y + .25;
+                textX = outline[(offset + 1) % outline.Length].x + .03;
+                textY = outline[(offset + 1) % outline.Length].y + .25;
                 for (int j = 0; j <= outline.Length; j++)
                 {
                     var point1 = outline[(j + offset) % outline.Length];
                     var point2 = outline[(j + offset + 1) % outline.Length];
                     var point3 = outline[(j + offset + 2) % outline.Length];
-                    var x = Kyudosudoku.SudokuX + point2.x;
-                    var y = Kyudosudoku.SudokuY + point2.y;
+                    var x = point2.x;
+                    var y = point2.y;
 
                     var dir1 = getDir(point1, point2);
                     var dir2 = getDir(point2, point3);

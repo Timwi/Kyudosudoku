@@ -6,7 +6,15 @@ namespace KyudosudokuWebsite
     sealed class Clockface : KyuFourCellConstraint
     {
         public override string Name => "Clockface";
-        public override string Description => $"The digits around the circle must be in {(Clockwise ? "clockwise" : "counter-clockwise")} order.";
+        public override string Description => $"The digits around the {(Clockwise ? "white" : "black")} circle must be in {(Clockwise ? "clockwise" : "counter-clockwise")} order.";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Clockface(0, true), new Clockface(11, false) },
+            Cells = { 0, 1, 10, 9, 11, 12, 21, 20 },
+            Good = { 3, 5, 8, 9, 2, 8, 7, 3 },
+            Bad = { 3, 7, 5, 9, 2, 4, 6, 3 }
+        };
+        
         public bool Clockwise { get; private set; }
 
         public Clockface(int topLeftCell, bool clockwise) : base(topLeftCell) { Clockwise = clockwise; }

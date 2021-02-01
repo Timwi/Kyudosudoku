@@ -10,12 +10,20 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "No-consecutive";
         public override string Description => "A digit that’s 1 more or 1 less than this digit can’t be orthogonally adjacent to it.";
-        protected override Constraint getConstraint() => new NoConsecutiveConstraint(9, 9, includeDiagonals: false, enforcedCells: new[] { Cell });
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new NoConsecutive(20) },
+            Cells = { 11, 20 },
+            Good = { 2, 7 },
+            Bad = { 6, 7 },
+            Reason = "6 and 7 are consecutive, so the 6 can’t be orthogonally adjacent to the 7."
+        };
 
         public NoConsecutive(int cell) : base(cell) { }
         private NoConsecutive() { }    // for Classify
 
-        public override string Svg => $"<path transform='translate({Kyudosudoku.SudokuX + Cell % 9}, {Kyudosudoku.SudokuY + Cell / 9})' d='M.5 .05 .7 .2 .3 .2z M.95 .5 .8 .7 .8 .3z M.5 .95 .3 .8 .7 .8z M.05 .5 .2 .3 .2 .7z' opacity='.2' />";
+        protected override Constraint getConstraint() => new NoConsecutiveConstraint(9, 9, includeDiagonals: false, enforcedCells: new[] { Cell });
+        public override string Svg => $"<path transform='translate({Cell % 9}, {Cell / 9})' d='M.5 .05 .7 .2 .3 .2z M.95 .5 .8 .7 .8 .3z M.5 .95 .3 .8 .7 .8z M.05 .5 .2 .3 .2 .7z' opacity='.2' />";
 
         public override bool Verify(int[] grid)
         {

@@ -10,6 +10,14 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Thermometer";
         public override string Description => "Digits must increase from the bulb.";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Thermometer(new[] { 18, 10, 20, 12, 3 }) },
+            Cells = { 18, 10, 20, 12, 3 },
+            Good = { 2, 4, 7, 8, 9 },
+            Bad = { 2, 7, 4, 8, 9 },
+            Reason = "4 is less than 7."
+        };
 
         public int[] Cells { get; private set; }
 
@@ -18,7 +26,7 @@ namespace KyudosudokuWebsite
 
         protected override Constraint getConstraint() => new LessThanConstraint(Cells);
 
-        public override string Svg => $@"<g opacity='.2' transform='translate({Kyudosudoku.SudokuX}, {Kyudosudoku.SudokuY})'>
+        public override string Svg => $@"<g opacity='.2'>
             <path d='M{Cells.Select(c => $"{c % 9 + .5} {c / 9 + .5}").JoinString(" ")}' stroke='black' stroke-width='.3' stroke-linecap='round' stroke-linejoin='round' fill='none' />
             <circle cx='{Cells[0] % 9 + .5}' cy='{Cells[0] / 9 + .5}' r='.4' fill='black' />
         </g>";

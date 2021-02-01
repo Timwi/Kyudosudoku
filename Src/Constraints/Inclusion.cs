@@ -10,6 +10,14 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Inclusion";
         public override string Description => $"The four cells around the circle must contain the digits {(Digits.JoinString(", ", lastSeparator: " and "))} in some order.";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Inclusion(2, new[] { 3, 3, 7 }) },
+            Cells = { 2, 3, 12, 11 },
+            Good = { 3, 5, 3, 7 },
+            Bad = { 3, 5, 8, 7 },
+            Reason = "Since the 3 is specified twice, it must occur at least twice."
+        };
 
         public int[] Digits { get; private set; }
 

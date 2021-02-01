@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
+    <Compile Include="Constraints\Battenburg.cs" />
     <Compile Include="Constraints\Binairo.cs" />
     <Compile Include="Constraints\Clockface.cs" />
     <Compile Include="Constraints\Inclusion.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Database\Puzzle.cs" />
     <Compile Include="DbSession.cs" />
     <Compile Include="Constraints\KyuConstraint.cs" />
+    <Compile Include="Example.cs" />
     <Compile Include="Kyudosudoku.cs" />
     <Compile Include="KyudosudokuPropellerModule.cs" />
     <Compile Include="KyudosudokuSettings.cs" />

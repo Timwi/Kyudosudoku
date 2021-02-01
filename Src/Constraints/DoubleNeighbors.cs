@@ -6,6 +6,14 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Double neighbors";
         public override string Description => "The two marked cells must have a ratio of 2 (one is double the other).";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new DoubleNeighbors(10, 11) },
+            Cells = { 10, 11 },
+            Good = { 2, 4 },
+            Bad = { 2, 6 },
+            Reason = "6 is not twice 2, and 2 is not twice 6."
+        };
 
         public DoubleNeighbors(int cell1, int cell2) : base(cell1, cell2) { }
         private DoubleNeighbors() { }   // for Classify

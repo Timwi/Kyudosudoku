@@ -9,9 +9,15 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Diagonal sum";
         public override string Description => "The digits along the indicated diagonal must sum up to the specified total. (The digits need not necessarily be unique.)";
-
         public override double ExtraRight => Direction == ClueDirection.SouthWest ? .25 : 0;
         public override double ExtraTop => Direction == ClueDirection.SouthEast ? .25 : 0;
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new LittleKiller(ClueDirection.NorthEast, 7, 8) },
+            Cells = { 1, 9 },
+            Good = { 2, 6 },
+            Bad = { 3, 6 }
+        };
 
         public enum ClueDirection { SouthEast, SouthWest, NorthWest, NorthEast }
         public ClueDirection Direction { get; private set; }
@@ -33,37 +39,25 @@ namespace KyudosudokuWebsite
         protected override Constraint getConstraint() => new SumConstraint(Sum, AffectedCells);
         public override bool Verify(int[] grid) => AffectedCells.Sum(c => grid[c]) == Sum;
 
-        // SouthEast, 7
-        public override string Svg
+        const double svgArrLen = .275;
+        const double svgArrWidth = .2;
+        const double svgMargin = .1;
+        public override string Svg => Direction switch
         {
-            get
-            {
-                const double arrLen = .275;
-                const double arrWidth = .2;
-                const double margin = .1;
-                string path = null, text = null;
-                switch (Direction)
-                {
-                    case ClueDirection.SouthEast:
-                        path = $"<path d='M {Offset - margin - arrLen} {-margin - arrLen} {Offset - margin} {-margin} M {Offset - margin - arrWidth} {-margin} h {arrWidth} v {-arrWidth}' stroke='black' stroke-width='.02' fill='none' />";
-                        text = $"<text text-anchor='middle' x='{Offset - margin - arrLen - margin}' y='{-margin - arrLen - margin + .05}' font-size='.3'>{Sum}</text>";
-                        break;
-                    case ClueDirection.SouthWest:
-                        path = $"<path d='M {9 + margin + arrLen} {Offset - margin - arrLen} {9 + margin} {Offset - margin} M {9 + margin} {Offset - margin - arrWidth} v {arrWidth} h {arrWidth}' stroke='black' stroke-width='.02' fill='none' />";
-                        text = $"<text text-anchor='middle' x='{9 + margin + arrLen + margin}' y='{Offset - margin - arrLen - margin + .05}' font-size='.3'>{Sum}</text>";
-                        break;
-                    case ClueDirection.NorthWest:
-                        path = $"<path d='M {9 - Offset + margin + arrLen} {9 + margin + arrLen} {9 - Offset + margin} {9 + margin} M {9 - Offset + margin + arrWidth} {9 + margin} h {-arrWidth} v {arrWidth}' stroke='black' stroke-width='.02' fill='none' />";
-                        text = $"<text text-anchor='middle' x='{9 - Offset + margin + arrLen + margin}' y='{9 + margin + arrLen + margin + .2}' font-size='.3'>{Sum}</text>";
-                        break;
-                    case ClueDirection.NorthEast:
-                        path = $"<path d='M {-margin - arrLen} {9 - Offset + margin + arrLen} {-margin} {9 - Offset + margin} M {-margin - arrWidth} {9 - Offset + margin} h {arrWidth} v {arrWidth}' stroke='black' stroke-width='.02' fill='none' />";
-                        text = $"<text text-anchor='middle' x='{-margin - arrLen - margin}' y='{9 - Offset + margin + arrLen + margin + .2}' font-size='.3'>{Sum}</text>";
-                        break;
-                }
-                return $"<g transform='translate({Kyudosudoku.SudokuX}, {Kyudosudoku.SudokuY})'>{path}{text}</g>";
-            }
-        }
+            ClueDirection.SouthEast =>
+                $"<path d='M {Offset - svgMargin - svgArrLen} {-svgMargin - svgArrLen} {Offset - svgMargin} {-svgMargin} M {Offset - svgMargin - svgArrWidth} {-svgMargin} h {svgArrWidth} v {-svgArrWidth}' stroke='black' stroke-width='.02' fill='none' />" +
+                $"<text text-anchor='middle' x='{Offset - svgMargin - svgArrLen - svgMargin}' y='{-svgMargin - svgArrLen - svgMargin + .05}' font-size='.3'>{Sum}</text>",
+            ClueDirection.SouthWest =>
+                $"<path d='M {9 + svgMargin + svgArrLen} {Offset - svgMargin - svgArrLen} {9 + svgMargin} {Offset - svgMargin} M {9 + svgMargin} {Offset - svgMargin - svgArrWidth} v {svgArrWidth} h {svgArrWidth}' stroke='black' stroke-width='.02' fill='none' />" +
+                $"<text text-anchor='middle' x='{9 + svgMargin + svgArrLen + svgMargin}' y='{Offset - svgMargin - svgArrLen - svgMargin + .05}' font-size='.3'>{Sum}</text>",
+            ClueDirection.NorthWest =>
+                $"<path d='M {9 - Offset + svgMargin + svgArrLen} {9 + svgMargin + svgArrLen} {9 - Offset + svgMargin} {9 + svgMargin} M {9 - Offset + svgMargin + svgArrWidth} {9 + svgMargin} h {-svgArrWidth} v {svgArrWidth}' stroke='black' stroke-width='.02' fill='none' />" +
+                $"<text text-anchor='middle' x='{9 - Offset + svgMargin + svgArrLen + svgMargin}' y='{9 + svgMargin + svgArrLen + svgMargin + .2}' font-size='.3'>{Sum}</text>",
+            ClueDirection.NorthEast =>
+                $"<path d='M {-svgMargin - svgArrLen} {9 - Offset + svgMargin + svgArrLen} {-svgMargin} {9 - Offset + svgMargin} M {-svgMargin - svgArrWidth} {9 - Offset + svgMargin} h {svgArrWidth} v {svgArrWidth}' stroke='black' stroke-width='.02' fill='none' />" +
+                $"<text text-anchor='middle' x='{-svgMargin - svgArrLen - svgMargin}' y='{9 - Offset + svgMargin + svgArrLen + svgMargin + .2}' font-size='.3'>{Sum}</text>",
+            _ => null
+        };
 
         public override bool ClashesWith(KyuConstraint other) => other switch
         {

@@ -190,6 +190,34 @@
                 return offsets.length > 1 ? false : constr.Cells1.some(n => grid[n] === null) || constr.Cells2.some(n => grid[n] === null) ? null : true;
             }
 
+            // FOUR-CELL CONSTRAINTS
+
+            case 'Clockface': {
+                let numbers = [0, 1, 10, 9].map(o => grid[constr.TopLeftCell + o]);
+                if (numbers.some(n => n === null))
+                    return null;
+                let a = numbers[0], b = numbers[1], c = numbers[2], d = numbers[3];
+                return constr.Clockwise
+                    ? (a < b && b < c && c < d) || (b < c && c < d && d < a) || (c < d && d < a && a < b) || (d < a && a < b && b < c)
+                    : (a > b && b > c && c > d) || (b > c && c > d && d > a) || (c > d && d > a && a > b) || (d > a && a > b && b > c);
+            }
+
+            case 'Inclusion': {
+                let numbers = [0, 1, 10, 9].map(o => grid[constr.TopLeftCell + o]);
+                if (numbers.some(n => n === null))
+                    return null;
+                return constr.Digits.every(d => numbers.filter(n => n === d).length >= constr.Digits.filter(d2 => d2 === d).length);
+            }
+
+            case 'Battenburg': {
+                let offsets = [0, 1, 10, 9].map(c => constr.TopLeftCell + c);
+                console.log(offsets);
+                for (let i = 0; i < 4; i++)
+                    if (grid[offsets[i]] !== null && grid[offsets[(i + 1) % offsets.length]] !== null && grid[offsets[i]] % 2 === grid[offsets[(i + 1) % offsets.length]] % 2)
+                        return false;
+                return offsets.some(c => grid[c] === null) ? null : true;
+            }
+
             // OTHER CONSTRAINTS
 
             case 'ConsecutiveNeighbors':
@@ -208,23 +236,6 @@
                     case 'NorthEast': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 72 - 9 * constr.Offset - 8 * i); break;
                 };
                 return affectedCells.some(c => grid[c] === null) ? null : affectedCells.reduce((p, n) => p + grid[n], 0) === constr.Sum;
-            }
-
-            case 'Clockface': {
-                let numbers = [0, 1, 10, 9].map(o => grid[constr.TopLeftCell + o]);
-                if (numbers.some(n => n === null))
-                    return null;
-                let a = numbers[0], b = numbers[1], c = numbers[2], d = numbers[3];
-                return constr.Clockwise
-                    ? (a < b && b < c && c < d) || (b < c && c < d && d < a) || (c < d && d < a && a < b) || (d < a && a < b && b < c)
-                    : (a > b && b > c && c > d) || (b > c && c > d && d > a) || (c > d && d > a && a > b) || (d > a && a > b && b > c);
-            }
-
-            case 'Inclusion': {
-                let numbers = [0, 1, 10, 9].map(o => grid[constr.TopLeftCell + o]);
-                if (numbers.some(n => n === null))
-                    return null;
-                return constr.Digits.every(d => numbers.filter(n => n === d).length >= constr.Digits.filter(d2 => d2 === d).length);
             }
         }
     }

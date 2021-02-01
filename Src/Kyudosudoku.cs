@@ -9,11 +9,6 @@ namespace KyudosudokuWebsite
 {
     sealed class Kyudosudoku
     {
-        public const double SudokuX = 14;
-        public const double SudokuY = 0;
-        public const double ControlsX = 14;
-        public const double ControlsY = 9.75;
-
         public int[][] Grids { get; private set; }
         public KyuConstraint[] Constraints { get; private set; }
 
@@ -233,11 +228,14 @@ namespace KyudosudokuWebsite
                 (25, ToroidalSandwich.Generate),
                 (22, XSum.Generate),
 
-                // Other
+                // Four-cell constraints
                 (60, Clockface.Generate),
+                (63, Inclusion.Generate),
+                (60, Battenburg.Generate),
+
+                // Other
                 (65, ConsecutiveNeighbors.Generate),
                 (80, DoubleNeighbors.Generate),
-                (63, Inclusion.Generate),
                 (13, LittleKiller.Generate)
             );
 

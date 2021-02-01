@@ -9,7 +9,15 @@ namespace KyudosudokuWebsite
     sealed class RenbanCage : KyuRegionConstraint
     {
         public override string Name => "Renban cage";
-        public override string Description => $"Digits within the cage must be distinct and form a consecutive set.";
+        public override string Description => $"Digits within the cage must be different and form a consecutive set.";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new RenbanCage(new[] { 0, 1, 2, 3, 10, 12 }) },
+            Cells = { 0, 1, 2, 3, 10, 12 },
+            Good = { 5, 3, 7, 4, 6, 2 },
+            Bad = { 5, 3, 7, 1, 6, 2 },
+            Reason = "Digits 1–3 and 5–7 occur. The 4 is skipped."
+        };
 
         public RenbanCage(int[] cells) : base(cells) { }
 

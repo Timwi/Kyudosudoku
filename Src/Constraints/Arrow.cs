@@ -10,6 +10,14 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Arrow";
         public override string Description => "The digits along the arrow must sum to the digit in the circle.";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Arrow(new[] { 18, 10, 20, 12, 3 }) },
+            Cells = { 18, 10, 20, 12, 3 },
+            Good = { 7, 1, 2, 3, 1 },
+            Bad = { 8, 1, 2, 3, 1 },
+            Reason = "The digits add up to 7, but the circle does not contain a 7."
+        };
 
         public int[] Cells { get; private set; }
 

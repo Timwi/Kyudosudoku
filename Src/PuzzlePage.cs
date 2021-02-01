@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -79,47 +80,29 @@ namespace KyudosudokuWebsite
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
                 new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }.Data("constraints", dbPuzzle.Constraints).Data("progress", userPuzzle.NullOr(up => up.Progess)).Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")._(
                     new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
-                        <defs>
+                        {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
+                        <g transform='translate(14, 0)'>{sudokuGrid(puzzleId, puzzle.Constraints)}</g>
+
+                        <g transform='translate(14, 9.75)'>
+                            {Enumerable.Range(0, 9).Select(btn => $@"
+                                <g class='button' id='p-{puzzleId}-num-{btn + 1}' transform='translate({(.8 + 9 * .2 / 8) * btn}, 0)'>
+                                    <rect class='clickable' x='0' y='0' width='.8' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
+                                    <text x='.4' y='.6' font-size='.55' text-anchor='middle'>{btn + 1}</text> 
+                                </g>
+                            ").JoinString()}
+                            {"Normal,Corner,Center,Restart,Undo,Redo".Split(',').Select((btn, btnIx) => $@"
+                                <g class='button' id='p-{puzzleId}-btn-{btn.ToLowerInvariant()}' transform='translate({3.25 * (btnIx % 3)}, {1.1 * (1 + btnIx / 3)})'>
+                                    <rect class='clickable' x='0' y='0' width='2.5' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
+                                    <text x='1.25' y='.6' font-size='.55' text-anchor='middle'>{btn}</text> 
+                                </g>
+                            ").JoinString()}
+                        </g>
+
+                        <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow'>
                             <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
                                 <stop stop-color='white' stop-opacity='1' offset='0'></stop> 
                                 <stop stop-color='hsl(216, 70%, 75%)' stop-opacity='1' offset='1'></stop> 
                             </linearGradient>
-                        </defs>
-                        {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
-                        <rect class='solve-glow frame' id='p-{puzzleId}-sudoku-frame' x='{Kyudosudoku.SudokuX}' y='{Kyudosudoku.SudokuY}' width='9' height='9' stroke-width='.2' fill='none' filter='blur(.1)' />
-                        {Enumerable.Range(0, 81).Select(cell => $@"
-                            <rect class='clickable sudoku-cell' id='p-{puzzleId}-sudoku-cell-{cell}' x='{cell % 9 + Kyudosudoku.SudokuX}' y='{cell / 9 + Kyudosudoku.SudokuY}' width='1' height='1' />
-                            <text id='p-{puzzleId}-sudoku-text-{cell}' x='{cell % 9 + Kyudosudoku.SudokuX + .5}' y='{cell / 9 + Kyudosudoku.SudokuY + .725}'></text>
-                            <text id='p-{puzzleId}-sudoku-center-text-{cell}' x='{cell % 9 + Kyudosudoku.SudokuX + .5}' y='{cell / 9 + Kyudosudoku.SudokuY + .625}' font-size='.3' fill='#1d6ae5'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-0' x='{cell % 9 + Kyudosudoku.SudokuX + .1}' y='{cell / 9 + Kyudosudoku.SudokuY + .3}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-1' x='{cell % 9 + Kyudosudoku.SudokuX + .9}' y='{cell / 9 + Kyudosudoku.SudokuY + .3}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-2' x='{cell % 9 + Kyudosudoku.SudokuX + .1}' y='{cell / 9 + Kyudosudoku.SudokuY + .85}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-3' x='{cell % 9 + Kyudosudoku.SudokuX + .9}' y='{cell / 9 + Kyudosudoku.SudokuY + .85}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-4' x='{cell % 9 + Kyudosudoku.SudokuX + .5}' y='{cell / 9 + Kyudosudoku.SudokuY + .25}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-5' x='{cell % 9 + Kyudosudoku.SudokuX + .9}' y='{cell / 9 + Kyudosudoku.SudokuY + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-6' x='{cell % 9 + Kyudosudoku.SudokuX + .5}' y='{cell / 9 + Kyudosudoku.SudokuY + .9}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
-                            <text id='p-{puzzleId}-sudoku-corner-text-{cell}-7' x='{cell % 9 + Kyudosudoku.SudokuX + .1}' y='{cell / 9 + Kyudosudoku.SudokuY + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
-                        ").JoinString()}
-                        {puzzle.Constraints.Where(c => !c.SvgAboveLines).Select(c => c.Svg).JoinString()}
-                        {Enumerable.Range(0, 8).Select(i => $@"<line x1='{Kyudosudoku.SudokuX + i + 1}' y1='{Kyudosudoku.SudokuY}' x2='{Kyudosudoku.SudokuX + i + 1}' y2='{Kyudosudoku.SudokuY + 9}' stroke='black' stroke-width='{(i % 3 == 2 ? ".03" : ".01")}' />").JoinString()}
-                        {Enumerable.Range(0, 8).Select(i => $@"<line x1='{Kyudosudoku.SudokuX}' y1='{Kyudosudoku.SudokuY + i + 1}' x2='{Kyudosudoku.SudokuX + 9}' y2='{Kyudosudoku.SudokuY + i + 1}' stroke='black' stroke-width='{(i % 3 == 2 ? ".03" : ".01")}' />").JoinString()}
-                        <rect x='{Kyudosudoku.SudokuX}' y='{Kyudosudoku.SudokuY}' width='9' height='9' stroke='black' stroke-width='.05' fill='none' />
-                        {puzzle.Constraints.Where(c => c.SvgAboveLines).Select(c => c.Svg).JoinString()}
-                                
-                        {Enumerable.Range(0, 9).Select(btn => $@"
-                            <g class='button' id='p-{puzzleId}-num-{btn + 1}' transform='translate({Kyudosudoku.ControlsX + (.8 + 9 * .2 / 8) * btn}, {Kyudosudoku.ControlsY})'>
-                                <rect class='clickable' x='0' y='0' width='.8' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
-                                <text x='.4' y='.6' font-size='.55' text-anchor='middle'>{btn + 1}</text> 
-                            </g>
-                        ").JoinString()}
-                        {"Normal,Corner,Center,Restart,Undo,Redo".Split(',').Select((btn, btnIx) => $@"
-                            <g class='button' id='p-{puzzleId}-btn-{btn.ToLowerInvariant()}' transform='translate({Kyudosudoku.ControlsX + 3.25 * (btnIx % 3)}, {Kyudosudoku.ControlsY + 1.1 * (1 + btnIx / 3)})'>
-                                <rect class='clickable' x='0' y='0' width='2.5' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
-                                <text x='1.25' y='.6' font-size='.55' text-anchor='middle'>{btn}</text> 
-                            </g>
-                        ").JoinString()}
-
-                        <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow'>
                             <rect x='-8' y='-1' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
                             <text x='0' y='.72' text-anchor='middle' font-size='2' font-weight='bold'>PUZZLE SOLVED</text>
                             <g font-size='.45' transform='translate(0, 1.3)'>
@@ -133,6 +116,30 @@ namespace KyudosudokuWebsite
                         </g>
                     </svg>")));
         }
+
+        private static string sudokuGrid(int puzzleId, IEnumerable<KyuConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glow = null) => $@"
+            <rect class='solve-glow frame' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='blur(.1)'{(glow == null ? null : $" stroke='{(glow.Value ? "#0f0" : "#f00")}'")} />
+            {Enumerable.Range(0, 81).Select(cell => $@"
+                <rect class='clickable sudoku-cell' id='p-{puzzleId}-sudoku-cell-{cell}' x='{cell % 9}' y='{cell / 9}' width='1' height='1'{(forHelpPage ? $" fill='{_cellColors[(cell % 9) / 3 + 3 * ((cell / 9) / 3)]}'" : null)} />
+                <text id='p-{puzzleId}-sudoku-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .725}'>{givens?.Get(cell, null)}</text>
+            ").JoinString()}
+            {(forHelpPage ? null : Enumerable.Range(0, 81).Select(cell => $@"
+                <text id='p-{puzzleId}-sudoku-center-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .625}' font-size='.3' fill='#1d6ae5'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-0' x='{cell % 9 + .1}' y='{cell / 9 + .3}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-1' x='{cell % 9 + .9}' y='{cell / 9 + .3}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-2' x='{cell % 9 + .1}' y='{cell / 9 + .85}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-3' x='{cell % 9 + .9}' y='{cell / 9 + .85}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-4' x='{cell % 9 + .5}' y='{cell / 9 + .25}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-5' x='{cell % 9 + .9}' y='{cell / 9 + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-6' x='{cell % 9 + .5}' y='{cell / 9 + .9}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-7' x='{cell % 9 + .1}' y='{cell / 9 + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
+            ").JoinString())}
+            {constraints.Where(c => !c.SvgAboveLines).Select(c => c.Svg).JoinString()}
+            {Enumerable.Range(0, 8).Select(i => $@"<line x1='{i + 1}' y1='0' x2='{i + 1}' y2='{9}' stroke='black' stroke-width='{(i % 3 == 2 ? ".03" : ".01")}' />").JoinString()}
+            {Enumerable.Range(0, 8).Select(i => $@"<line x1='0' y1='{i + 1}' x2='{9}' y2='{i + 1}' stroke='black' stroke-width='{(i % 3 == 2 ? ".03" : ".01")}' />").JoinString()}
+            <rect x='0' y='0' width='9' height='9' stroke='black' stroke-width='.05' fill='none' />
+            {constraints.Where(c => c.SvgAboveLines).Select(c => c.Svg).JoinString()}
+        ";
 
         private static readonly string[] _cellColors = "white;hsl(0, 100%, 94%);white;hsl(52, 100%, 89%);hsl(0, 0%, 94%);hsl(226, 100%, 94%);white;hsl(103, 84%, 95%);white".Split(';');
         private static readonly string[] _highlightedCellColors = "#aaa;hsl(0, 70%, 50%);#aaa;hsl(52, 80%, 40%);#999;hsl(226, 60%, 50%);#aaa;hsl(103, 50%, 50%);#aaa".Split(';');

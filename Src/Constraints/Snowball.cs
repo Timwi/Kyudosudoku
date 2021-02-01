@@ -10,7 +10,15 @@ namespace KyudosudokuWebsite
     sealed class Snowball : KyuConstraint
     {
         public override string Name => "Snowball";
-        public override string Description => "One of the regions contains the same digits as the other, plus or minus a consistent addend. For example, if one region contains 1, 5, 7, the other might contain 2, 6, 8 or 3, 7, 9.";
+        public override string Description => "One of the regions must contain the same digits as the other, plus or minus a consistent addend. For example, if one region contains 1, 4, 7, the other might contain 3, 6, 9. (The digits within one region need not necessarily be different. The addend can be zero.)";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Snowball(new[] { 0, 1, 9 }, new[] { 11, 12, 20 }) },
+            Cells = { 0, 1, 9, 11, 12, 20 },
+            Good = { 1, 4, 7, 3, 6, 9 },
+            Bad = { 1, 4, 7, 3, 5, 8 },
+            Reason = "3 is 2 more than 1, but 5 and 8 are only 1 more than 4 and 7."
+        };
 
         public int[] Cells1 { get; private set; }
         public int[] Cells2 { get; private set; }
@@ -21,12 +29,12 @@ namespace KyudosudokuWebsite
 
         public override string Svg => GenerateSvgPath(Cells1, 0, 0).Apply(path1 => GenerateSvgPath(Cells2, 0, 0).Apply(path2 => $@"
             <filter id='snowball-filter-a' color-interpolation-filters='sRGB'>
-                <feGaussianBlur result='fbSourceGraphic' stdDeviation='.02' />
+                <feGaussianBlur result='fbSourceGraphic' stdDeviation='.03' />
             </filter>
             <clipPath id='snowball-clip-a' clipPathUnits='userSpaceOnUse'><path d='{path1}' /></clipPath>
             <clipPath id='snowball-clip-b' clipPathUnits='userSpaceOnUse'><path d='{path2}' /></clipPath>
-            <path d='{path1}' fill='none' stroke='black' stroke-width='.075' filter='url(#snowball-filter-a)' clip-path='url(#snowball-clip-a)' />
-            <path d='{path2}' fill='none' stroke='black' stroke-width='.075' filter='url(#snowball-filter-a)' clip-path='url(#snowball-clip-b)' />
+            <path d='{path1}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a)' clip-path='url(#snowball-clip-a)' />
+            <path d='{path2}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a)' clip-path='url(#snowball-clip-b)' />
         "));
 
         public override bool Verify(int[] grid)

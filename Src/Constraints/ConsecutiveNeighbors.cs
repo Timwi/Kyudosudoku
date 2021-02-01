@@ -7,6 +7,14 @@ namespace KyudosudokuWebsite
     {
         public override string Name => "Consecutive neighbors";
         public override string Description => "The two marked cells must be consecutive (have a difference of 1).";
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new ConsecutiveNeighbors(10, 11) },
+            Cells = { 10, 11 },
+            Good = { 3, 4 },
+            Bad = { 3, 7 },
+            Reason = "3 and 7 are not consecutive numbers."
+        };
 
         public ConsecutiveNeighbors(int cell1, int cell2) : base(cell1, cell2) { }
         private ConsecutiveNeighbors() { }   // for Classify

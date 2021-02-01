@@ -12,6 +12,15 @@ namespace KyudosudokuWebsite
         public override string Description => $"The first and last number in the region represent the sizes of two armies, who march inward; the clue ({Clue}) specifies the sum of the digits that are either sandwiched between the armies or within the armies’ overlap.";
         public override double ExtraTop => IsCol ? .5 : 0;
         public override bool ShownTopLeft => true;
+        public static readonly Example Example = new Example
+        {
+            Constraints = { new Battlefield(false, 0, 20) },
+            Cells = { 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+            Good = { 2, 1, 8, 5, 7, 3, 9, 6, 4 },
+            Bad = { 5, 1, 4, 6, 7, 3, 9, 2, 8 },
+            Reason = "The armies (sizes 5 and 8) overlap at the 1, 4, 6 and 7, which adds up to 18.",
+            Wide = true
+        };
 
         public Battlefield(bool isCol, int rowCol, int clue) : base(isCol, rowCol)
         {
@@ -25,7 +34,7 @@ namespace KyudosudokuWebsite
 
         public override bool Verify(int[] grid) => BattlefieldUniquenessConstraint.CalculateBattlefieldClue(GetAffectedCells(false).Select(cell => grid[cell]).ToArray()) == Clue;
 
-        public override string Svg => $@"<g transform='translate({Kyudosudoku.SudokuX + (IsCol ? RowCol : -1)}, {Kyudosudoku.SudokuY + (IsCol ? -.85 : RowCol)}) scale(.001)'>
+        public override string Svg => $@"<g transform='translate({(IsCol ? RowCol : -1)}, {(IsCol ? -.85 : RowCol)}) scale(.001)'>
             <linearGradient id='battlefield-e'>
               <stop offset='0' stop-color='#fff'/>
               <stop offset='1' stop-color='#fff' stop-opacity='0'/>
