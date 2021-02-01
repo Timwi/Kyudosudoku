@@ -201,30 +201,44 @@ namespace KyudosudokuWebsite
 
         private static IEnumerable<KyuConstraint> GenerateConstraints(int[] sudoku, Random rnd)
         {
+            // Start by generating all orthogonally contiguous regions that contain unique digits.
+            // Several constraints make use of these, so it makes sense to generate them only once.
+
+            var uniquenessRegions = GenerateUniqueContiguousRegions(sudoku);
+
+
+            // The numbers balance the relative probabilities of each constraint occurring so that they each occur reasonably similarly often.
+
             var constraintGenerators = Ut.NewArray<(int num, Func<int[], IList<KyuConstraint>> generator)>(
                 // Cell constraints
-                (5, OddEven.Generate),
-                (5, AntiBishop.Generate),
-                (5, AntiKnight.Generate),
-                (5, AntiKing.Generate),
-                (5, NoConsecutive.Generate),
-
-                // Row/column constraints
-                (5, Sandwich.Generate),
-                (5, Skyscraper.Generate),
-                (5, Battlefield.Generate),
-                (5, Binairo.Generate),
+                (88, AntiBishop.Generate),
+                (250, AntiKing.Generate),
+                (146, AntiKnight.Generate),
+                (146, NoConsecutive.Generate),
+                (88, OddEven.Generate),
 
                 // Area constraints
-                (5, Thermometer.Generate),
-                (5, Arrow.Generate),
-                (5, Palindrome.Generate),
-                (5, KillerCage.Generate),
-                (5, RenbanCage.Generate),
+                (24, Arrow.Generate),
+                (41, s => KillerCage.Generate(s, uniquenessRegions)),
+                (18, Palindrome.Generate),
+                (40, s => RenbanCage.Generate(s, uniquenessRegions)),
+                (20, Snowball.Generate),
+                (29, Thermometer.Generate),
+
+                // Row/column constraints
+                (37, Battlefield.Generate),
+                (159, Binairo.Generate),
+                (27, Sandwich.Generate),
+                (46, Skyscraper.Generate),
+                (25, ToroidalSandwich.Generate),
+                (22, XSum.Generate),
 
                 // Other
-                (200, ConsecutiveNeighbors.Generate),
-                (200, DoubleNeighbors.Generate)
+                (60, Clockface.Generate),
+                (65, ConsecutiveNeighbors.Generate),
+                (80, DoubleNeighbors.Generate),
+                (63, Inclusion.Generate),
+                (13, LittleKiller.Generate)
             );
 
             foreach (var (num, generator) in constraintGenerators)
@@ -244,6 +258,33 @@ namespace KyudosudokuWebsite
                     yield return generated[j];
                 }
             }
+        }
+
+        public static int[][] GenerateUniqueContiguousRegions(int[] sudoku)
+        {
+            IEnumerable<bool[]> generateRegions(bool[] sofar, bool[] banned, int count)
+            {
+                if (count >= 2)
+                    yield return sofar;
+                if (count >= 9)
+                    yield break;
+
+                for (var adj = 0; adj < 81; adj++)
+                {
+                    if (banned[adj] || !KyuConstraint.Orthogonal(adj).Any(a => sofar[a]) || sofar.Any((b, ix) => b && ix != adj && sudoku[ix] == sudoku[adj]))
+                        continue;
+                    sofar[adj] = true;
+                    banned[adj] = true;
+                    foreach (var item in generateRegions(sofar, (bool[]) banned.Clone(), count + 1))
+                        yield return item;
+                    sofar[adj] = false;
+                }
+            }
+            var uniquenessRegions = Enumerable.Range(0, 81)
+                .SelectMany(startIx => generateRegions(Ut.NewArray(81, x => x == startIx), Ut.NewArray(81, x => x <= startIx), 1))
+                .Select(region => region.SelectIndexWhere(b => b).ToArray())
+                .ToArray();
+            return uniquenessRegions;
         }
     }
 }

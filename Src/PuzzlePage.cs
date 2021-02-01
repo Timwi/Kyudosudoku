@@ -66,13 +66,14 @@ namespace KyudosudokuWebsite
             }
             else
             {
-                puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(), ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
+                puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
+                    dbPuzzle.Constraints == null ? new KyuConstraint[0] : ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
             }
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 
-            var extraTop = puzzle.Constraints.Max(c => c.ExtraTop);
-            var extraRight = puzzle.Constraints.Max(c => c.ExtraRight);
+            var extraTop = puzzle.Constraints.MaxOrDefault(c => c.ExtraTop, 0);
+            var extraRight = puzzle.Constraints.MaxOrDefault(c => c.ExtraRight, 0);
 
             return RenderPageTagSoup($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true, PuzzleID = puzzleId },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
@@ -124,10 +125,10 @@ namespace KyudosudokuWebsite
                             <g font-size='.45' transform='translate(0, 1.3)'>
                                 <text text-anchor='start' x='-7.7' y='0'>Solved:</text>
                                 <text class='inf-count' text-anchor='start' x='-6.1' y='0' font-weight='bold'></text>
-                                <text text-anchor='start' x='-4.25' y='0'>Your time:</text>
-                                <text class='inf-time' text-anchor='start' x='-1.95' y='0' font-weight='bold'></text>
-                                <text text-anchor='start' x='2' y='0'>Average:</text>
-                                <text class='inf-avg' text-anchor='start' x='3.95' y='0' font-weight='bold'></text>
+                                <text text-anchor='start' x='-4' y='0'>Your time:</text>
+                                <text class='inf-time' text-anchor='start' x='-1.7' y='0' font-weight='bold'></text>
+                                <text text-anchor='start' x='2.05' y='0'>Average:</text>
+                                <text class='inf-avg' text-anchor='start' x='4' y='0' font-weight='bold'></text>
                             </g>
                         </g>
                     </svg>")));

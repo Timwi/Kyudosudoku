@@ -54,14 +54,14 @@ namespace KyudosudokuWebsite
                 }
 
                 if (cells1.Length >= 3)
-                    yield return new Palindrome((adjacent(cells1[1]).Contains(cells2[1]) ? cells1.Skip(1) : cells1).Reverse().Concat(cells2.Skip(1)).ToArray());
+                    yield return new Palindrome((Adjacent(cells1[1]).Contains(cells2[1]) ? cells1.Skip(1) : cells1).Reverse().Concat(cells2.Skip(1)).ToArray());
 
                 if (cells1.Length > 4)
                     yield break;
 
-                foreach (var adj1 in adjacent(cells1.Last()))
+                foreach (var adj1 in Adjacent(cells1.Last()))
                     if (!cells1.Contains(adj1) && !cells2.Contains(adj1) && noDiagonalCrossingExists(cells1, cells1.Last(), adj1))
-                        foreach (var adj2 in adjacent(cells2.Last()))
+                        foreach (var adj2 in Adjacent(cells2.Last()))
                             if (adj2 != adj1 && sudoku[adj1] == sudoku[adj2] && !cells1.Contains(adj2) && !cells2.Contains(adj2) && noDiagonalCrossingExists(cells2, cells2.Last(), adj2))
                                 foreach (var item in recurse(cells1.Insert(cells1.Length, adj1), cells2.Insert(cells2.Length, adj2)))
                                     yield return item;

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using PuzzleSolvers;
 using RT.Util;
 using RT.Util.ExtensionMethods;
@@ -33,10 +32,10 @@ namespace KyudosudokuWebsite
 
         public override bool ClashesWith(KyuConstraint other) => other is KyuRegionConstraint kc && kc.Cells.Intersect(Cells).Any();
 
-        public override string Svg => $"<path d='{GenerateSvgPath(.06, .06, Sum.NullOr(s => .275), Sum.NullOr(s => .25))}' fill='none' stroke='black' stroke-width='.025' stroke-dasharray='.09,.07' />"
+        public override string Svg => $"<path d='{GenerateSvgPath(Cells, .06, .06, Sum.NullOr(s => .275), Sum.NullOr(s => .25))}' fill='none' stroke='black' stroke-width='.025' stroke-dasharray='.09,.07' />"
             + Sum.NullOr(s => $"<text x='{svgX(Cells.Min()) - .46}' y='{svgY(Cells.Min()) - .25}' text-anchor='start' font-size='.25'>{s}</text>");
 
-        public static IList<KyuConstraint> Generate(int[] sudoku) => generateUniquenessRegions(sudoku)
+        public static IList<KyuConstraint> Generate(int[] sudoku, int[][] uniquenessRegions) => uniquenessRegions
             .SelectMany(region => new KyuConstraint[] { new KillerCage(region, region.Sum(c => sudoku[c])), new KillerCage(region, null) })
             .ToList();
     }

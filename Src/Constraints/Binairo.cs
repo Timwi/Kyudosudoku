@@ -55,9 +55,6 @@ namespace KyudosudokuWebsite
                 var i = ix.Value;
                 var x = AffectedCells.IndexOf(i);
 
-                //if ((i == 5 + 9 * 7 && grid[i] + minValue == 1) || (i == 6 + 9 * 7 && grid[i] + minValue == 9) || (i == 7 + 9 * 7 && grid[i] + minValue == 5))
-                //    System.Diagnostics.Debugger.Break();
-
                 foreach (var (offset, toEnforce) in _combinations)
                 {
                     if (x + offset >= 0 && x + offset < 9 && x + toEnforce >= 0 && x + toEnforce < 9 && grid[AffectedCells[x + offset]] != null && grid[AffectedCells[x + offset]].Value % 2 == grid[i].Value % 2 && grid[AffectedCells[x + toEnforce]] == null)
@@ -67,53 +64,6 @@ namespace KyudosudokuWebsite
                 }
                 return null;
             }
-
-            //public sealed class BinairoRowConstraint : Constraint
-            //{
-            //    public BinairoRowConstraint(int[] affectedCells) : base(affectedCells) { }
-            //    public override IEnumerable<Constraint> MarkTakens(bool[][] takens, int?[] grid, int? ix, int minValue, int maxValue)
-            //    {
-            //        if (ix == null)
-            //            return null;
-
-            //        var pos = Array.IndexOf(AffectedCells, ix.Value);
-            //        if (pos == -1)
-            //            return null;
-
-            //        // Sandwich between pos-2 and pos
-            //        if (pos > 1 && grid[AffectedCells[pos - 2]] != null && grid[AffectedCells[pos - 2]].Value % 2 == grid[ix.Value].Value % 2)
-            //            for (var v = 0; v < takens[AffectedCells[pos]].Length; v++)
-            //                if ((v + minValue) % 2 == grid[ix.Value].Value % 2)
-            //                    takens[AffectedCells[pos - 1]][v] = true;
-
-            //        // Either side of pos-1 and pos
-            //        if (pos > 0 && grid[AffectedCells[pos - 1]] != null && grid[AffectedCells[pos - 1]].Value % 2 == grid[ix.Value].Value % 2)
-            //            for (var v = 0; v < takens[AffectedCells[pos]].Length; v++)
-            //            {
-            //                if ((v + minValue) % 2 == grid[ix.Value].Value % 2 && pos > 1)
-            //                    takens[AffectedCells[pos - 2]][v] = true;
-            //                if ((v + minValue) % 2 == grid[ix.Value].Value % 2 && pos < AffectedCells.Length - 1)
-            //                    takens[AffectedCells[pos + 1]][v] = true;
-            //            }
-
-            //        // Either side of pos and pos+1
-            //        if (pos < AffectedCells.Length - 1 && grid[AffectedCells[pos + 1]] != null && grid[AffectedCells[pos + 1]].Value % 2 == grid[ix.Value].Value % 2)
-            //            for (var v = 0; v < takens[AffectedCells[pos]].Length; v++)
-            //            {
-            //                if ((v + minValue) % 2 == grid[ix.Value].Value % 2 && pos > 0)
-            //                    takens[AffectedCells[pos - 1]][v] = true;
-            //                if ((v + minValue) % 2 == grid[ix.Value].Value % 2 && pos < AffectedCells.Length - 2)
-            //                    takens[AffectedCells[pos + 2]][v] = true;
-            //            }
-
-            //        // Sandwich between pos and pos+2
-            //        if (pos < AffectedCells.Length - 2 && grid[AffectedCells[pos + 2]] != null && grid[AffectedCells[pos + 2]].Value % 2 == grid[ix.Value].Value % 2)
-            //            for (var v = 0; v < takens[AffectedCells[pos]].Length; v++)
-            //                if ((v + minValue) % 2 == grid[ix.Value].Value % 2)
-            //                    takens[AffectedCells[pos + 1]][v] = true;
-
-            //        return null;
-            //    }
         }
     }
 }

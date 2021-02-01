@@ -1,15 +1,15 @@
 ﻿window.addEventListener('DOMContentLoaded', function()
 {
     let colors = [
-        ["white", "#aaa"],
+        ["white", "hsl(0, 0%, 50%)"],
         ["hsl(0, 100%, 94%)", "hsl(0, 70%, 50%)"],
-        ["white", "#aaa"],
-        ["hsl(52, 100%, 89%)", "hsl(52, 80%, 40%)"],
-        ["hsl(0, 0%, 94%)", "#999"],
+        ["white", "hsl(0, 0%, 50%)"],
+        ["hsl(52, 100%, 89%)", "hsl(52, 100%, 35%)"],
+        ["hsl(0, 0%, 94%)", "hsl(0, 0%, 40%)"],
         ["hsl(226, 100%, 94%)", "hsl(226, 60%, 50%)"],
-        ["white", "#aaa"],
+        ["white", "hsl(0, 0%, 50%)"],
         ["hsl(103, 84%, 95%)", "hsl(103, 50%, 50%)"],
-        ["white", "#aaa"]
+        ["white", "hsl(0, 0%, 50%)"]
     ];
     let invalidCellColor = '#f00';
 
@@ -82,6 +82,24 @@
                 return sandwich.some(n => n === null) ? null : sandwich.reduce((p, n) => p + n, 0) === constr.Sum;
             }
 
+            case 'ToroidalSandwich': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * x) : (x + 9 * constr.RowCol)]);
+                let p1 = numbers.indexOf(constr.Digit1);
+                let p2 = numbers.indexOf(constr.Digit2);
+                if (p1 === -1 || p2 === -1)
+                    return numbers.some(n => n === null) ? null : false;
+                let s = 0;
+                let i = (p1 + 1) % numbers.length;
+                while (i !== p2)
+                {
+                    if (numbers[i] === null)
+                        return null;
+                    s += numbers[i];
+                    i = (i + 1) % numbers.length;
+                }
+                return s === constr.Sum;
+            }
+
             case 'Skyscraper': {
                 let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
                 if (numbers.some(n => n === null))
@@ -94,6 +112,13 @@
                         c++;
                     }
                 return c === constr.Clue;
+            }
+
+            case 'XSum': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
+                if (numbers[0] === null || numbers.slice(0, numbers[0]).some(n => n === null))
+                    return null;
+                return constr.Clue === numbers.slice(0, numbers[0]).reduce((p, n) => p + n, 0);
             }
 
             case 'Battlefield': {
@@ -160,6 +185,11 @@
                 return numbers.some(n => n === null) ? null : numbers.filter(n => !numbers.includes(n + 1)).length === 1;
             }
 
+            case 'Snowball': {
+                let offsets = [...new Set(Array(constr.Cells1.length).fill(null).map((_, ix) => grid[constr.Cells1[ix]] === null || grid[constr.Cells2[ix]] === null ? null : grid[constr.Cells2[ix]] - grid[constr.Cells1[ix]]).filter(c => c !== null))];
+                return offsets.length > 1 ? false : constr.Cells1.some(n => grid[n] === null) || constr.Cells2.some(n => grid[n] === null) ? null : true;
+            }
+
             // OTHER CONSTRAINTS
 
             case 'ConsecutiveNeighbors':
@@ -167,6 +197,35 @@
 
             case 'DoubleNeighbors':
                 return grid[constr.Cell1] === null || grid[constr.Cell2] === null ? null : grid[constr.Cell1] * 2 === grid[constr.Cell2] || grid[constr.Cell2] * 2 === grid[constr.Cell1];
+
+            case 'LittleKiller': {
+                let affectedCells = [];
+                switch (constr.Direction)
+                {
+                    case 'SouthEast': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => constr.Offset + 10 * i); break;
+                    case 'SouthWest': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 8 + 9 * constr.Offset + 8 * i); break;
+                    case 'NorthWest': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 80 - constr.Offset - 10 * i); break;
+                    case 'NorthEast': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 72 - 9 * constr.Offset - 8 * i); break;
+                };
+                return affectedCells.some(c => grid[c] === null) ? null : affectedCells.reduce((p, n) => p + grid[n], 0) === constr.Sum;
+            }
+
+            case 'Clockface': {
+                let numbers = [0, 1, 10, 9].map(o => grid[constr.TopLeftCell + o]);
+                if (numbers.some(n => n === null))
+                    return null;
+                let a = numbers[0], b = numbers[1], c = numbers[2], d = numbers[3];
+                return constr.Clockwise
+                    ? (a < b && b < c && c < d) || (b < c && c < d && d < a) || (c < d && d < a && a < b) || (d < a && a < b && b < c)
+                    : (a > b && b > c && c > d) || (b > c && c > d && d > a) || (c > d && d > a && a > b) || (d > a && a > b && b > c);
+            }
+
+            case 'Inclusion': {
+                let numbers = [0, 1, 10, 9].map(o => grid[constr.TopLeftCell + o]);
+                if (numbers.some(n => n === null))
+                    return null;
+                return constr.Digits.every(d => numbers.filter(n => n === d).length >= constr.Digits.filter(d2 => d2 === d).length);
+            }
         }
     }
 
@@ -203,7 +262,7 @@
         }
 
         let kyudokuGrids = [0, 1, 2, 3].map(corner => Array(36).fill(null).map((_, cell) => parseInt(document.getElementById(`p-${puzzleId}-kyudo-${corner}-text-${cell}`).textContent)));
-        let constraints = JSON.parse(puzzleDiv.dataset.constraints) || [];
+        let constraints = JSON.parse(puzzleDiv.dataset.constraints || null) || [];
 
         let state = {
             circledDigits: Array(4).fill(null).map(_ => Array(36).fill(null)),
