@@ -34,19 +34,18 @@ namespace KyudosudokuWebsite
         {
             get
             {
+                int id;
                 lock (_lockObject)
-                {
-                    _svgIdCounter = (_svgIdCounter + 1) % int.MaxValue;
-                    return GenerateSvgPath(Cells1, 0, 0).Apply(path1 => GenerateSvgPath(Cells2, 0, 0).Apply(path2 => $@"
-                        <filter id='snowball-filter-a-{_svgIdCounter}' color-interpolation-filters='sRGB'>
-                            <feGaussianBlur result='fbSourceGraphic' stdDeviation='.03' />
-                        </filter>
-                        <clipPath id='snowball-clip-a-{_svgIdCounter}' clipPathUnits='userSpaceOnUse'><path d='{path1}' /></clipPath>
-                        <clipPath id='snowball-clip-b-{_svgIdCounter}' clipPathUnits='userSpaceOnUse'><path d='{path2}' /></clipPath>
-                        <path d='{path1}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a-{_svgIdCounter})' clip-path='url(#snowball-clip-a-{_svgIdCounter})' />
-                        <path d='{path2}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a-{_svgIdCounter})' clip-path='url(#snowball-clip-b-{_svgIdCounter})' />
-                    "));
-                }
+                    id = _svgIdCounter = (_svgIdCounter + 1) % int.MaxValue;
+                return GenerateSvgPath(Cells1, 0, 0).Apply(path1 => GenerateSvgPath(Cells2, 0, 0).Apply(path2 => $@"
+                    <filter id='snowball-filter-a-{id}' color-interpolation-filters='sRGB'>
+                        <feGaussianBlur result='fbSourceGraphic' stdDeviation='.03' />
+                    </filter>
+                    <clipPath id='snowball-clip-a-{id}' clipPathUnits='userSpaceOnUse'><path d='{path1}' /></clipPath>
+                    <clipPath id='snowball-clip-b-{id}' clipPathUnits='userSpaceOnUse'><path d='{path2}' /></clipPath>
+                    <path d='{path1}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a-{id})' clip-path='url(#snowball-clip-a-{id})' />
+                    <path d='{path2}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a-{id})' clip-path='url(#snowball-clip-b-{id})' />
+                "));
             }
         }
 
