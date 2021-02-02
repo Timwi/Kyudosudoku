@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -55,6 +56,7 @@ namespace KyudosudokuWebsite
                 }
                 catch (Exception e)
                 {
+                    Log.Error($"Kyudosudoku: Generating puzzle {puzzleId} caused exception:");
                     Log.Exception(e);
                     dbPuzzle.Invalid = true;
                     db.SaveChanges();
@@ -195,9 +197,18 @@ namespace KyudosudokuWebsite
 
             if (req.Post["getdata"].Value == "1")
             {
-                var average = (int?) db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => (double?) up.Time);
+                var median = db.Database.SqlQuery<int>(@"
+                    DECLARE @c BIGINT = (SELECT COUNT(*) FROM UserPuzzles WHERE PuzzleID=@puz AND Solved=1);
+                    SELECT Time FROM UserPuzzles
+	                    WHERE PuzzleID=@puz AND Solved=1
+                        ORDER BY Time
+                        OFFSET (@c - 1) / 2 ROWS
+                        FETCH NEXT 1 + (1 - @c % 2) ROWS ONLY
+                ", new SqlParameter("@puz", puzzleId)).DefaultIfEmpty().Average();
+
+                //var average = (int?) db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => (double?) up.Time);
                 var count = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Count();
-                return HttpResponse.Json(new JsonDict { { "time", already?.Time }, { "avg", average }, { "count", count } });
+                return HttpResponse.Json(new JsonDict { { "time", already?.Time }, { "avg", (int) median }, { "count", count } });
             }
 
             return HttpResponse.Empty(HttpStatusCode._200_OK);
