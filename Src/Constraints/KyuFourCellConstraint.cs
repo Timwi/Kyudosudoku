@@ -20,6 +20,7 @@ namespace KyudosudokuWebsite
 
         public override bool SvgAboveLines => true;
         public sealed override bool Verify(int[] grid) => verify(grid[TopLeftCell], grid[TopLeftCell + 1], grid[TopLeftCell + 10], grid[TopLeftCell + 9]);
+        public sealed override bool IncludesCell(int cell) => cell == TopLeftCell || cell == TopLeftCell + 1 || cell == TopLeftCell + 10 || cell == TopLeftCell + 9;
 
         public override bool ClashesWith(KyuConstraint other) => other switch
         {

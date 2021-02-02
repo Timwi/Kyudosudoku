@@ -9,7 +9,7 @@ namespace KyudosudokuWebsite
     sealed class Inclusion : KyuFourCellConstraint, IEquatable<Inclusion>
     {
         public override string Name => "Inclusion";
-        public override string Description => $"The four cells around the circle must contain the digits {(Digits.JoinString(", ", lastSeparator: " and "))} in some order.";
+        public override string Description => $"The four cells around the circle must contain the {(Digits.Length == 1 ? $"digit {Digits[0]}" : $"digits {(Digits.JoinString(", ", lastSeparator: " and "))} in some order")}.";
         public static readonly Example Example = new Example
         {
             Constraints = { new Inclusion(2, new[] { 3, 3, 7 }) },

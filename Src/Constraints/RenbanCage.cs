@@ -20,7 +20,6 @@ namespace KyudosudokuWebsite
         };
 
         public RenbanCage(int[] cells) : base(cells) { }
-
         private RenbanCage() { }    // for Classify
 
         protected override Constraint getConstraint() => new ConsecutiveUniquenessConstraint(Cells);

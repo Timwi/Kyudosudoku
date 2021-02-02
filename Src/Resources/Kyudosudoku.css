@@ -146,6 +146,11 @@ th, td {
         fill: hsl(212, 90%, 90%);
     }
 
+    .puzzle .edge-cell {
+        fill: transparent;
+        stroke: none;
+    }
+
 .choice > a {
     display: inline-block;
     width: 7.5cm;
@@ -252,9 +257,10 @@ hr {
         padding: .2cm .5cm;
         text-decoration: none;
     }
-    .jump a:hover {
-        background: hsl(220, 70%, 80%);
-    }
+
+        .jump a:hover {
+            background: hsl(220, 70%, 80%);
+        }
 
 table.example th, table.example td {
     text-align: center;

@@ -26,6 +26,7 @@ namespace KyudosudokuWebsite
         private Palindrome() { }   // for Classify
 
         protected override Constraint getConstraint() => new CloneConstraint(Cells.Subarray(0, Cells.Length / 2), Cells.Subarray((Cells.Length + 1) / 2).ReverseInplace());
+        public sealed override bool IncludesCell(int cell) => Cells.Contains(cell);
 
         public override string Svg => $@"<g opacity='.2'>
             <path d='M{Cells.Select(c => $"{svgX(c)} {svgY(c)}").JoinString(" ")}' stroke='black' stroke-width='.2' stroke-linecap='square' stroke-linejoin='bevel' fill='none' />

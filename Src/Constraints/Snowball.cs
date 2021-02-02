@@ -26,26 +26,37 @@ namespace KyudosudokuWebsite
         private Snowball() { }      // for Classify
 
         protected override Constraint getConstraint() => new OffsetCloneConstraint(Cells1, Cells2);
+        public sealed override bool IncludesCell(int cell) => Cells1.Contains(cell) || Cells2.Contains(cell);
 
-        public override string Svg => GenerateSvgPath(Cells1, 0, 0).Apply(path1 => GenerateSvgPath(Cells2, 0, 0).Apply(path2 => $@"
-            <filter id='snowball-filter-a' color-interpolation-filters='sRGB'>
-                <feGaussianBlur result='fbSourceGraphic' stdDeviation='.03' />
-            </filter>
-            <clipPath id='snowball-clip-a' clipPathUnits='userSpaceOnUse'><path d='{path1}' /></clipPath>
-            <clipPath id='snowball-clip-b' clipPathUnits='userSpaceOnUse'><path d='{path2}' /></clipPath>
-            <path d='{path1}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a)' clip-path='url(#snowball-clip-a)' />
-            <path d='{path2}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a)' clip-path='url(#snowball-clip-b)' />
-        "));
-
-        public override bool Verify(int[] grid)
+        private static int _svgIdCounter = 0;
+        private static readonly object _lockObject = new object();
+        public override string Svg
         {
-            throw new NotImplementedException();
+            get
+            {
+                lock (_lockObject)
+                {
+                    _svgIdCounter = (_svgIdCounter + 1) % int.MaxValue;
+                    return GenerateSvgPath(Cells1, 0, 0).Apply(path1 => GenerateSvgPath(Cells2, 0, 0).Apply(path2 => $@"
+                        <filter id='snowball-filter-a-{_svgIdCounter}' color-interpolation-filters='sRGB'>
+                            <feGaussianBlur result='fbSourceGraphic' stdDeviation='.03' />
+                        </filter>
+                        <clipPath id='snowball-clip-a-{_svgIdCounter}' clipPathUnits='userSpaceOnUse'><path d='{path1}' /></clipPath>
+                        <clipPath id='snowball-clip-b-{_svgIdCounter}' clipPathUnits='userSpaceOnUse'><path d='{path2}' /></clipPath>
+                        <path d='{path1}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a-{_svgIdCounter})' clip-path='url(#snowball-clip-a-{_svgIdCounter})' />
+                        <path d='{path2}' fill='none' stroke='#666' stroke-width='.08' filter='url(#snowball-filter-a-{_svgIdCounter})' clip-path='url(#snowball-clip-b-{_svgIdCounter})' />
+                    "));
+                }
+            }
         }
+
+        public override bool Verify(int[] grid) => Cells1.Select((c1, ix) => grid[Cells2[ix]] - grid[c1]).Distinct().ToArray().Length == 1;
 
         public override bool ClashesWith(KyuConstraint other) => other switch
         {
             RenbanCage => false,
             KillerCage => false,
+            Snowball sn => sn.Cells1.Length == Cells1.Length || sn.Cells1.Concat(sn.Cells2).Intersect(Cells1.Concat(Cells2)).Any(),
             KyuRegionConstraint kr => Cells1.Concat(Cells2).Intersect(kr.Cells).Any(),
             _ => false
         };

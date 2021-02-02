@@ -8,9 +8,18 @@ namespace KyudosudokuWebsite
     sealed class LittleKiller : KyuConstraint
     {
         public override string Name => "Diagonal sum";
-        public override string Description => "The digits along the indicated diagonal must sum up to the specified total. (The digits need not necessarily be unique.)";
+        public override string Description => "The digits along the indicated diagonal must sum to the specified total. (The digits need not necessarily be different.)";
         public override double ExtraRight => Direction == ClueDirection.SouthWest ? .25 : 0;
         public override double ExtraTop => Direction == ClueDirection.SouthEast ? .25 : 0;
+        public override bool IncludesCell(int cell) => false;
+        public override bool IncludesRowCol(bool isCol, int rowCol, bool topLeft) => Direction switch
+        {
+            ClueDirection.SouthEast => isCol && rowCol == Offset - 1 && topLeft,
+            ClueDirection.SouthWest => !isCol && rowCol == Offset - 1 && !topLeft,
+            ClueDirection.NorthWest => isCol && rowCol == 9 - Offset && !topLeft,
+            ClueDirection.NorthEast => !isCol && rowCol == 9 - Offset && topLeft,
+            _ => false
+        };
         public static readonly Example Example = new Example
         {
             Constraints = { new LittleKiller(ClueDirection.NorthEast, 7, 8) },
@@ -61,14 +70,8 @@ namespace KyudosudokuWebsite
 
         public override bool ClashesWith(KyuConstraint other) => other switch
         {
-            KyuRowColConstraint rc => Direction switch
-            {
-                ClueDirection.SouthEast => rc.IsCol && rc.RowCol == Offset - 1 && rc.ShownTopLeft,
-                ClueDirection.SouthWest => !rc.IsCol && rc.RowCol == Offset - 1 && !rc.ShownTopLeft,
-                ClueDirection.NorthWest => rc.IsCol && rc.RowCol == 9 - Offset && !rc.ShownTopLeft,
-                ClueDirection.NorthEast => !rc.IsCol && rc.RowCol == 9 - Offset && rc.ShownTopLeft,
-                _ => false
-            },
+            KyuRowColConstraint rc => IncludesRowCol(rc.IsCol, rc.RowCol, rc.ShownTopLeft),
+            LittleKiller lk => lk.Direction == Direction && lk.Offset == Offset,
             _ => false
         };
 

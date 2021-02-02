@@ -135,25 +135,23 @@ namespace KyudosudokuWebsite
 
         private IEnumerable<object> renderExamples(params Example[] examples)
         {
-            for (var exampleId = 0; exampleId < examples.Length; exampleId++)
+            foreach (var example in examples)
             {
-                var example = examples[exampleId];
-                var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(3 * exampleId + 1, example.Constraints, glow: false, givens: example.BadGivens, wide: example.Wide),
+                var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(example.Constraints, glow: false, givens: example.BadGivens, wide: example.Wide),
                     new DIV(new SPAN("✗ Invalid", example.Reason == null ? "." : ":"), example.Reason.NullOr(r => new DIV(r))));
-                var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(3 * exampleId + 2, example.Constraints, glow: true, givens: example.GoodGivens, wide: example.Wide),
+                var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(example.Constraints, glow: true, givens: example.GoodGivens, wide: example.Wide),
                     new DIV(new SPAN("✓ Valid.")));
                 if (example.Wide)
                     yield return new TABLE { class_ = "example" }._(
                         new TR(
-                            new TD { rowspan = 2 }._(clippedSudokuGrid(3 * exampleId, example.Constraints)),
+                            new TD { rowspan = 2 }._(clippedSudokuGrid(example.Constraints)),
                             new TD { rowspan = 2, class_ = "explanation" }._(new H4(example.Constraints.First().Name), example.Constraints.Select(c => new P(c.Description))),
                             invalidTd),
-                        new TR(
-                            validTd));
+                        new TR(validTd));
                 else
                     yield return new TABLE { class_ = "example" }._(
                         new TR(
-                            new TD(clippedSudokuGrid(3 * exampleId, example.Constraints)),
+                            new TD(clippedSudokuGrid(example.Constraints)),
                             new TD { class_ = "explanation" }._(new H4(example.Constraints.First().Name), example.Constraints.Select(c => new P(c.Description))),
                             invalidTd,
                             validTd));
@@ -161,15 +159,7 @@ namespace KyudosudokuWebsite
             }
         }
 
-        private object clippedSudokuGrid(int exampleId, IEnumerable<KyuConstraint> constraints, bool? glow = null, Dictionary<int, int?> givens = null, bool wide = false)
-        {
-            //return new RawTag($@"<svg viewBox='-1 {(wide ? -.25 : -1)} {(wide ? 10.25 : 5.5)} {(wide ? 1.75 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
-            //    <clipPath id='example-clip-{exampleId}' clipPathUnits='userSpaceOnUse'><path d='M-1 {(wide ? -.25 : -1)} h {(wide ? 10.25 : 5.5)} v {(wide ? 1.75 : 4.5)} h {(wide ? -10.25 : -5.5)} z' /></clipPath>
-            //    <g clip-path='url(#example-clip-{exampleId})'>{sudokuGrid(1, constraints, true, givens, glow)}</g>
-            //</svg>");
-            return new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
-                {sudokuGrid(1, constraints, true, givens, glow)}
-            </svg>");
-        }
+        private object clippedSudokuGrid(IEnumerable<KyuConstraint> constraints, bool? glow = null, Dictionary<int, int?> givens = null, bool wide = false) =>
+            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGrid(1, constraints, true, givens, glow)}</svg>");
     }
 }

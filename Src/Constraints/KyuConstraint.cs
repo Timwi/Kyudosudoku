@@ -17,6 +17,8 @@ namespace KyudosudokuWebsite
         public abstract string Svg { get; }
         public virtual bool SvgAboveLines => false;
         public abstract bool Verify(int[] grid);
+        public abstract bool IncludesCell(int cell);
+        public virtual bool IncludesRowCol(bool isCol, int rowCol, bool topLeft) => false;
 
         public virtual double ExtraTop => 0;
         public virtual double ExtraRight => 0;

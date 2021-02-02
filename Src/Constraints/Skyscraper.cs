@@ -9,7 +9,7 @@ namespace KyudosudokuWebsite
     sealed class Skyscraper : KyuRowColConstraint
     {
         public override string Name => "Skyscraper";
-        public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits represent skyscrapers, where taller ones obstruct smaller ones behind them. {Clue} skyscrapers are visible from the clue.";
+        public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits represent skyscrapers, where taller ones obstruct the view of smaller ones behind them. {Clue} skyscrapers are visible from the clue.";
         public override double ExtraTop => IsCol && !Reverse ? .5 : 0;
         public override double ExtraRight => !IsCol && Reverse ? .5 : 0;
         public override bool ShownTopLeft => !Reverse;

@@ -25,6 +25,7 @@ namespace KyudosudokuWebsite
         private Thermometer() { }   // for Classify
 
         protected override Constraint getConstraint() => new LessThanConstraint(Cells);
+        public sealed override bool IncludesCell(int cell) => Cells.Contains(cell);
 
         public override string Svg => $@"<g opacity='.2'>
             <path d='M{Cells.Select(c => $"{c % 9 + .5} {c / 9 + .5}").JoinString(" ")}' stroke='black' stroke-width='.3' stroke-linecap='round' stroke-linejoin='round' fill='none' />

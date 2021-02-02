@@ -45,6 +45,7 @@ namespace KyudosudokuWebsite
         }
 
         public override bool Verify(int[] grid) => Cells.Skip(1).Sum(c => grid[c]) == grid[Cells[0]];
+        public override bool IncludesCell(int cell) => Cells.Contains(cell);
 
         public override bool ClashesWith(KyuConstraint other) => other switch
         {
