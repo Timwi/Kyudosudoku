@@ -251,9 +251,16 @@
         };
     }
 
+    function setClass(elem, className, setUnset)
+    {
+        if (setUnset)
+            elem.classList.add(className);
+        else
+            elem.classList.remove(className);
+    }
+
     let first = true;
     let draggingMode = null;
-    let hasDragged = false;
     document.body.onmouseup = handler(function() { draggingMode = null; });
 
     Array.from(document.getElementsByClassName('puzzle')).forEach(puzzleDiv =>
@@ -285,6 +292,7 @@
         let redoBuffer = [];
 
         let mode = 'normal';
+        let helpEnabled = localStorage.getItem('kyu-help') !== 'Off';
         let selectedCells = [];
         let highlightedDigit = null;
 
@@ -602,13 +610,9 @@
                 }
             }
 
+            setClass(puzzleDiv, 'solved', isSolved);
             if (isSolved)
-            {
-                puzzleDiv.classList.add('solved');
                 dbUpdate(true);
-            }
-            else
-                puzzleDiv.classList.remove('solved');
 
             // Kyudoku grids (digits, highlights, X’s/O’s — not red glow, that’s done further up)
             for (let corner = 0; corner < 4; corner++)
@@ -666,25 +670,17 @@
             }
 
             // Button highlights
-            "normal,center,corner".split(',').forEach(btn =>
-            {
-                if (mode === btn)
-                    document.getElementById(`p-${puzzleId}-btn-${btn}`).classList.add('selected');
-                else
-                    document.getElementById(`p-${puzzleId}-btn-${btn}`).classList.remove('selected');
-            });
+            for (let btn of ["normal", "center", "corner"])
+                setClass(document.getElementById(`p-${puzzleId}-btn-${btn}`), 'selected', mode === btn);
 
-            Array(9).fill(null).forEach((_, digit) =>
+            for (let digit = 0; digit < 9; digit++)
             {
-                let btn = document.getElementById(`p-${puzzleId}-num-${digit + 1}`);
-                btn.classList.remove('selected');
-                btn.classList.remove('success');
+                let btn = document.getElementById(`p-${puzzleId}-btn-${digit + 1}`);
+                setClass(btn, 'selected', highlightedDigit === digit + 1);
+                setClass(btn, 'success', digitCounts[digit] === 9);
+            }
 
-                if (highlightedDigit === digit + 1)
-                    btn.classList.add('selected');
-                else if (digitCounts[digit] === 9)
-                    btn.classList.add('success');
-            });
+            setClass(document.getElementById(`p-${puzzleId}-btn-help`), 'selected', helpEnabled);
         }
         updateVisuals(true);
 
@@ -693,61 +689,6 @@
             undoBuffer.push(JSON.parse(JSON.stringify(state)));
             redoBuffer = [];
         }
-
-        Array.from(puzzleDiv.getElementsByClassName('kyudo-cell')).forEach(cellRect =>
-        {
-            let match = /^p-\d+-kyudo-(\d+)-cell-(\d+)$/.exec(cellRect.id);
-            if (!match)
-            {
-                console.error(`Unexpected cell ID: ${cellRect.id}`);
-                return;
-            }
-
-            let corner = parseInt(match[1]);
-            let cell = parseInt(match[2]);
-            cellRect.onclick = handler(function(ev)
-            {
-                saveUndo();
-                if (state.circledDigits[corner][cell] === null)
-                    state.circledDigits[corner][cell] = (ev.shiftKey ? true : false);
-                else if (state.circledDigits[corner][cell] === false)
-                    state.circledDigits[corner][cell] = (ev.shiftKey ? null : true);
-                else
-                    state.circledDigits[corner][cell] = (ev.shiftKey ? false : null);
-                updateVisuals(true);
-            });
-        });
-
-        Array.from(puzzleDiv.getElementsByClassName('sudoku-cell')).forEach(cellRect =>
-        {
-            let match = /^p-\d+-sudoku-cell-(\d+)$/.exec(cellRect.id);
-            if (!match)
-            {
-                console.error(`Unexpected cell ID: ${cellRect.id}`);
-                return;
-            }
-
-            let cell = parseInt(match[1]);
-            cellRect.onclick = handler(function() { });
-            cellRect.onmousedown = handler(function(ev)
-            {
-                let shift = ev.ctrlKey || ev.shiftKey;
-                draggingMode = shift && selectedCells.includes(cell) ? 'remove' : 'add';
-                highlightedDigit = null;
-                selectCell(cell, shift ? draggingMode : 'toggle');
-                updateVisuals();
-            });
-            cellRect.onmousemove = handler(function()
-            {
-                if (draggingMode === null)
-                    return;
-                let oldLength = selectedCells.length;
-                selectCell(cell, draggingMode);
-                if (selectedCells.length !== oldLength)
-                    hasDragged = true;
-                updateVisuals();
-            });
-        });
 
         function undo()
         {
@@ -841,18 +782,101 @@
             }
         }
 
-        Array(9).fill(null).forEach((_, btn) => { puzzleDiv.querySelector(`#p-${puzzleId}-num-${btn + 1}`).onclick = handler(function() { pressDigit(btn + 1); }); });
-
-        "normal,corner,center".split(',').forEach(btn =>
+        function autofill()
         {
-            puzzleDiv.querySelector(`#p-${puzzleId}-btn-${btn}>rect`).onclick = handler(function()
+            saveUndo();
+            for (let cell of selectedCells)
+                if (getDisplayedSudokuDigit(state, cell) === null)
+                {
+                    let poss = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                    for (let otherCell = 0; otherCell < 81; otherCell++)
+                    {
+                        let dd = getDisplayedSudokuDigit(state, otherCell);
+                        if (dd !== null && poss.includes(dd) && (cell % 9 === otherCell % 9 || ((cell / 9) | 0) === ((otherCell / 9) | 0) || ((((cell % 9) / 3) | 0) === (((otherCell % 9) / 3) | 0) && ((((cell / 9) | 0) / 3) | 0) === ((((otherCell / 9) | 0) / 3) | 0))))
+                            poss.splice(poss.indexOf(dd), 1);
+                    }
+                    state.centerNotation[cell] = poss;
+                }
+            updateVisuals(true);
+        }
+
+        Array.from(puzzleDiv.getElementsByClassName('kyudo-cell')).forEach(cellRect =>
+        {
+            let match = /^p-\d+-kyudo-(\d+)-cell-(\d+)$/.exec(cellRect.id);
+            if (!match)
             {
-                mode = btn;
+                console.error(`Unexpected cell ID: ${cellRect.id}`);
+                return;
+            }
+
+            let corner = parseInt(match[1]);
+            let cell = parseInt(match[2]);
+            cellRect.onclick = handler(function(ev)
+            {
+                saveUndo();
+                if (state.circledDigits[corner][cell] === null)
+                    state.circledDigits[corner][cell] = (ev.shiftKey ? true : false);
+                else if (state.circledDigits[corner][cell] === false)
+                    state.circledDigits[corner][cell] = (ev.shiftKey ? null : true);
+                else
+                    state.circledDigits[corner][cell] = (ev.shiftKey ? false : null);
+                updateVisuals(true);
+            });
+        });
+
+        Array.from(puzzleDiv.getElementsByClassName('sudoku-cell')).forEach(cellRect =>
+        {
+            let match = /^p-\d+-sudoku-cell-(\d+)$/.exec(cellRect.id);
+            if (!match)
+            {
+                console.error(`Unexpected cell ID: ${cellRect.id}`);
+                return;
+            }
+
+            let cell = parseInt(match[1]);
+            cellRect.onclick = handler(function() { });
+            cellRect.onmousedown = handler(function(ev)
+            {
+                let shift = ev.ctrlKey || ev.shiftKey;
+                draggingMode = shift && selectedCells.includes(cell) ? 'remove' : 'add';
+                highlightedDigit = null;
+                selectCell(cell, shift ? draggingMode : 'toggle');
+                updateVisuals();
+            });
+            cellRect.onmousemove = handler(function()
+            {
+                if (draggingMode === null)
+                    return;
+                selectCell(cell, draggingMode);
                 updateVisuals();
             });
         });
 
-        puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>rect`).onclick = handler(function()
+        function setButtonHandler(btn, click)
+        {
+            btn.onclick = handler(ev => click(ev));
+            btn.onmousedown = handler(function() { });
+        }
+
+        Array(9).fill(null).forEach((_, btn) => setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-${btn + 1}`), function() { pressDigit(btn + 1); }));
+
+        ["normal", "corner", "center"].forEach(btn => setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-${btn}>rect`), function()
+        {
+            mode = btn;
+            updateVisuals();
+        }));
+
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-help>rect`), function()
+        {
+            helpEnabled = !helpEnabled;
+            updateVisuals();
+            if (helpEnabled)
+                localStorage.removeItem('kyu-help');
+            else
+                localStorage.setItem('kyu-help', 'Off');
+        });
+
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>rect`), function()
         {
             var elem = puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart`);
             if (!elem.classList.contains('warning'))
@@ -875,8 +899,9 @@
             }
         });
 
-        puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo>rect`).onclick = handler(undo);
-        puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`).onclick = handler(redo);
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo>rect`), undo);
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`), redo);
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-fill>rect`), autofill);
 
         function selectCell(cell, mode)
         {
@@ -925,7 +950,6 @@
                 str = `Ctrl+${str}`;
 
             let anyFunction = true;
-            let anyChanges = false;
 
             function ArrowMovement(dx, dy, mode)
             {
@@ -993,22 +1017,7 @@
                     updateVisuals(true);
                     break;
 
-                case 'KeyF':
-                    saveUndo();
-                    for (let cell of selectedCells)
-                        if (getDisplayedSudokuDigit(state, cell) === null)
-                        {
-                            let poss = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                            for (let otherCell = 0; otherCell < 81; otherCell++)
-                            {
-                                let dd = getDisplayedSudokuDigit(state, otherCell);
-                                if (dd !== null && poss.includes(dd) && (cell % 9 === otherCell % 9 || ((cell / 9) | 0) === ((otherCell / 9) | 0) || ((((cell % 9) / 3) | 0) === (((otherCell % 9) / 3) | 0) && ((((cell / 9) | 0) / 3) | 0) === ((((otherCell / 9) | 0) / 3) | 0))))
-                                    poss.splice(poss.indexOf(dd), 1);
-                            }
-                            state.centerNotation[cell] = poss;
-                        }
-                    updateVisuals(true);
-                    break;
+                case 'KeyF': autofill(); break;
 
                 // Navigation
                 case 'KeyZ': mode = 'normal'; updateVisuals(); break;
@@ -1070,15 +1079,13 @@
             }
         });
 
-        puzzleDiv.onclick = handler(function()
+        puzzleDiv.onmousedown = handler(function(ev)
         {
-            if (hasDragged)
+            if (!ev.shiftKey && !ev.ctrlKey)
             {
-                hasDragged = false;
-                return;
+                selectedCells = [];
+                updateVisuals();
             }
-            selectedCells = [];
-            updateVisuals();
         });
 
         let puzzleSvg = puzzleDiv.getElementsByTagName('svg')[0];

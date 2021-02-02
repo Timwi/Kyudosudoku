@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <path fill="none" stroke="black" d="M12.5 18.16h75v25h-75z"/>
+  <text x="50" y="33.4" stroke-width="5" font-family="Bitter" font-size="24" text-anchor="middle" transform="translate(0 5.66)">???</text>
+  <path fill="white" stroke="black" d="M53.238 33.237V73.17l9.513-9.513 7.499 18.106 5.272-2.184-7.38-17.818h13.62z"/>
+</svg>

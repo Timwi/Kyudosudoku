@@ -78,6 +78,25 @@ namespace KyudosudokuWebsite
             var extraTop = puzzle.Constraints.MaxOrDefault(c => c.ExtraTop, 0);
             var extraRight = puzzle.Constraints.MaxOrDefault(c => c.ExtraRight, 0);
 
+            var helpSvg = @"<g transform='scale(.008)'>
+                <path fill='#fcedca' stroke='black' stroke-width='2' d='M12.5 18.16h75v25h-75z'/>
+                <text class='label' x='50' y='33.4' font-size='24' text-anchor='middle' transform='translate(0 5.66)'>???</text>
+                <path fill='white' stroke='black' stroke-width='2' d='M53.238 33.237V73.17l9.513-9.513 7.499 18.106 5.272-2.184-7.38-17.818h13.62z'/>
+            </g>";
+            var fillSvg = @"<text x='.4' y='.35' font-size='.25'>Auto</text><text x='.4' y='.6' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
+            var buttons = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
+                ("Normal", false, "normal", 2.5, 1),
+                ("Corner", false, "corner", 2.5, 1),
+                ("Center", false, "center", 2.5, 1),
+                (fillSvg, true, "fill", .8, 1),
+
+                ("Restart", false, "restart", 2.5, 2),
+                ("Undo", false, "undo", 2.5, 2),
+                ("Redo", false, "redo", 2.5, 2),
+                (helpSvg, true, "help", .8, 2)
+            )
+                .Insert(0, Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .8, 0)));
+
             return RenderPageTagSoup($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true, PuzzleID = puzzleId },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
                 new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }.Data("constraints", dbPuzzle.Constraints).Data("progress", userPuzzle.NullOr(up => up.Progess)).Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")._(
@@ -85,19 +104,11 @@ namespace KyudosudokuWebsite
                         {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                         <g transform='translate(14, 0)'>{sudokuGrid(puzzleId, puzzle.Constraints)}</g>
 
-                        <g transform='translate(14, 9.75)'>
-                            {Enumerable.Range(0, 9).Select(btn => $@"
-                                <g class='button' id='p-{puzzleId}-num-{btn + 1}' transform='translate({(.8 + 9 * .2 / 8) * btn}, 0)'>
-                                    <rect class='clickable' x='0' y='0' width='.8' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
-                                    <text x='.4' y='.6' font-size='.55' text-anchor='middle'>{btn + 1}</text> 
-                                </g>
-                            ").JoinString()}
-                            {"Normal,Corner,Center,Restart,Undo,Redo".Split(',').Select((btn, btnIx) => $@"
-                                <g class='button' id='p-{puzzleId}-btn-{btn.ToLowerInvariant()}' transform='translate({3.25 * (btnIx % 3)}, {1.1 * (1 + btnIx / 3)})'>
-                                    <rect class='clickable' x='0' y='0' width='2.5' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
-                                    <text x='1.25' y='.6' font-size='.55' text-anchor='middle'>{btn}</text> 
-                                </g>
-                            ").JoinString()}
+                        <g transform='translate(14, 9.75)'>{buttons.GroupBy(g => g.row).SelectMany(row => row.Select((btn, btnIx) => $@"
+                            <g class='button' id='p-{puzzleId}-btn-{btn.id}' transform='translate({row.Take(btnIx).Sum(b => b.width) + btnIx * ((9 - row.Sum(tup => tup.width)) / (row.Count() - 1))}, {1.1 * btn.row})'>
+                                <rect class='clickable' x='0' y='0' width='{btn.width}' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
+                                {(btn.isSvg ? btn.label : $"<text class='label' x='{btn.width / 2}' y='.6' font-size='.55' text-anchor='middle'>{btn.label}</text>")}
+                            </g>")).JoinString()}
                         </g>
 
                         <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow'>

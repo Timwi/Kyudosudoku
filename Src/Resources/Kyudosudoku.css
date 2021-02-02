@@ -122,7 +122,7 @@ th, td {
         stroke-width: 0.025;
     }
 
-    .puzzle svg .button > text {
+    .puzzle svg .button > text.label {
         fill: black;
     }
 
@@ -138,7 +138,7 @@ th, td {
         fill: hsl(0, 80%, 40%);
     }
 
-    .puzzle svg .button.selected > text, .puzzle svg .button.warning > text {
+    .puzzle svg .button.selected > text.label, .puzzle svg .button.warning > text.label {
         fill: white;
     }
 
