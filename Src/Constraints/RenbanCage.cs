@@ -32,6 +32,7 @@ namespace KyudosudokuWebsite
 
         public override bool ClashesWith(KyuConstraint other) => other switch
         {
+            RenbanCage r => r.Cells.Intersect(Cells).Any(),
             KyuCellConstraint c => Cells.Contains(c.Cell),
             Thermometer t => t.Cells.Intersect(Cells).Any(),
             Palindrome p => p.Cells.Intersect(Cells).Any(),
