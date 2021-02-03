@@ -54,7 +54,6 @@ namespace KyudosudokuWebsite
         public override bool ClashesWith(KyuConstraint other) => other switch
         {
             RenbanCage => false,
-            KillerCage => false,
             Snowball sn => sn.Cells1.Length == Cells1.Length || sn.Cells1.Concat(sn.Cells2).Intersect(Cells1.Concat(Cells2)).Any(),
             KyuRegionConstraint kr => Cells1.Concat(Cells2).Intersect(kr.Cells).Any(),
             _ => false
