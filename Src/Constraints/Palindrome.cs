@@ -36,7 +36,7 @@ namespace KyudosudokuWebsite
         public override bool Verify(int[] grid)
         {
             for (var i = 0; i < Cells.Length / 2; i++)
-                if (grid[Cells[i]] != grid[Cells[Cells.Length - i]])
+                if (grid[Cells[i]] != grid[Cells[Cells.Length - 1 - i]])
                     return false;
             return true;
         }

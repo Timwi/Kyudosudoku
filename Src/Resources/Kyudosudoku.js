@@ -822,6 +822,7 @@
                     state.circledDigits[corner][cell] = (ev.shiftKey ? false : null);
                 updateVisuals(true);
             });
+            cellRect.onmousedown = handler(function() { });
         });
 
         var tooltip = null;

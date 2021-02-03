@@ -144,14 +144,14 @@ namespace KyudosudokuWebsite
                 <text id='p-{puzzleId}-sudoku-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .725}'>{givens?.Get(cell, null)}</text>
             ")).JoinString()}
             {(forHelpPage ? null : Enumerable.Range(0, 81).Select(cell => $@"
-                <text id='p-{puzzleId}-sudoku-center-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .625}' font-size='.3' fill='#1d6ae5'></text>
+                <text id='p-{puzzleId}-sudoku-center-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .62}' font-size='.3' fill='#1d6ae5'></text>
                 <text id='p-{puzzleId}-sudoku-corner-text-{cell}-0' x='{cell % 9 + .1}' y='{cell / 9 + .3}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
                 <text id='p-{puzzleId}-sudoku-corner-text-{cell}-1' x='{cell % 9 + .9}' y='{cell / 9 + .3}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
-                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-2' x='{cell % 9 + .1}' y='{cell / 9 + .85}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
-                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-3' x='{cell % 9 + .9}' y='{cell / 9 + .85}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
-                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-4' x='{cell % 9 + .5}' y='{cell / 9 + .25}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-2' x='{cell % 9 + .1}' y='{cell / 9 + .875}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-3' x='{cell % 9 + .9}' y='{cell / 9 + .875}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-4' x='{cell % 9 + .5}' y='{cell / 9 + .3}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
                 <text id='p-{puzzleId}-sudoku-corner-text-{cell}-5' x='{cell % 9 + .9}' y='{cell / 9 + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='end'></text>
-                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-6' x='{cell % 9 + .5}' y='{cell / 9 + .9}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
+                <text id='p-{puzzleId}-sudoku-corner-text-{cell}-6' x='{cell % 9 + .5}' y='{cell / 9 + .875}' font-size='.25' fill='#1d6ae5' text-anchor='middle'></text>
                 <text id='p-{puzzleId}-sudoku-corner-text-{cell}-7' x='{cell % 9 + .1}' y='{cell / 9 + .6125}' font-size='.25' fill='#1d6ae5' text-anchor='start'></text>
             ").JoinString())}
             {constraints.Where(c => !c.SvgAboveLines).Select(c => c.Svg).JoinString()}
