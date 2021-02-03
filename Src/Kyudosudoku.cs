@@ -102,27 +102,32 @@ namespace KyudosudokuWebsite
                     // The Sudoku is ambiguous even with all the constraints.
                     continue;
 
-                // Remove constraints that would be redundant. If the Sudoku was already unique to begin with, this will remove all of the constraints.
-                var attempts = 3;
-                tryRRagain:
-                var kyConstraints = Ut.ReduceRequiredSet(
-                    Enumerable.Range(0, allKyConstraints.Length),
-                    state => new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(state.SetToTest.Select(ix => allKyConstraints[ix].GetConstraint()), avoidColors: true).Solve().Take(2).Count() == 1,
-                    skipConsistencyTest: true)
-                    .Select(ix => allKyConstraints[ix])
-                    .ToArray();
+                // Check if the Sudoku works without any constraints.
+                var kyConstraints = new KyuConstraint[0];
+                if (new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).Solve().Take(2).Count() > 1)
+                {
+                    // Remove constraints that would be redundant.
+                    var attempts = 3;
+                    tryRRagain:
+                    kyConstraints = Ut.ReduceRequiredSet(
+                        Enumerable.Range(0, allKyConstraints.Length),
+                        state => new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(state.SetToTest.Select(ix => allKyConstraints[ix].GetConstraint()), avoidColors: true).Solve().Take(2).Count() == 1,
+                        skipConsistencyTest: true)
+                            .Select(ix => allKyConstraints[ix])
+                            .ToArray();
 
-                // Don’t allow combinations of constraints that would visually clash on the screen
-                for (var i = 0; i < kyConstraints.Length; i++)
-                    for (var j = i + 1; j < kyConstraints.Length; j++)
-                        if (kyConstraints[i].ClashesWith(kyConstraints[j]) || kyConstraints[j].ClashesWith(kyConstraints[i]))
-                        {
-                            attempts--;
-                            if (attempts == 0)
-                                goto busted2;
-                            allKyConstraints.Shuffle(rnd);
-                            goto tryRRagain;
-                        }
+                    // Don’t allow combinations of constraints that would visually clash on the screen
+                    for (var i = 0; i < kyConstraints.Length; i++)
+                        for (var j = i + 1; j < kyConstraints.Length; j++)
+                            if (kyConstraints[i].ClashesWith(kyConstraints[j]) || kyConstraints[j].ClashesWith(kyConstraints[i]))
+                            {
+                                attempts--;
+                                if (attempts == 0)
+                                    goto busted2;
+                                allKyConstraints.Shuffle(rnd);
+                                goto tryRRagain;
+                            }
+                }
 
                 // Try up to 10 random fillings of the Kyudoku grids. If none of these results in a valid puzzle, we start again from scratch.
                 var kyudokus = new[] { topLeft, topRight, bottomLeft, bottomRight };
