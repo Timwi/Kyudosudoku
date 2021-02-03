@@ -9,7 +9,7 @@ namespace KyudosudokuWebsite
     sealed class Arrow : KyuConstraint
     {
         public override string Name => "Arrow";
-        public override string Description => "The digits along the arrow must sum to the digit in the circle.";
+        public override string Description => "The digits along the arrow must sum to the digit in the circle. (These digits need not necessarily be different.)";
         public static readonly Example Example = new Example
         {
             Constraints = { new Arrow(new[] { 18, 10, 20, 12, 3 }) },
