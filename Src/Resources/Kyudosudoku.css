@@ -79,6 +79,7 @@ th, td {
 
 .puzzle {
     outline: none;
+    min-height: calc(100vh - 2cm);
 }
 
     .puzzle.solved {

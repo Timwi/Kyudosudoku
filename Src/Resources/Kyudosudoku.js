@@ -1151,14 +1151,15 @@
             }
         });
 
-        puzzleDiv.onmousedown = handler(function(ev)
+        puzzleDiv.onmousedown = function(ev)
         {
             if (!ev.shiftKey && !ev.ctrlKey)
             {
                 selectedCells = [];
+                highlightedDigit = null;
                 updateVisuals();
             }
-        });
+        };
 
         let puzzleSvg = puzzleDiv.getElementsByTagName('svg')[0];
         window.onresize = function()
