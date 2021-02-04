@@ -16,6 +16,7 @@ namespace KyudosudokuWebsite.Database
         public bool Invalid { get; set; }
         public string Constraints { get; set; }             // ClassifyJson of KyuConstraint[]
         public string ConstraintNames { get; set; }     // for searching/filtering
+        public double? AverageTime { get; set; }
 
         public bool IsSolved(string json)
         {

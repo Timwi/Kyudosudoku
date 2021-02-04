@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Transactions;
 using KyudosudokuWebsite.Database;
 using RT.PropellerApi;
 using RT.Servers;
 using RT.TagSoup;
-using RT.Util;
 using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
@@ -22,9 +21,13 @@ namespace KyudosudokuWebsite
             System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<Db, Configuration>());
             Db.ConnectionString = Settings.ConnectionString;
 
-            // Trigger any pending migrations (without this, transactions that don’t commit mess up the migrations)
+            // This also triggers any pending migrations. Without doing some DB stuff here, transactions that don’t commit mess up the migrations.
             using (var db = new Db())
-                Log.Info("Number of puzzles in the database: {0}".Fmt(db.Puzzles.Count()));
+            {
+                foreach (var puzzle in db.Puzzles.Where(p => p.AverageTime == null && db.UserPuzzles.Any(up => up.Solved && up.PuzzleID == p.PuzzleID)).ToArray())
+                    puzzle.AverageTime = getAveragePuzzleTime(db, puzzle.PuzzleID);
+                db.SaveChanges();
+            }
 
             _resolver = new UrlResolver(
 #if DEBUG
@@ -44,6 +47,15 @@ namespace KyudosudokuWebsite
                 // Catch-all 404
                 new UrlMapping(path: null, handler: page404));
         }
+
+        private static double getAveragePuzzleTime(Db db, int puzzleId) => db.Database.SqlQuery<int>(@"
+            DECLARE @c BIGINT = (SELECT COUNT(*) FROM UserPuzzles WHERE PuzzleID=@puzzleId AND Solved=1);
+            SELECT Time FROM UserPuzzles
+	            WHERE PuzzleID=@puzzleId AND Solved=1
+                ORDER BY Time
+                OFFSET (@c - 1) / 2 ROWS
+                FETCH NEXT 1 + (1 - @c % 2) ROWS ONLY
+        ", new SqlParameter("@puzzleId", puzzleId)).Average();
 
         private HttpResponse page404(HttpRequest req) => withSession(req, (session, db) =>
             RenderPageTagSoup("Not found — Kyudosudoku", session.User, new PageOptions { StatusCode = HttpStatusCode._404_NotFound }, new H1("404 — Not Found")));

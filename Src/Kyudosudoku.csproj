@@ -42,32 +42,32 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="PropellerApi, Version=1.0.19.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\PropellerApi.1.0.19\lib\net472\PropellerApi.dll</HintPath>
+    <Reference Include="PropellerApi, Version=1.0.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PropellerApi.1.0.20\lib\net472\PropellerApi.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Json, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Json.2.0.1681\lib\netstandard2.0\RT.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.CommandLine, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.CommandLine.2.0.1682\lib\netstandard2.0\RT.CommandLine.dll</HintPath>
     </Reference>
-    <Reference Include="RT.PostBuild, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.PostBuild.2.0.1681\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.Json, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Json.2.0.1682\lib\netstandard2.0\RT.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.2.0.1681\lib\netstandard2.0\RT.Serialization.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.Lingo.Base, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Lingo.Base.2.0.1682\lib\netstandard2.0\RT.Lingo.Base.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization.Binary, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.Binary.2.0.1681\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.PostBuild, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.PostBuild.2.0.1682\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization.Json, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.Json.2.0.1681\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.Serialization, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.2.0.1682\lib\netstandard2.0\RT.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization.Xml, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.Xml.2.0.1681\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.Serialization.Binary, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Binary.2.0.1682\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Serialization.Json, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Json.2.0.1682\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Serialization.Xml, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Xml.2.0.1682\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
     </Reference>
     <Reference Include="RT.Servers, Version=1.0.1660.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RT.Servers.1.0.1660\lib\net472\RT.Servers.dll</HintPath>
@@ -75,13 +75,11 @@
     <Reference Include="RT.TagSoup, Version=1.0.1625.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RT.TagSoup.1.0.1625\lib\net472\RT.TagSoup.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Util, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Util.2.0.1681\lib\net472\RT.Util.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.Util, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.2.0.1682\lib\net472\RT.Util.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Util.Core, Version=2.0.1681.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Util.Core.2.0.1681\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RT.Util.Core, Version=2.0.1682.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.Core.2.0.1682\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -99,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
+    <Compile Include="CommandLine.cs" />
     <Compile Include="Constraints\Battenburg.cs" />
     <Compile Include="Constraints\Binairo.cs" />
     <Compile Include="Constraints\Clockface.cs" />
@@ -189,4 +188,7 @@
     <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
   </Target>
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(TargetPath)" postbuild "$(SolutionDir)."</PostBuildEvent>
+  </PropertyGroup>
 </Project>

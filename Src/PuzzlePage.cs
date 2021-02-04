@@ -26,52 +26,12 @@ namespace KyudosudokuWebsite
             if (!int.TryParse(puzzleIdStr, out int puzzleId) || puzzleId < 0)
                 return page404(req);
 
-            Kyudosudoku puzzle;
-
-            getAgain:
             var dbPuzzle = db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzleId);
-            if (dbPuzzle != null && dbPuzzle.Invalid)
-                return HttpResponse.Empty(HttpStatusCode._500_InternalServerError);
-            else if (dbPuzzle != null && dbPuzzle.KyudokuGrids == null)
-            {
-                Thread.Sleep(1000);
-                goto getAgain;
-            }
-            else if (dbPuzzle == null)
-            {
-                try
-                {
-                    dbPuzzle = new Puzzle { PuzzleID = puzzleId, KyudokuGrids = null };
-                    db.Puzzles.Add(dbPuzzle);
-                    db.SaveChanges();
-                }
-                catch
-                {
-                    goto getAgain;
-                }
+            if (dbPuzzle == null || dbPuzzle.Invalid)
+                return page404(req);
 
-                try
-                {
-                    puzzle = Kyudosudoku.Generate(puzzleId);   // potentially long operation
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"Kyudosudoku: Generating puzzle {puzzleId} caused exception:");
-                    Log.Exception(e);
-                    dbPuzzle.Invalid = true;
-                    db.SaveChanges();
-                    return HttpResponse.Empty(HttpStatusCode._500_InternalServerError);
-                }
-                dbPuzzle.KyudokuGrids = puzzle.Grids.Select(grid => grid.Select(i => (char) (i + '0')).JoinString()).JoinString();
-                dbPuzzle.Constraints = ClassifyJson.Serialize(puzzle.Constraints).ToString();
-                dbPuzzle.ConstraintNames = puzzle.Constraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString();
-                db.SaveChanges();
-            }
-            else
-            {
-                puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
-                    dbPuzzle.Constraints == null ? new KyuConstraint[0] : ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
-            }
+            var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
+                dbPuzzle.Constraints == null ? new KyuConstraint[0] : ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 
@@ -210,24 +170,22 @@ namespace KyudosudokuWebsite
                     already.Progess = req.Post["progress"].Value;
                     already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
                     db.SaveChanges();
+
+                    if (already.Solved)
+                    {
+                        puzzle.AverageTime = getAveragePuzzleTime(db, puzzleId);
+                        db.SaveChanges();
+                    }
                 }
             }
 
             if (req.Post["getdata"].Value == "1")
-            {
-                var median = db.Database.SqlQuery<int>(@"
-                    DECLARE @c BIGINT = (SELECT COUNT(*) FROM UserPuzzles WHERE PuzzleID=@puz AND Solved=1);
-                    SELECT Time FROM UserPuzzles
-	                    WHERE PuzzleID=@puz AND Solved=1
-                        ORDER BY Time
-                        OFFSET (@c - 1) / 2 ROWS
-                        FETCH NEXT 1 + (1 - @c % 2) ROWS ONLY
-                ", new SqlParameter("@puz", puzzleId)).DefaultIfEmpty().Average();
-
-                //var average = (int?) db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Average(up => (double?) up.Time);
-                var count = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Count();
-                return HttpResponse.Json(new JsonDict { { "time", already?.Time }, { "avg", (int) median }, { "count", count } });
-            }
+                return HttpResponse.Json(new JsonDict
+                {
+                    ["time"] = already?.Time,
+                    ["avg"] = puzzle.AverageTime == null ? null : (int) puzzle.AverageTime.Value,
+                    ["count"] = db.UserPuzzles.Where(up => up.PuzzleID == puzzleId && up.Solved).Count()
+                });
 
             return HttpResponse.Empty(HttpStatusCode._200_OK);
         }
