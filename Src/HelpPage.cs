@@ -30,7 +30,7 @@ namespace KyudosudokuWebsite
                 </svg>");
 
             return RenderPageTagSoup("How to play Kyudosudoku", session.User, null,
-                new P { class_ = "jump" }._("Jump to: ", new A { href = "#rules" }._("Rules"), " | ",new A { href = "#constraints" }._("Constraints"), " | ",new A { href = "#controls" }._("Controls"), " | ",new A { href = "#strategies" }._("Common strategies")),
+                new P { class_ = "jump" }._("Jump to: ", new A { href = "#rules" }._("Rules"), " | ", new A { href = "#constraints" }._("Constraints"), " | ", new A { href = "#controls" }._("Controls"), " | ", new A { href = "#strategies" }._("Common strategies")),
                 new H1 { id = "rules" }._("Rules of Kyudosudoku"),
                 new P("Kyudosudoku is a logic puzzle that combines Kyudoku with variety Sudoku."),
                 new P("Each puzzle consists of four 6×6 grids filled with digits 1–9, which we will call the ", new CITE("Kyudoku grids"), ", and a blank 9×9 grid, the ", new CITE("Sudoku grid"), ", usually with some extra graphics in or around it."),

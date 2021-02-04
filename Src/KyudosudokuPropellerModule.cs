@@ -64,10 +64,7 @@ namespace KyudosudokuWebsite
         private HttpResponse withSession(HttpRequest req, Func<DbSession, Db, HttpResponse> handler)
         {
             using var db = new Db();
-            using var tr = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable });
-            var result = new DbSession(db).EnableManual(req, session => handler(session, db));
-            tr.Complete();
-            return result;
+            return new DbSession(db).EnableManual(req, session => handler(session, db));
         }
     }
 }

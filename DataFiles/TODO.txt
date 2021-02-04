@@ -5,3 +5,4 @@ TODO
     • enter specific puzzle number
 • Halt timer when tab inactive
 • List of puzzles solved
+• Use Q/W to circle/cross a Kyudoku digit hovered over
