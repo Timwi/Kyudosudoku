@@ -11,11 +11,10 @@ namespace KyudosudokuWebsite
             public bool IsPuzzlePage = false;
             public HttpStatusCode StatusCode = HttpStatusCode._200_OK;
             public int? PuzzleID;
+            public bool AddFooter;
         }
 
-        private HttpResponse RenderPageTagSoup(string title, User loggedInUser, PageOptions opt, params object[] body) => RenderPageString(title, loggedInUser, opt, body: Tag.ToString(body));
-
-        private HttpResponse RenderPageString(string title, User loggedInUser, PageOptions opt, string body)
+        private HttpResponse RenderPage(string title, User loggedInUser, PageOptions opt, params object[] body)
         {
             opt ??= new PageOptions();
             var fullTitle = $"{(title == null ? "" : $"{title} — ")}Kyudosudoku";
@@ -31,7 +30,10 @@ namespace KyudosudokuWebsite
                         opt.PuzzleID == null ? null : new DIV { class_ = "puzzle-id" }._($"Puzzle #{opt.PuzzleID.Value}"),
                         new A { class_ = "right", href = "/auth" }._(loggedInUser == null ? "Log in" : "Settings"),
                         new A { class_ = "right", href = "/help" }._("How to play")),
-                    opt.IsPuzzlePage ? new RawTag(body) : new DIV { class_ = "main" }._(new RawTag(body))))));
+                    body,
+                    !opt.AddFooter ? null : new DIV { class_ = "footer" }._(
+                        new P("Send feedback and suggestions to Timwi#0551 or Goofy#1262 on Discord, or post a ticket to ", new A { href = "https://github.com/Timwi/Kyudosudoku/issues" }._("Kyudosudoku on GitHub"), "."),
+                        new P(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")))))));
         }
     }
 }

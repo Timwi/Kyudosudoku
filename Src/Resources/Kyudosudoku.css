@@ -73,6 +73,13 @@ th, td {
         vertical-align: bottom;
     }
 
+.footer {
+    margin-top: 2cm;
+    background: hsl(220, 70%, 80%);
+    padding: .1cm .5cm;
+    font-size: 12pt;
+}
+
 .main {
     padding: 1cm 2cm;
 }

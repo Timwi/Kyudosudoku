@@ -57,10 +57,13 @@ namespace KyudosudokuWebsite
             )
                 .Insert(0, Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .8, 0)));
 
-            return RenderPageTagSoup($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true, PuzzleID = puzzleId },
+            return RenderPage($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true, PuzzleID = puzzleId },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
-                new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }.Data("constraints", dbPuzzle.Constraints).Data("progress", userPuzzle.NullOr(up => up.Progess)).Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")._(
-                    new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
+                new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }
+                    .Data("constraints", dbPuzzle.Constraints)
+                    .Data("progress", userPuzzle.NullOr(up => up.Progess))
+                    .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
+                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
                         <g transform='translate(14, 9.75)'>{buttons.GroupBy(g => g.row).SelectMany(row => row.Select((btn, btnIx) => $@"
                             <g class='button' id='p-{puzzleId}-btn-{btn.id}' transform='translate({row.Take(btnIx).Sum(b => b.width) + btnIx * ((9 - row.Sum(tup => tup.width)) / (row.Count() - 1))}, {1.1 * btn.row})'>
                                 <rect class='clickable' x='0' y='0' width='{btn.width}' height='.8' stroke-width='.025' rx='.08' ry='.08'/>

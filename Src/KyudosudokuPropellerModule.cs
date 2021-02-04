@@ -58,7 +58,7 @@ namespace KyudosudokuWebsite
         ", new SqlParameter("@puzzleId", puzzleId)).Average();
 
         private HttpResponse page404(HttpRequest req) => withSession(req, (session, db) =>
-            RenderPageTagSoup("Not found — Kyudosudoku", session.User, new PageOptions { StatusCode = HttpStatusCode._404_NotFound }, new H1("404 — Not Found")));
+            RenderPage("Not found — Kyudosudoku", session.User, new PageOptions { StatusCode = HttpStatusCode._404_NotFound }, new DIV { class_ = "main" }._(new H1("404 — Not Found"))));
 
         private UrlResolver getAuthResolver()
         {
