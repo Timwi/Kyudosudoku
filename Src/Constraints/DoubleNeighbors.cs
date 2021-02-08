@@ -2,9 +2,9 @@
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Double neighbors")]
     sealed class DoubleNeighbors : KyuNeighborConstraint
     {
-        public override string Name => "Double neighbors";
         public override string Description => "The two marked cells must have a ratio of 2 (one is double the other).";
         public static readonly Example Example = new Example
         {

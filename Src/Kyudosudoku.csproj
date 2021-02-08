@@ -98,8 +98,10 @@
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
     <Compile Include="CommandLine.cs" />
+    <Compile Include="Constraints\CappedLine.cs" />
     <Compile Include="Constraints\Battenburg.cs" />
     <Compile Include="Constraints\Binairo.cs" />
+    <Compile Include="Constraints\KyuConstraintInfoAttribute.cs" />
     <Compile Include="Constraints\Clockface.cs" />
     <Compile Include="Constraints\Inclusion.cs" />
     <Compile Include="Constraints\KyuFourCellConstraint.cs" />
@@ -108,6 +110,8 @@
     <Compile Include="Constraints\ConsecutiveNeighbors.cs" />
     <Compile Include="Constraints\KyuRegionConstraint.cs" />
     <Compile Include="Constraints\LittleKiller.cs" />
+    <Compile Include="Constraints\FindThe9.cs" />
+    <Compile Include="Constraints\MaximumCell.cs" />
     <Compile Include="Constraints\Snowball.cs" />
     <Compile Include="Constraints\RenbanCage.cs" />
     <Compile Include="Constraints\NoConsecutive.cs" />
@@ -134,12 +138,14 @@
     <Compile Include="DbSession.cs" />
     <Compile Include="Constraints\KyuConstraint.cs" />
     <Compile Include="Example.cs" />
+    <Compile Include="JsFile.cs" />
     <Compile Include="Kyudosudoku.cs" />
     <Compile Include="KyudosudokuPropellerModule.cs" />
     <Compile Include="KyudosudokuSettings.cs" />
     <Compile Include="AuthPages.cs" />
     <Compile Include="HelpPage.cs" />
-    <Compile Include="Pages.cs" />
+    <Compile Include="FindPuzzlesPage.cs" />
+    <Compile Include="RenderPage.cs" />
     <Compile Include="PuzzlePage.cs" />
     <Compile Include="MainPage.cs" />
     <Compile Include="Program.cs" />
@@ -170,6 +176,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Find.js" />
     <Content Include="Resources\Kyudosudoku.css">
       <LastGenOutput>Kyudosudoku.Designer.cs</LastGenOutput>
     </Content>

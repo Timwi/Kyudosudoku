@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Skyscraper")]
     sealed class Skyscraper : KyuRowColConstraint
     {
-        public override string Name => "Skyscraper";
         public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits represent skyscrapers, where taller ones obstruct the view of smaller ones behind them. {Clue} skyscrapers are visible from the clue.";
         public override double ExtraTop => IsCol && !Reverse ? .5 : 0;
         public override double ExtraRight => !IsCol && Reverse ? .5 : 0;
@@ -33,7 +33,7 @@ namespace KyudosudokuWebsite
         public int Clue { get; private set; }
         public bool Reverse { get; private set; }
 
-        protected override Constraint getConstraint() => new SkyscraperUniquenessConstraint(Clue, GetAffectedCells(Reverse));
+        protected override IEnumerable<Constraint> getConstraints() { yield return new SkyscraperUniquenessConstraint(Clue, GetAffectedCells(Reverse)); }
 
         public override bool Verify(int[] grid) => SkyscraperUniquenessConstraint.CalculateSkyscraperClue(GetAffectedCells(Reverse).Select(cell => grid[cell])) == Clue;
 

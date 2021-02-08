@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Arrow")]
     sealed class Arrow : KyuConstraint
     {
-        public override string Name => "Arrow";
         public override string Description => "The digits along the arrow must sum to the digit in the circle. (These digits need not necessarily be different.)";
         public static readonly Example Example = new Example
         {
@@ -24,7 +24,7 @@ namespace KyudosudokuWebsite
         public Arrow(int[] cells) { Cells = cells; }
         private Arrow() { }   // for Classify
 
-        protected override Constraint getConstraint() => new IndirectSumConstraint(Cells[0], Cells.Subarray(1));
+        protected override IEnumerable<Constraint> getConstraints() { yield return new IndirectSumConstraint(Cells[0], Cells.Subarray(1)); }
 
         public override string Svg
         {
@@ -70,15 +70,11 @@ namespace KyudosudokuWebsite
                     return p1 == -1 || p2 == -1 || Math.Abs(p1 - p2) != 1;
                 }
 
-                var x = sofar.Last() % 9;
-                var y = sofar.Last() / 9;
-                for (var xx = x - 1; xx <= x + 1; xx++)
-                    if (xx >= 0 && xx < 9)
-                        for (var yy = y - 1; yy <= y + 1; yy++)
-                            if (yy >= 0 && yy < 9 && !sofar.Contains(xx + 9 * yy) && sumSofar + sudoku[xx + 9 * yy] <= sudoku[sofar[0]]
-                                && (xx == x || yy == y || noDiagonalCrossingExists(x, y, xx, yy)))
-                                foreach (var next in recurse(sofar.Insert(sofar.Length, xx + 9 * yy), sumSofar + sudoku[xx + 9 * yy]))
-                                    yield return next;
+                var last = sofar.Last();
+                foreach (var adj in Adjacent(last))
+                    if (!sofar.Contains(adj) && sumSofar + sudoku[adj] <= sudoku[sofar[0]] && noDiagonalCrossingExists(last % 9, last / 9, adj % 9, adj / 9))
+                        foreach (var next in recurse(sofar.Insert(sofar.Length, adj), sumSofar + sudoku[adj]))
+                            yield return next;
             }
 
             for (var startCell = 0; startCell < 81; startCell++)

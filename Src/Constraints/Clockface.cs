@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Clockface")]
     sealed class Clockface : KyuFourCellConstraint
     {
-        public override string Name => "Clockface";
         public override string Description => $"The digits around the {(Clockwise ? "white" : "black")} circle must be in {(Clockwise ? "clockwise" : "counter-clockwise")} order.";
         public static readonly Example Example = new Example
         {

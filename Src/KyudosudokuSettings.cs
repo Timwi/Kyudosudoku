@@ -2,9 +2,9 @@
 {
     public class KyudosudokuSettings
     {
-        public string JsFile;
-        public string CssFile;
+        public string ResourcesDir;
         public string ConnectionString;
+
         //public string SmtpServer;
         //public int SmtpPort;
         //public string SmtpFromAddress;

@@ -57,7 +57,15 @@ namespace KyudosudokuWebsite
             )
                 .Insert(0, Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .8, 0)));
 
-            return RenderPage($"#{puzzleId}", session.User, new PageOptions { IsPuzzlePage = true, PuzzleID = puzzleId },
+            return RenderPage(
+                $"#{puzzleId}",
+                session.User,
+                new PageOptions
+                {
+                    IsPuzzlePage = true,
+                    PuzzleID = puzzleId,
+                    Js = JsFile.Puzzle
+                },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
                 new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }
                     .Data("constraints", dbPuzzle.Constraints)

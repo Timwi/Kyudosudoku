@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Renban cage")]
     sealed class RenbanCage : KyuRegionConstraint
     {
-        public override string Name => "Renban cage";
         public override string Description => $"Digits within the cage must be different and form a consecutive set.";
         public static readonly Example Example = new Example
         {
@@ -22,7 +22,7 @@ namespace KyudosudokuWebsite
         public RenbanCage(int[] cells) : base(cells) { }
         private RenbanCage() { }    // for Classify
 
-        protected override Constraint getConstraint() => new ConsecutiveUniquenessConstraint(Cells);
+        protected override IEnumerable<Constraint> getConstraints() { yield return new ConsecutiveUniquenessConstraint(Cells); }
 
         public override bool Verify(int[] grid)
         {
@@ -40,27 +40,15 @@ namespace KyudosudokuWebsite
         };
 
         private enum Direction { Up, Right, Down, Left }
-        public override string Svg
-        {
-            get
-            {
-                //return $@"<g>
-                //    <filter id='filter-renban' color-interpolation-filters='sRGB'>
-                //        <feGaussianBlur result='fbSourceGraphic' stdDeviation='.02'/>
-                //    </filter>
-                //    <path d='{GenerateSvgPath(.1, .1)}' fill='none' stroke='black' stroke-width='.02' opacity='1' filter='url(#filter-renban)' />
-                //</g>";
-                return $@"<g>
-                    <pattern id='pattern-renban' width='2' height='2' patternTransform='rotate(45) scale(.35355) translate(.5, .5)' patternUnits='userSpaceOnUse'>
-                        <path d='M0 0h1v1H0zM1 1h1v1H1z' />
-                    </pattern>
-                    <path d='{GenerateSvgPath(Cells, .25, .25)}' fill='url(#pattern-renban)' stroke='none' opacity='.2' />
-                </g>";
-            }
-        }
+        public override string Svg => $@"<g>
+            <pattern id='pattern-renban' width='2' height='2' patternTransform='rotate(45) scale(.35355) translate(.5, .5)' patternUnits='userSpaceOnUse'>
+                <path d='M0 0h1v1H0zM1 1h1v1H1z' />
+            </pattern>
+            <path d='{GenerateSvgPath(Cells, .25, .25)}' fill='url(#pattern-renban)' stroke='none' opacity='.2' />
+        </g>";
 
         public static IList<KyuConstraint> Generate(int[] sudoku, int[][] uniquenessRegions) => uniquenessRegions
-            .Where(region => region.Select(c => sudoku[c]).Apply(numbers => numbers.Count(n => !numbers.Contains(n + 1)) == 1))
+            .Where(region => region.Length <= 7 && region.Select(c => sudoku[c]).Apply(numbers => numbers.Count(n => !numbers.Contains(n + 1)) == 1))
             .Select(region => (KyuConstraint) new RenbanCage(region))
             .ToList();
     }

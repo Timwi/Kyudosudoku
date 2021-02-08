@@ -98,7 +98,7 @@ namespace KyudosudokuWebsite
                         (cell % 9 >= 3 && cell / 9 >= 3 && bottomRight.Contains(cell % 9 - 3 + 6 * (cell / 9 - 3))))
                         givensFromKyu.Add(new GivenConstraint(cell, sudoku[cell]));
 
-                if (new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(allKyConstraints.Select(s => s.GetConstraint()), avoidColors: true).Solve().Take(2).Count() > 1)
+                if (new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(allKyConstraints.SelectMany(s => s.GetConstraints()), avoidColors: true).Solve().Take(2).Count() > 1)
                     // The Sudoku is ambiguous even with all the constraints.
                     continue;
 
@@ -111,7 +111,7 @@ namespace KyudosudokuWebsite
                     tryRRagain:
                     kyConstraints = Ut.ReduceRequiredSet(
                         Enumerable.Range(0, allKyConstraints.Length),
-                        state => new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(state.SetToTest.Select(ix => allKyConstraints[ix].GetConstraint()), avoidColors: true).Solve().Take(2).Count() == 1,
+                        state => new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).AddConstraints(state.SetToTest.SelectMany(ix => allKyConstraints[ix].GetConstraints()), avoidColors: true).Solve().Take(2).Count() == 1,
                         skipConsistencyTest: true)
                             .Select(ix => allKyConstraints[ix])
                             .ToArray();
@@ -177,7 +177,7 @@ namespace KyudosudokuWebsite
                         }
                         sud.AddGivens(givens);
                         foreach (var constr in kyConstraints)
-                            sud.AddConstraint(constr.GetConstraint());
+                            sud.AddConstraints(constr.GetConstraints());
                         var sols = sud.Solve().Take(2).ToArray();
 
                         if (sols.Length == 1)       // Sudoku is valid
@@ -209,25 +209,28 @@ namespace KyudosudokuWebsite
 
             // The numbers balance the relative probabilities of each constraint occurring so that they each occur reasonably similarly often.
 
-            var constraintGenerators = Ut.NewArray<(int num, Func<int[], IList<KyuConstraint>> generator)>(
+            var constraintGenerators = Ut.NewArray<(int? num, Func<int[], IList<KyuConstraint>> generator)>(
                 // Cell constraints
-                (88, AntiBishop.Generate),
-                (250, AntiKing.Generate),
-                (146, AntiKnight.Generate),
-                (146, NoConsecutive.Generate),
-                (88, OddEven.Generate),
+                (null, AntiBishop.Generate),
+                (null, AntiKing.Generate),
+                (null, AntiKnight.Generate),
+                (null, NoConsecutive.Generate),
+                (null, MaximumCell.Generate),
+                (null, FindThe9.Generate),
+                (null, OddEven.Generate),
 
                 // Area constraints
-                (24, Arrow.Generate),
-                (41, s => KillerCage.Generate(s, uniquenessRegions)),
-                (18, Palindrome.Generate),
-                (40, s => RenbanCage.Generate(s, uniquenessRegions)),
+                (25, Arrow.Generate),
+                (20, s => KillerCage.Generate(s, uniquenessRegions)),
+                (20, Palindrome.Generate),
+                (20, CappedLine.Generate),
+                (20, s => RenbanCage.Generate(s, uniquenessRegions)),
                 (20, Snowball.Generate),
-                (29, Thermometer.Generate),
+                (30, Thermometer.Generate),
 
                 // Row/column constraints
                 (37, Battlefield.Generate),
-                (159, Binairo.Generate),
+                (null, Binairo.Generate),
                 (27, Sandwich.Generate),
                 (46, Skyscraper.Generate),
                 (25, ToroidalSandwich.Generate),
@@ -239,8 +242,8 @@ namespace KyudosudokuWebsite
                 (60, Battenburg.Generate),
 
                 // Other
-                (65, ConsecutiveNeighbors.Generate),
-                (80, DoubleNeighbors.Generate),
+                (null, ConsecutiveNeighbors.Generate),
+                (null, DoubleNeighbors.Generate),
                 (13, LittleKiller.Generate)
             );
 
@@ -249,7 +252,7 @@ namespace KyudosudokuWebsite
                 var generated = generator(sudoku);
 
                 // Variant of Fisher-Yates shuffle that stops once we have the required number of elements
-                for (int j = 0; j < generated.Count && j < num; j++)
+                for (int j = 0; j < generated.Count && (num == null || j < num.Value); j++)
                 {
                     int item = rnd.Next(j, generated.Count);
                     if (item > j)

@@ -7,9 +7,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Snowball")]
     sealed class Snowball : KyuConstraint
     {
-        public override string Name => "Snowball";
         public override string Description => "One of the regions must contain the same digits as the other, plus or minus a consistent addend. For example, if one region contains 1, 4, 7, the other might contain 3, 6, 9. (The digits within one region need not necessarily be different. The addend can be zero.)";
         public static readonly Example Example = new Example
         {
@@ -25,7 +25,7 @@ namespace KyudosudokuWebsite
         public Snowball(int[] cells1, int[] cells2) { Cells1 = cells1; Cells2 = cells2; }
         private Snowball() { }      // for Classify
 
-        protected override Constraint getConstraint() => new OffsetCloneConstraint(Cells1, Cells2);
+        protected override IEnumerable<Constraint> getConstraints() { yield return new OffsetCloneConstraint(Cells1, Cells2); }
         public sealed override bool IncludesCell(int cell) => Cells1.Contains(cell) || Cells2.Contains(cell);
 
         private static int _svgIdCounter = 0;

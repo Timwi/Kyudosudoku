@@ -7,9 +7,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Sandwich")]
     sealed class Sandwich : KyuRowColConstraint
     {
-        public override string Name => "Sandwich";
         public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits sandwiched between the {Digit1} and the {Digit2} must add up to {Sum}. The {Digit1} and {Digit2} can occur in either order.";
         public override double ExtraTop => IsCol ? .25 : 0;
         public override bool ShownTopLeft => true;
@@ -35,7 +35,7 @@ namespace KyudosudokuWebsite
         public int Digit2 { get; private set; }
         public int Sum { get; private set; }
 
-        protected override Constraint getConstraint() => new SandwichUniquenessConstraint(Digit1, Digit2, Sum, Ut.NewArray(9, x => IsCol ? (RowCol + 9 * x) : (x + 9 * RowCol)));
+        protected override IEnumerable<Constraint> getConstraints() { yield return new SandwichUniquenessConstraint(Digit1, Digit2, Sum, Ut.NewArray(9, x => IsCol ? (RowCol + 9 * x) : (x + 9 * RowCol))); }
 
         public override bool Verify(int[] grid)
         {

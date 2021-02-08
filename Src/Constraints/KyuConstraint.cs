@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using PuzzleSolvers;
 using RT.Serialization;
@@ -11,21 +14,21 @@ namespace KyudosudokuWebsite
 {
     abstract class KyuConstraint
     {
-        public abstract string Name { get; }
         public abstract string Description { get; }
-        protected abstract Constraint getConstraint();
         public abstract string Svg { get; }
         public virtual bool SvgAboveLines => false;
         public abstract bool Verify(int[] grid);
         public abstract bool IncludesCell(int cell);
         public virtual bool IncludesRowCol(bool isCol, int rowCol, bool topLeft) => false;
+        public string Name => Constraints.FirstOrDefault(c => c.type == GetType()).name;
 
         public virtual double ExtraTop => 0;
         public virtual double ExtraRight => 0;
 
         [ClassifyIgnore]
-        private Constraint _cachedConstraint;
-        public Constraint GetConstraint() => _cachedConstraint ??= getConstraint();
+        private Constraint[] _cachedConstraint;
+        public IEnumerable<Constraint> GetConstraints() => _cachedConstraint ??= getConstraints().ToArray();
+        protected abstract IEnumerable<Constraint> getConstraints();
 
         /// <summary>Determines whether a constraint visually clashes with another (overlaps in an undesirable way).</summary>
         public abstract bool ClashesWith(KyuConstraint other);
@@ -36,14 +39,20 @@ namespace KyudosudokuWebsite
         protected static double svgY(int cell) => cell / 9 + .5;
         protected static PointD svgP(int cell) => new PointD(svgX(cell), svgY(cell));
 
+        private static (string name, Type type)[] _constraintsCache = null;
+        public static (string name, Type type)[] Constraints => _constraintsCache ??= typeof(KyuConstraint).Assembly.GetTypes()
+            .Where(t => typeof(KyuConstraint).IsAssignableFrom(t) && !t.IsAbstract && t.GetCustomAttribute<KyuConstraintInfoAttribute>() != null)
+            .Select(t => (name: t.GetCustomAttribute<KyuConstraintInfoAttribute>().Name, type: t))
+            .ToArray();
+
         public static IEnumerable<int> Adjacent(int cell)
         {
             var x = cell % 9;
             var y = cell / 9;
             for (var xx = x - 1; xx <= x + 1; xx++)
-                if (xx >= 0 && xx < 9)
+                if (inRange(xx))
                     for (var yy = y - 1; yy <= y + 1; yy++)
-                        if (yy >= 0 && yy < 9)
+                        if (inRange(yy) && (xx != x || yy != y))
                             yield return xx + 9 * yy;
         }
 
@@ -52,13 +61,21 @@ namespace KyudosudokuWebsite
             var x = cell % 9;
             var y = cell / 9;
             for (var xx = x - 1; xx <= x + 1; xx++)
-                if (xx >= 0 && xx < 9)
+                if (inRange(xx))
                     for (var yy = y - 1; yy <= y + 1; yy++)
-                        if (yy >= 0 && yy < 9 && (xx == x || yy == y))
+                        if (inRange(yy) && (xx == x || yy == y) && (xx != x || yy != y))
                             yield return xx + 9 * yy;
         }
 
-        private enum Direction { Up, Right, Down, Left }
+        public enum CellDirection { Up, Right, Down, Left }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static bool inRange(int c) => c >= 0 && c < 9;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static int dx(CellDirection dir) => dir switch { CellDirection.Left => -1, CellDirection.Right => 1, _ => 0 };
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static int dy(CellDirection dir) => dir switch { CellDirection.Up => -1, CellDirection.Down => 1, _ => 0 };
+
         protected static string GenerateSvgPath(int[] cells, double marginX, double marginY, double? gapX = null, double? gapY = null)
         {
             var outlines = new List<(int x, int y)[]>();
@@ -92,23 +109,23 @@ namespace KyudosudokuWebsite
                     var dir2 = getDir(point2, point3);
 
                     // “Outer” corners
-                    if (dir1 == Direction.Up && dir2 == Direction.Right) // top left corner
+                    if (dir1 == CellDirection.Up && dir2 == CellDirection.Right) // top left corner
                         path.Append($" {x + marginX + (j == 0 ? gapX ?? 0 : 0) } {y + marginY + (j == outline.Length ? gapY ?? 0 : 0)}");
-                    else if (dir1 == Direction.Right && dir2 == Direction.Down)  // top right corner
+                    else if (dir1 == CellDirection.Right && dir2 == CellDirection.Down)  // top right corner
                         path.Append($" {x - marginX} {y + marginY}");
-                    else if (dir1 == Direction.Down && dir2 == Direction.Left) // bottom right corner
+                    else if (dir1 == CellDirection.Down && dir2 == CellDirection.Left) // bottom right corner
                         path.Append($" {x - marginX} {y - marginY}");
-                    else if (dir1 == Direction.Left && dir2 == Direction.Up) // bottom left corner
+                    else if (dir1 == CellDirection.Left && dir2 == CellDirection.Up) // bottom left corner
                         path.Append($" {x + marginX} {y - marginY}");
 
                     // “Inner” corners
-                    else if (dir1 == Direction.Left && dir2 == Direction.Down) // top left corner
+                    else if (dir1 == CellDirection.Left && dir2 == CellDirection.Down) // top left corner
                         path.Append($" {x - marginX} {y - marginY}");
-                    else if (dir1 == Direction.Up && dir2 == Direction.Left) // top right corner
+                    else if (dir1 == CellDirection.Up && dir2 == CellDirection.Left) // top right corner
                         path.Append($" {x + marginX} {y - marginY}");
-                    else if (dir1 == Direction.Right && dir2 == Direction.Up) // bottom right corner
+                    else if (dir1 == CellDirection.Right && dir2 == CellDirection.Up) // bottom right corner
                         path.Append($" {x + marginX} {y + marginY}");
-                    else if (dir1 == Direction.Down && dir2 == Direction.Right) // bottom left corner
+                    else if (dir1 == CellDirection.Down && dir2 == CellDirection.Right) // bottom left corner
                         path.Append($" {x - marginX} {y + marginY}");
                 }
             }
@@ -116,16 +133,16 @@ namespace KyudosudokuWebsite
             return path.ToString();
         }
 
-        private static Direction getDir((int x, int y) from, (int x, int y) to) => from.x == to.x
-                        ? (from.y > to.y ? Direction.Up : Direction.Down)
-                        : (from.x > to.x ? Direction.Left : Direction.Right);
+        private static CellDirection getDir((int x, int y) from, (int x, int y) to) => from.x == to.x
+                        ? (from.y > to.y ? CellDirection.Up : CellDirection.Down)
+                        : (from.x > to.x ? CellDirection.Left : CellDirection.Right);
 
         private static bool get(int[] cells, int x, int y) => x >= 0 && x < 9 && y >= 0 && y < 9 && cells.Contains(x + 9 * y);
 
         private static (int x, int y)[] tracePolygon(int[] cells, int i, int j, bool[][] visitedUpArrow)
         {
             var result = new List<(int x, int y)>();
-            var dir = Direction.Up;
+            var dir = CellDirection.Up;
 
             while (true)
             {
@@ -135,7 +152,7 @@ namespace KyudosudokuWebsite
                 // When we get back to the original edge, the polygon is complete.
                 switch (dir)
                 {
-                    case Direction.Up:
+                    case CellDirection.Up:
                         // If we’re back at the beginning, we’re done with this polygon
                         if (visitedUpArrow[i][j])
                             return result.ToArray();
@@ -145,60 +162,60 @@ namespace KyudosudokuWebsite
                         if (!get(cells, i, j - 1))
                         {
                             result.Add((i, j));
-                            dir = Direction.Right;
+                            dir = CellDirection.Right;
                         }
                         else if (get(cells, i - 1, j - 1))
                         {
                             result.Add((i, j));
-                            dir = Direction.Left;
+                            dir = CellDirection.Left;
                             i--;
                         }
                         else
                             j--;
                         break;
 
-                    case Direction.Down:
+                    case CellDirection.Down:
                         j++;
                         if (!get(cells, i - 1, j))
                         {
                             result.Add((i, j));
-                            dir = Direction.Left;
+                            dir = CellDirection.Left;
                             i--;
                         }
                         else if (get(cells, i, j))
                         {
                             result.Add((i, j));
-                            dir = Direction.Right;
+                            dir = CellDirection.Right;
                         }
                         break;
 
-                    case Direction.Left:
+                    case CellDirection.Left:
                         if (!get(cells, i - 1, j - 1))
                         {
                             result.Add((i, j));
-                            dir = Direction.Up;
+                            dir = CellDirection.Up;
                             j--;
                         }
                         else if (get(cells, i - 1, j))
                         {
                             result.Add((i, j));
-                            dir = Direction.Down;
+                            dir = CellDirection.Down;
                         }
                         else
                             i--;
                         break;
 
-                    case Direction.Right:
+                    case CellDirection.Right:
                         i++;
                         if (!get(cells, i, j))
                         {
                             result.Add((i, j));
-                            dir = Direction.Down;
+                            dir = CellDirection.Down;
                         }
                         else if (get(cells, i, j - 1))
                         {
                             result.Add((i, j));
-                            dir = Direction.Up;
+                            dir = CellDirection.Up;
                             j--;
                         }
                         break;

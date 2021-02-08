@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using KyudosudokuWebsite.Database;
 using RT.PropellerApi;
@@ -31,15 +32,15 @@ namespace KyudosudokuWebsite
 
             _resolver = new UrlResolver(
 #if DEBUG
-                new UrlMapping(path: "/js", specificPath: true, handler: req => HttpResponse.File(Settings.JsFile, "text/javascript; charset=utf-8")),
-                new UrlMapping(path: "/css", specificPath: true, handler: req => HttpResponse.File(Settings.CssFile, "text/css; charset=utf-8")),
+                new UrlMapping(path: "/css", specificPath: true, handler: req => HttpResponse.File(Path.Combine(Settings.ResourcesDir, "Kyudosudoku.css"), "text/css; charset=utf-8")),
 #else
-                new UrlMapping(path: "/js", specificPath: true, handler: req => HttpResponse.JavaScript(Resources.Js)),
                 new UrlMapping(path: "/css", specificPath: true, handler: req => HttpResponse.Css(Resources.Css)),
 #endif
 
                 new UrlMapping(path: "/", specificPath: true, handler: mainPage),
                 new UrlMapping(path: "/help", specificPath: true, handler: helpPage),
+                new UrlMapping(path: "/find", specificPath: true, handler: findPuzzlesPage),
+                new UrlMapping(path: "/find-puzzles", specificPath: true, handler: findPuzzlesHandler),
                 new UrlMapping(path: "/auth", handler: getAuthResolver().Handle),
                 new UrlMapping(path: "/puzzle", handler: req => withSession(req, (session, db) => PuzzlePage(req, session, db))),
                 new UrlMapping(path: "/logo", handler: req => HttpResponse.Create(Resources.Logo, "image/png")),

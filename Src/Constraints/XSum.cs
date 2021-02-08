@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("X-sum")]
     sealed class XSum : KyuRowColConstraint
     {
-        public override string Name => "X-sum";
         public override string Description => $"The sum of the first X digits in this {(IsCol ? "column" : "row")} must add up to {Clue}, where X is the first digit in the {(IsCol ? "column" : "row")}.";
         public override double ExtraTop => IsCol && !Reverse ? .5 : 0;
         public override double ExtraRight => !IsCol && Reverse ? .25 : 0;
@@ -33,7 +33,7 @@ namespace KyudosudokuWebsite
         public int Clue { get; private set; }
         public bool Reverse { get; private set; }
 
-        protected override Constraint getConstraint() => new XSumUniquenessConstraint(Clue, GetAffectedCells(Reverse));
+        protected override IEnumerable<Constraint> getConstraints() { yield return new XSumUniquenessConstraint(Clue, GetAffectedCells(Reverse)); }
 
         public override bool Verify(int[] grid) => GetAffectedCells(Reverse).Select(cell => grid[cell]).ToArray().Apply(numbers => numbers.Take(numbers[0]).Sum() == Clue);
 

@@ -5,9 +5,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Diagonal sum")]
     sealed class LittleKiller : KyuConstraint
     {
-        public override string Name => "Diagonal sum";
         public override string Description => "The digits along the indicated diagonal must sum to the specified total. (The digits need not necessarily be different.)";
         public override double ExtraRight => Direction == ClueDirection.SouthWest ? .25 : 0;
         public override double ExtraTop => Direction == ClueDirection.SouthEast ? .25 : 0;
@@ -45,7 +45,7 @@ namespace KyudosudokuWebsite
             ClueDirection.NorthEast => Enumerable.Range(0, 9 - offset).Select(i => 72 - 9 * offset - 8 * i).ToArray(),
             _ => null,
         };
-        protected override Constraint getConstraint() => new SumConstraint(Sum, AffectedCells);
+        protected override IEnumerable<Constraint> getConstraints() { yield return new SumConstraint(Sum, AffectedCells); }
         public override bool Verify(int[] grid) => AffectedCells.Sum(c => grid[c]) == Sum;
 
         const double svgArrLen = .275;

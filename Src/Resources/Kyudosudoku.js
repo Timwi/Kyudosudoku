@@ -13,11 +13,43 @@
     ];
     let invalidCellColor = '#f00';
 
+    function inRange(x) { return x >= 0 && x < 9; }
+    function dx(dir) { return dir === 'Left' ? -1 : dir === 'Right' ? 1 : 0 }
+    function dy(dir) { return dir === 'Up' ? -1 : dir === 'Down' ? 1 : 0 }
+    function Adjacent(cell)
+    {
+        let list = [];
+        let x = cell % 9;
+        let y = (cell / 9) | 0;
+        for (let xx = x - 1; xx <= x + 1; xx++)
+            if (inRange(xx))
+                for (let yy = y - 1; yy <= y + 1; yy++)
+                    if (inRange(yy) && (xx != x || yy != y))
+                        list.push(xx + 9 * yy);
+        return list;
+    }
+
+    function Orthogonal(cell)
+    {
+        let list = [];
+        let x = cell % 9;
+        let y = (cell / 9) | 0;
+        for (let xx = x - 1; xx <= x + 1; xx++)
+            if (inRange(xx))
+                for (let yy = y - 1; yy <= y + 1; yy++)
+                    if (inRange(yy) && (xx == x || yy == y) && (xx != x || yy != y))
+                        list.push(xx + 9 * yy);
+        return list;
+    }
+
     function validateConstraint(grid, constr)
     {
         switch (constr[':type'])
         {
             // CELL CONSTRAINTS
+
+            case 'OddEven':
+                return grid[constr.Cell] === null ? null : grid[constr.Cell] % 2 === (constr.Odd ? 1 : 0);
 
             case 'AntiBishop': {
                 if (grid[constr.Cell] === null)
@@ -30,45 +62,33 @@
             case 'AntiKnight': {
                 let x = constr.Cell % 9;
                 let y = (constr.Cell / 9) | 0;
-                let toroidal = false;
                 let knightsMoves = [];
                 for (let dx of [-2, -1, 1, 2])
-                    if (toroidal || (x + dx >= 0 && x + dx < 9))
+                    if (inRange(x + dx))
                         for (let dy of (dx === 1 || dx === -1) ? [-2, 2] : [-1, 1])
-                            if (toroidal || (y + dy >= 0 && y + dy < 9))
-                                knightsMoves.push((x + dx + 9) % 9 + 9 * ((y + dy + 9) % 9));
+                            if (inRange(y + dy))
+                                knightsMoves.push(x + dx + 9 * (y + dy));
                 return knightsMoves.some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
                     knightsMoves.some(c => grid[c] === null) ? null : true;
             }
 
-            case 'AntiKing': {
-                let x = constr.Cell % 9;
-                let y = (constr.Cell / 9) | 0;
-                let kingsMoves = [];
-                for (let dx of [-1, 0, 1])
-                    if (x + dx >= 0 && x + dx < 9)
-                        for (let dy of [-1, 0, 1])
-                            if ((dx !== 0 || dy !== 0) && y + dy >= 0 && y + dy < 9)
-                                kingsMoves.push(x + dx + 9 * (y + dy));
-                return kingsMoves.some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
-                    kingsMoves.some(c => grid[c] === null) ? null : true;
-            }
+            case 'AntiKing':
+                console.log(Adjacent(constr.Cell).join(', '));
+                return Adjacent(constr.Cell).some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
+                    Adjacent(constr.Cell).some(c => grid[c] === null) ? null : true;
 
-            case 'NoConsecutive': {
-                let x = constr.Cell % 9;
-                let y = (constr.Cell / 9) | 0;
-                let adjCells = [];
-                for (let dx of [-1, 0, 1])
-                    if (x + dx >= 0 && x + dx < 9)
-                        for (let dy of [-1, 0, 1])
-                            if ((dx !== 0 || dy !== 0) && (dx === 0 || dy === 0) && y + dy >= 0 && y + dy < 9)
-                                adjCells.push(x + dx + 9 * (y + dy));
-                return adjCells.some(c => grid[c] !== null && Math.abs(grid[c] - grid[constr.Cell]) === 1) ? false :
-                    adjCells.some(c => grid[c] === null) ? null : true;
-            }
+            case 'NoConsecutive':
+                return grid[constr.Cell] !== null && Orthogonal(constr.Cell).some(c => grid[c] !== null && Math.abs(grid[c] - grid[constr.Cell]) === 1) ? false :
+                    grid[constr.Cell] === null || Orthogonal(constr.Cell).some(c => grid[c] === null) ? null : true;
 
-            case 'OddEven':
-                return grid[constr.Cell] === null ? null : grid[constr.Cell] % 2 === (constr.Odd ? 1 : 0);
+            case 'MaximumCell':
+                return grid[constr.Cell] !== null && Orthogonal(constr.Cell).some(c => grid[c] !== null && grid[c] >= grid[constr.Cell]) ? false :
+                    grid[constr.Cell] === null || Orthogonal(constr.Cell).some(c => grid[c] === null) ? null : true;
+
+            case 'FindThe9':
+                return grid[constr.Cell] === null || grid[constr.Cell + (dx(constr.Direction) + 9 * dy(constr.Direction)) * grid[constr.Cell]] === null ? null :
+                    grid[constr.Cell + (dx(constr.Direction) + 9 * dy(constr.Direction)) * grid[constr.Cell]] === 9;
+
 
             // ROW/COLUMN CONSTRAINTS
 
@@ -1165,16 +1185,16 @@
         window.onresize = function()
         {
             // Set the width to 100% in order to measure its height
-            puzzleSvg.style.width = '100%';
+            puzzleSvg.style.width = '100vw';
             let puzzleHeight = puzzleDiv.offsetHeight;
-            let availableHeight = window.innerHeight - document.querySelector('.top-bar').offsetHeight;
+            let availableHeight = window.innerHeight - document.querySelector('#topbar').offsetHeight;
             let warning = document.querySelector('.warning');
             if (warning !== null)
                 availableHeight -= warning.offsetHeight;
             if (puzzleHeight > availableHeight)
             {
                 puzzleDiv.style.display = 'none';
-                puzzleSvg.style.width = `${100 * availableHeight / puzzleHeight}%`;
+                puzzleSvg.style.width = `${100 * availableHeight / puzzleHeight}vw`;
                 puzzleDiv.style.display = '';
             }
         };

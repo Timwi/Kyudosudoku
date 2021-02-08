@@ -14,7 +14,7 @@ namespace KyudosudokuWebsite
 
         protected abstract bool verify(int a, int b, int c, int d);
 
-        protected sealed override Constraint getConstraint() => new FourCellLambdaConstraint(TopLeftCell, TopLeftCell + 1, TopLeftCell + 10, TopLeftCell + 9, verify);
+        protected sealed override IEnumerable<Constraint> getConstraints() { yield return new FourCellLambdaConstraint(TopLeftCell, TopLeftCell + 1, TopLeftCell + 10, TopLeftCell + 9, verify); }
         protected double x => svgX(TopLeftCell) + .5;
         protected double y => svgY(TopLeftCell) + .5;
 

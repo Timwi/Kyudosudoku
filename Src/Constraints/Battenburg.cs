@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Battenburg")]
     sealed class Battenburg : KyuFourCellConstraint
     {
-        public override string Name => "Battenburg";
         public override string Description => "The four cells around the clue must form a 2×2 checkerboard of odd and even digits.";
         public static readonly Example Example = new Example
         {

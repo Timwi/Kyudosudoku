@@ -5,9 +5,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Binairo")]
     sealed class Binairo : KyuRowColConstraint
     {
-        public override string Name => "Binairo";
         public override string Description => $"In this {(IsCol ? "column" : "row")}, no three adjacent digits can be all odd or all even.";
         public override bool ShownTopLeft => true;
         public override double ExtraTop => IsCol ? .5 : 0;
@@ -24,12 +24,12 @@ namespace KyudosudokuWebsite
         public Binairo(bool isCol, int rowCol) : base(isCol, rowCol) { }
         private Binairo() { }   // for Classify
 
-        protected override Constraint getConstraint() => new BinairoRowConstraint(GetAffectedCells(false));
+        protected override IEnumerable<Constraint> getConstraints() { yield return new BinairoRowConstraint(GetAffectedCells(false)); }
 
         public override string Svg => $@"<g stroke='black' stroke-width='.075' fill='none' transform='translate({(IsCol ? RowCol + .5 : -.5)}, {(IsCol ? -.5 : RowCol + .5)}) scale(.7)'>
-            <circle cx='-.25' cy='-.25' r='.2' />
-            <circle cx='.25' cy='.25' r='.2' />
-            <path d='M .25 -.45 v .4 M -.25 .05 v .4' />
+            <circle cx='.25' cy='-.25' r='.2' />
+            <circle cx='-.25' cy='.25' r='.2' />
+            <path d='M -.25 -.45 v .4 M .25 .05 v .4' />
         </g>";
 
         public override bool Verify(int[] grid) => VerifyBinairo(GetAffectedCells(false).Select(c => grid[c]).ToArray());

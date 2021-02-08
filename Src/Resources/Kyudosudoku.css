@@ -18,21 +18,29 @@ kbd {
     text-decoration: underline;
 }
 
-th {
-    text-align: right;
-    padding-right: .5cm;
-}
-
 th, td {
     vertical-align: top;
 }
 
-.top-bar {
-    background: hsl(220, 70%, 80%);
-    height: 2cm;
+.nowrap {
+    white-space: nowrap;
 }
 
-    .top-bar a, .top-bar .puzzle-id {
+#layout {
+    width: 100%;
+}
+
+#main {
+    padding: 0;
+}
+
+#topbar {
+    background: hsl(220, 70%, 80%);
+    height: 2cm;
+    box-sizing: border-box;
+}
+
+    #topbar a, #topbar .puzzle-id {
         display: inline-block;
         text-decoration: none;
         color: black;
@@ -40,18 +48,18 @@ th, td {
         box-sizing: border-box;
     }
 
-        .top-bar a:hover {
+        #topbar a:hover {
             background: hsl(220, 70%, 70%);
         }
 
-    .top-bar .home {
+    #topbar .home {
         padding: .5cm 1cm 0 2.25cm;
         left: 0;
         font-size: 24pt;
         font-weight: bold;
     }
 
-        .top-bar .home::before {
+        #topbar .home::before {
             content: '';
             position: absolute;
             left: .75cm;
@@ -64,21 +72,25 @@ th, td {
             background-position: 0 0;
         }
 
-    .top-bar .right {
+    #topbar .right {
         float: right;
     }
 
-    .top-bar .right, .top-bar .puzzle-id {
+    #topbar .right, #topbar .puzzle-id {
         padding: .725cm 1cm 0;
         vertical-align: bottom;
     }
 
-.footer {
-    margin-top: 2cm;
+#footer {
     background: hsl(220, 70%, 80%);
     padding: .1cm .5cm;
     font-size: 12pt;
 }
+
+    #footer .legal {
+        float: right;
+        margin-left: 1cm;
+    }
 
 .main {
     padding: 1cm 2cm;
@@ -230,8 +242,10 @@ table {
         padding: .2cm .5cm;
     }
 
-    table.controls th {
+    table.help-controls th {
         white-space: nowrap;
+        text-align: right;
+        padding-right: .5cm;
     }
 
 h1 {
@@ -306,3 +320,101 @@ table.example td.explanation {
     padding: 0 .5cm .5cm;
     vertical-align: middle;
 }
+
+#sidebar {
+    background: hsl(220, 70%, 80%);
+    text-align: center;
+    font-size: 14pt;
+    width: 200px;
+    position: sticky;
+}
+
+    #sidebar a {
+        padding: 1cm .7cm;
+        display: block;
+        text-decoration: none;
+        color: black;
+    }
+
+    #sidebar .stats {
+        margin-top: 1.5cm;
+    }
+
+        #sidebar .stats div {
+            margin: .2cm;
+        }
+
+    #sidebar .solve-count {
+        font-size: 36pt;
+        font-weight: bold;
+    }
+
+    #sidebar a:hover {
+        background: hsl(220, 70%, 70%);
+    }
+
+    #sidebar a.stats > div.label {
+        font-weight: bold;
+        font-size: 14pt;
+        margin-top: .5cm;
+    }
+
+.controls {
+    font-size: 18pt;
+    margin: .5cm 0;
+}
+
+#find-form label, #find-form button, #find-form input {
+    padding: .1cm .4cm;
+    margin: 0 .25cm;
+    border-radius: .3cm;
+    border: 2px solid hsl(220, 50%, 75%);
+    background: transparent;
+    font: inherit;
+    font-size: 18pt;
+    cursor: pointer;
+}
+
+    #find-form input[type="radio"] {
+        display: none;
+    }
+
+    #find-form input[type="number"] {
+        width: 3cm;
+        padding: .1cm .2cm;
+    }
+
+    #find-form label:hover, #find-form button:hover {
+        background: hsl(220, 70%, 80%);
+    }
+
+
+    #find-form input:checked + label, #find-form button.selected {
+        background: hsl(220, 70%, 80%);
+        border-color: hsl(220, 30%, 50%);
+    }
+
+#results {
+    margin-top: 1.5cm;
+}
+
+    #results table {
+        border-collapse: collapse;
+    }
+
+        #results table tr:nth-child(2n+1) {
+            background: hsl(220, 45%, 85%);
+        }
+
+        #results table tr.headers th {
+            background: hsl(220, 70%, 80%);
+            text-align: left;
+        }
+
+        #results table td, #results table th {
+            padding: .15cm .5cm;
+        }
+
+    #results .pagination {
+        margin-top: .5cm;
+    }

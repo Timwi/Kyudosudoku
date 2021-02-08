@@ -121,10 +121,13 @@
   <data name="Css" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\kyudosudoku.css;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Js" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\kyudosudoku.js;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="PuzzleJs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\kyudosudoku.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\logo.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="FindJs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\find.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

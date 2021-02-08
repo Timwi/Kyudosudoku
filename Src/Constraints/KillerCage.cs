@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Killer cage")]
     sealed class KillerCage : KyuRegionConstraint
     {
-        public override string Name => "Killer cage";
         public override string Description => $"Digits within the cage must be different{Sum.NullOr(s => $" and must add up to {s}")}.";
         public static readonly Example Example = new Example
         {
@@ -27,7 +27,7 @@ namespace KyudosudokuWebsite
 
         public int? Sum { get; private set; }
 
-        protected override Constraint getConstraint() => Sum == null ? new UniquenessConstraint(Cells) : new SumUniquenessConstraint(Sum.Value, Cells);
+        protected override IEnumerable<Constraint> getConstraints() { yield return Sum == null ? new UniquenessConstraint(Cells) : new SumUniquenessConstraint(Sum.Value, Cells); }
 
         public override bool Verify(int[] grid)
         {

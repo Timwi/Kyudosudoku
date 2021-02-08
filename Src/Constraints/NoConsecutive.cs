@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("No-consecutive")]
     sealed class NoConsecutive : KyuCellConstraint
     {
-        public override string Name => "No-consecutive";
         public override string Description => "A digit that’s 1 more or 1 less than this digit can’t be orthogonally adjacent to it.";
         public static readonly Example Example = new Example
         {
@@ -22,8 +22,8 @@ namespace KyudosudokuWebsite
         public NoConsecutive(int cell) : base(cell) { }
         private NoConsecutive() { }    // for Classify
 
-        protected override Constraint getConstraint() => new NoConsecutiveConstraint(9, 9, includeDiagonals: false, enforcedCells: new[] { Cell });
-        public override string Svg => $"<path transform='translate({Cell % 9}, {Cell / 9})' d='M.5 .05 .7 .2 .3 .2z M.95 .5 .8 .7 .8 .3z M.5 .95 .3 .8 .7 .8z M.05 .5 .2 .3 .2 .7z' opacity='.2' />";
+        protected override IEnumerable<Constraint> getConstraints() { yield return new NoConsecutiveConstraint(9, 9, includeDiagonals: false, enforcedCells: new[] { Cell }); }
+        public override string Svg => $"<path transform='translate({Cell % 9}, {Cell / 9})' d='m 0 .5 .1 -.1 .1 .1 -.1 .1z M .4 .1 l .1 -.1 .1 .1 -.1 .1z M .8 .5 l .1 -.1 .1 .1 -.1 .1z M .4 .9 l .1 -.1 .1 .1 -.1 .1z' opacity='.2' />";
 
         public override bool Verify(int[] grid)
         {

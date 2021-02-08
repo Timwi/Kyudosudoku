@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Battlefield")]
     sealed class Battlefield : KyuRowColConstraint
     {
-        public override string Name => "Battlefield";
         public override string Description => $"The first and last number in the region represent the sizes of two armies, who march inward; the clue ({Clue}) specifies the sum of the digits that are either sandwiched between the armies or within the armies’ overlap.";
         public override double ExtraTop => IsCol ? .5 : 0;
         public override bool ShownTopLeft => true;
@@ -30,7 +30,7 @@ namespace KyudosudokuWebsite
 
         public int Clue { get; private set; }
 
-        protected override Constraint getConstraint() => new BattlefieldUniquenessConstraint(Clue, GetAffectedCells(false));
+        protected override IEnumerable<Constraint> getConstraints() { yield return new BattlefieldUniquenessConstraint(Clue, GetAffectedCells(false)); }
 
         public override bool Verify(int[] grid) => BattlefieldUniquenessConstraint.CalculateBattlefieldClue(GetAffectedCells(false).Select(cell => grid[cell]).ToArray()) == Clue;
 

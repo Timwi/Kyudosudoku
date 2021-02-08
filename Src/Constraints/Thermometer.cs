@@ -6,9 +6,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Thermometer")]
     sealed class Thermometer : KyuConstraint
     {
-        public override string Name => "Thermometer";
         public override string Description => "Digits must increase from the bulb.";
         public static readonly Example Example = new Example
         {
@@ -24,7 +24,7 @@ namespace KyudosudokuWebsite
         public Thermometer(int[] cells) { Cells = cells; }
         private Thermometer() { }   // for Classify
 
-        protected override Constraint getConstraint() => new LessThanConstraint(Cells);
+        protected override IEnumerable<Constraint> getConstraints() { yield return new LessThanConstraint(Cells); }
         public sealed override bool IncludesCell(int cell) => Cells.Contains(cell);
 
         public override string Svg => $@"<g opacity='.2'>

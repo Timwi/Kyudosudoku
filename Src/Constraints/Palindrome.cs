@@ -7,9 +7,9 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Palindrome")]
     sealed class Palindrome : KyuConstraint
     {
-        public override string Name => "Palindrome";
         public override string Description => "The digits along the line must form a palindrome (same sequence of digits when read from either end).";
         public static readonly Example Example = new Example
         {
@@ -25,7 +25,7 @@ namespace KyudosudokuWebsite
         public Palindrome(int[] cells) { Cells = cells; }
         private Palindrome() { }   // for Classify
 
-        protected override Constraint getConstraint() => new CloneConstraint(Cells.Subarray(0, Cells.Length / 2), Cells.Subarray((Cells.Length + 1) / 2).ReverseInplace());
+        protected override IEnumerable<Constraint> getConstraints() { yield return new CloneConstraint(Cells.Subarray(0, Cells.Length / 2), Cells.Subarray((Cells.Length + 1) / 2).ReverseInplace()); }
         public sealed override bool IncludesCell(int cell) => Cells.Contains(cell);
 
         public override string Svg => $@"<g opacity='.2'>

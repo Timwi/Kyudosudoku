@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace KyudosudokuWebsite
 {
+    [KyuConstraintInfo("Consecutive neighbors")]
     sealed class ConsecutiveNeighbors : KyuNeighborConstraint
     {
-        public override string Name => "Consecutive neighbors";
         public override string Description => "The two marked cells must be consecutive (have a difference of 1).";
         public static readonly Example Example = new Example
         {

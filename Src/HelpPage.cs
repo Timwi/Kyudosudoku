@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using RT.Servers;
 using RT.TagSoup;
@@ -29,7 +28,7 @@ namespace KyudosudokuWebsite
                     {kyudokuGridSvg(3, 1, kyudoExample[3], true, highlight?[3], circled?[3], xed?[3])}
                 </svg>");
 
-            return RenderPage("How to play Kyudosudoku", session.User, new PageOptions { AddFooter = true },
+            return RenderPage("How to play Kyudosudoku", session.User, new PageOptions { AddFooter = true, Db = db },
                 new DIV { class_ = "main" }._(
                     new P { class_ = "jump" }._("Jump to: ", new A { href = "#rules" }._("Rules"), " | ", new A { href = "#constraints" }._("Constraints"), " | ", new A { href = "#controls" }._("Controls"), " | ", new A { href = "#strategies" }._("Common strategies")),
                     new H1 { id = "rules" }._("Rules of Kyudosudoku"),
@@ -56,6 +55,8 @@ namespace KyudosudokuWebsite
                         AntiKnight.Example,
                         AntiKing.Example,
                         NoConsecutive.Example,
+                        MaximumCell.Example,
+                        FindThe9.Example,
 
                         // Two cells
                         ConsecutiveNeighbors.Example,
@@ -72,6 +73,7 @@ namespace KyudosudokuWebsite
                         Thermometer.Example,
                         Arrow.Example,
                         Palindrome.Example,
+                        CappedLine.Example,
                         Snowball.Example,
 
                         // Rows/columns
@@ -88,7 +90,7 @@ namespace KyudosudokuWebsite
 
                     new H1 { id = "controls" }._("Controls"),
                     new H2("Keyboard"),
-                    new TABLE { class_ = "controls" }._(
+                    new TABLE { class_ = "help-controls" }._(
                         new TR(new TH("Arrow keys"), new TD("Moves the selection within the Sudoku grid.")),
                         new TR(new TH("Shift+Arrow keys"), new TD("Extends the selection within the Sudoku grid.")),
                         new TR(new TH("Ctrl+Arrow keys, Ctrl+Space"), new TD("Can be used to select multiple cells that may not be contiguous.")),
@@ -103,7 +105,7 @@ namespace KyudosudokuWebsite
                         new TR(new TH("Shift+Digits"), new TD("Enters a digit in corner notation.")),
                         new TR(new TH("F"), new TD("Replaces center-notated digits with all those that aren’t excluded by other digits in the same row, column or 3×3 box."))),
                     new H2("Mouse"),
-                    new TABLE { class_ = "controls" }._(
+                    new TABLE { class_ = "help-controls" }._(
                         new TR(new TH("Click (Kyudoku cell)"), new TD("Cycle unmarked → crossed out → circled")),
                         new TR(new TH("Shift+Click (Kyudoku cell)"), new TD("Cycle unmarked → circled → crossed out")),
                         new TR(new TH("Click and drag (Sudoku cell)"), new TD("Select any number of cells.")),

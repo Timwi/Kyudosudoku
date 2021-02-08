@@ -71,12 +71,11 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to alert(&apos;yes&apos;);.
         /// </summary>
-        internal static byte[] Js {
+        internal static string FindJs {
             get {
-                object obj = ResourceManager.GetObject("Js", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("FindJs", resourceCulture);
             }
         }
         
@@ -87,6 +86,28 @@ namespace KyudosudokuWebsite {
             get {
                 object obj = ResourceManager.GetObject("Logo", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to window.addEventListener(&apos;DOMContentLoaded&apos;, function()
+        ///{
+        ///    let colors = [
+        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
+        ///        [&quot;hsl(0, 100%, 94%)&quot;, &quot;hsl(0, 70%, 50%)&quot;],
+        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
+        ///        [&quot;hsl(52, 100%, 89%)&quot;, &quot;hsl(52, 100%, 35%)&quot;],
+        ///        [&quot;hsl(0, 0%, 94%)&quot;, &quot;hsl(0, 0%, 40%)&quot;],
+        ///        [&quot;hsl(226, 100%, 94%)&quot;, &quot;hsl(226, 60%, 50%)&quot;],
+        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
+        ///        [&quot;hsl(103, 84%, 95%)&quot;, &quot;hsl(103, 50%, 50%)&quot;],
+        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;]
+        ///    ];
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PuzzleJs {
+            get {
+                return ResourceManager.GetString("PuzzleJs", resourceCulture);
             }
         }
     }
