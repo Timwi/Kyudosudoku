@@ -71,6 +71,7 @@ namespace KyudosudokuWebsite
                     .Data("constraints", dbPuzzle.Constraints)
                     .Data("progress", userPuzzle.NullOr(up => up.Progess))
                     .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
+                    .Data("semitransparentxs", (session?.User?.SemitransparentXs ?? false) ? "1" : "0")
                     ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
                         <g transform='translate(14, 9.75)'>{buttons.GroupBy(g => g.row).SelectMany(row => row.Select((btn, btnIx) => $@"
                             <g class='button' id='p-{puzzleId}-btn-{btn.id}' transform='translate({row.Take(btnIx).Sum(b => b.width) + btnIx * ((9 - row.Sum(tup => tup.width)) / (row.Count() - 1))}, {1.1 * btn.row})'>
@@ -184,7 +185,7 @@ namespace KyudosudokuWebsite
 
                     if (already.Solved)
                     {
-                        puzzle.AverageTime = getAveragePuzzleTime(db, puzzleId);
+                        puzzle.AverageTime = db.CalculateAveragePuzzleTime(puzzleId);
                         db.SaveChanges();
                     }
                 }

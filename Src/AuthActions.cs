@@ -50,7 +50,8 @@ namespace KyudosudokuWebsite
                 Username = username,
                 EmailAddress = string.IsNullOrWhiteSpace(req.Post["email"].Value) ? null : req.Post["email"].Value,
                 PasswordHash = createPasswordHash(password),
-                ShowErrors = true
+                ShowErrors = true,
+                SemitransparentXs = false
             });
             db.SaveChanges();
             session.User = newUser;
@@ -107,10 +108,17 @@ namespace KyudosudokuWebsite
             }
 
             var changingGameOptions = false;
-            if (session.User.ShowErrors != (req.Post["opt-show-errors"].Value == "1"))
+            foreach (var (curVal, setter, key) in Ut.NewArray<(bool curVal, Action<bool> setter, string key)>(
+                (session.User.ShowErrors, v => { session.User.ShowErrors = v; }, "opt-show-errors"),
+                (session.User.SemitransparentXs, v => { session.User.SemitransparentXs = v; }, "opt-semitransparent-xs")
+            ))
             {
-                session.User.ShowErrors = (req.Post["opt-show-errors"].Value == "1");
-                changingGameOptions = true;
+                var newVal = req.Post[key].Value == "1";
+                if (curVal != newVal)
+                {
+                    setter(newVal);
+                    changingGameOptions = true;
+                }
             }
             if (changingGameOptions)
                 messages.Add("Game options updated.");

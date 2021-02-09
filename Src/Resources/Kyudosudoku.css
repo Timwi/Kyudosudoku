@@ -166,7 +166,7 @@ th, td {
         fill: hsl(212, 90%, 90%);
     }
 
-    .puzzle .edge-cell {
+    .puzzle svg .edge-cell {
         fill: transparent;
         stroke: none;
     }

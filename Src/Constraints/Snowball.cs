@@ -10,7 +10,7 @@ namespace KyudosudokuWebsite
     [KyuConstraintInfo("Snowball")]
     sealed class Snowball : KyuConstraint
     {
-        public override string Description => "One of the regions must contain the same digits as the other, plus or minus a consistent addend. For example, if one region contains 1, 4, 7, the other might contain 3, 6, 9. (The digits within one region need not necessarily be different. The addend can be zero.)";
+        public override string Description => "One of the regions must contain the same digits in the same places as the other, plus or minus a consistent addend. For example, if one region contains 1, 4, 7, the other might contain 3, 6, 9 in the same order. (The digits within one region need not necessarily be different. The addend can be zero.)";
         public static readonly Example Example = new Example
         {
             Constraints = { new Snowball(new[] { 0, 1, 9 }, new[] { 11, 12, 20 }) },

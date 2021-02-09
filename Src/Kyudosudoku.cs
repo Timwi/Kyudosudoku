@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using KyudosudokuWebsite.Database;
 using PuzzleSolvers;
+using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
 
@@ -142,7 +144,7 @@ namespace KyudosudokuWebsite
                     for (var corner = 0; corner < 4; corner++)
                     {
                         var ixs = kyudokus[corner];
-                        var kyudoku = new Puzzle(36, 0, 1);
+                        var kyudoku = new PuzzleSolvers.Puzzle(36, 0, 1);
                         kyudoku.AddConstraint(new Kyudoku6x6Constraint(grids[corner]));
                         allSolutions[corner] = kyudoku.Solve().Select(solution => solution.SelectIndexWhere(v => v == 0).ToArray()).ToArray();
                         if (!allSolutions[corner].Any(solution => solution.SequenceEqual(ixs)))
@@ -222,7 +224,7 @@ namespace KyudosudokuWebsite
                 // Area constraints
                 (25, Arrow.Generate),
                 (20, s => KillerCage.Generate(s, uniquenessRegions)),
-                (20, Palindrome.Generate),
+                (15, Palindrome.Generate),
                 (20, CappedLine.Generate),
                 (20, s => RenbanCage.Generate(s, uniquenessRegions)),
                 (20, Snowball.Generate),
@@ -231,14 +233,14 @@ namespace KyudosudokuWebsite
                 // Row/column constraints
                 (37, Battlefield.Generate),
                 (null, Binairo.Generate),
-                (27, Sandwich.Generate),
-                (46, Skyscraper.Generate),
-                (25, ToroidalSandwich.Generate),
+                (20, Sandwich.Generate),
+                (47, Skyscraper.Generate),
+                (20, ToroidalSandwich.Generate),
                 (22, XSum.Generate),
 
                 // Four-cell constraints
-                (60, Clockface.Generate),
-                (63, Inclusion.Generate),
+                (50, Clockface.Generate),
+                (40, Inclusion.Generate),
                 (60, Battenburg.Generate),
 
                 // Other
@@ -291,6 +293,19 @@ namespace KyudosudokuWebsite
                 .Select(region => region.SelectIndexWhere(b => b).ToArray())
                 .ToArray();
             return uniquenessRegions;
+        }
+
+        public void SaveToDb(int puzzleId)
+        {
+            using var db = new Db();
+            db.Puzzles.Add(new Database.Puzzle
+            {
+                PuzzleID = puzzleId,
+                KyudokuGrids = Grids.SelectMany(grid => grid.Select(i => (char) (i + '0'))).JoinString(),
+                Constraints = ClassifyJson.Serialize(Constraints).ToString(),
+                ConstraintNames = Constraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString()
+            });
+            db.SaveChanges();
         }
     }
 }

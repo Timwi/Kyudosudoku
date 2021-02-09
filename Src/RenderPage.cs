@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using KyudosudokuWebsite.Database;
 using RT.Servers;
 using RT.TagSoup;
@@ -26,12 +27,14 @@ namespace KyudosudokuWebsite
             return HttpResponse.Html(Tag.ToString(new HTML(
                 new HEAD(
                     new TITLE($"{fullTitle}"),
+                    new LINK { rel = "stylesheet", href = "/css" },
+                    opt.Js.NullOr(js => new SCRIPTLiteral(
 #if DEBUG
-                    opt.Js.NullOr(js => new SCRIPTLiteral(File.ReadAllText(Path.Combine(Settings.ResourcesDir, js.Filename)))),
+                        File.ReadAllText(Path.Combine(Settings.ResourcesDir, js.Filename))
 #else
-                    opt.Js.NullOr(js => new SCRIPTLiteral(js.Js)),
+                        js.Js
 #endif
-                    new LINK { rel = "stylesheet", href = $"/css" },
+                    )),
                     new LINK { rel = "shortcut icon", type = "image/png", href = "/logo" }),
                 new BODY { class_ = opt.IsPuzzlePage ? "is-puzzle" : null }._(
                     new TABLE { id = "layout" }._(
@@ -48,7 +51,7 @@ namespace KyudosudokuWebsite
                                     new DIV("puzzles.")),
                                 new A { href = "/find" }._("Find puzzles")),
                             new TD { id = "main" }._(body)),
-                        new TR(new TD { id = "footer", colspan = opt.IsPuzzlePage ? 1 : 2 }._(
+                        opt.IsPuzzlePage ? null : new TR(new TD { id = "footer", colspan = opt.IsPuzzlePage ? 1 : 2 }._(
                             new P { class_ = "legal" }._(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")),
                             new P("Send feedback and suggestions to Timwi#0551 or Goofy#1262 on Discord, or post a ticket to ", new A { href = "https://github.com/Timwi/Kyudosudoku/issues" }._("Kyudosudoku on GitHub"), "."))))))));
         }

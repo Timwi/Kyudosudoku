@@ -1,4 +1,4 @@
-﻿window.addEventListener('DOMContentLoaded', function()
+﻿window.onload = (function()
 {
     let colors = [
         ["white", "hsl(0, 0%, 50%)"],
@@ -315,6 +315,9 @@
         let helpEnabled = localStorage.getItem('kyu-help') !== 'Off';
         let selectedCells = [];
         let highlightedDigit = null;
+        let hoveredKyDigit = null;    // if not null, it’s an array of [corner, cell]
+        let showErrors = puzzleDiv.dataset.showerrors === '1';
+        let semitransparentXs = puzzleDiv.dataset.semitransparentxs === '1';
 
         function encodeState(st)
         {
@@ -425,10 +428,21 @@
 
         try
         {
-            let item;
+            let undoB = localStorage.getItem(`ky${puzzleId}-undo`);
+            let redoB = localStorage.getItem(`ky${puzzleId}-redo`);
+
+            undoBuffer = undoB ? undoB.split(' ').map(decodeState) : [JSON.parse(JSON.stringify(state))];
+            redoBuffer = redoB ? redoB.split(' ').map(decodeState) : [];
+
+            let item = null;
             if (puzzleDiv.dataset.progress)
+            {
                 item = JSON.parse(puzzleDiv.dataset.progress);
-            else
+                if (undoB && undoB.includes(encodeState(item)))
+                    item = null;
+            }
+
+            if (item === null)
             {
                 str = localStorage.getItem(`ky${puzzleId}`);
                 if (str !== null)
@@ -437,12 +451,6 @@
             }
             if (item && item.circledDigits && item.cornerNotation && item.centerNotation && item.enteredDigits)
                 state = item;
-
-            let undoB = localStorage.getItem(`ky${puzzleId}-undo`);
-            let redoB = localStorage.getItem(`ky${puzzleId}-redo`);
-
-            undoBuffer = undoB ? undoB.split(' ').map(decodeState) : [JSON.parse(JSON.stringify(state))];
-            redoBuffer = redoB ? redoB.split(' ').map(decodeState) : [];
         }
         catch
         {
@@ -460,17 +468,14 @@
             let reqStart = new Date();
             req.onload = function()
             {
-                if (req.responseText)
+                var json = req.responseText ? JSON.parse(req.responseText) : null;
+                if (json)
                 {
-                    var json = JSON.parse(req.responseText);
-                    if (json)
-                    {
-                        puzzleDiv.querySelector('text.inf-time').textContent = json.time ? (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`) : 'not recorded';
-                        puzzleDiv.querySelector('text.inf-avg').textContent = json.avg ? (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`) : 'unknown';
-                        puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count | 0} times`;
-                    }
-                    timeLastDbUpdate = reqStart;
+                    puzzleDiv.querySelector('text.inf-time').textContent = json.time ? (json.time < 60 ? `${json.time} seconds` : json.time < 60 * 60 ? `${(json.time / 60) | 0} min ${json.time % 60} sec` : `${(json.time / 60 / 60) | 0} h ${((json.time / 60) | 0) % 60} min ${json.time % 60} sec`) : 'not recorded';
+                    puzzleDiv.querySelector('text.inf-avg').textContent = json.avg ? (json.avg < 60 ? `${json.avg} seconds` : json.avg < 60 * 60 ? `${(json.avg / 60) | 0} min ${json.avg % 60} sec` : `${(json.avg / 60 / 60) | 0} h ${((json.avg / 60) | 0) % 60} min ${json.avg % 60} sec`) : 'unknown';
+                    puzzleDiv.querySelector('text.inf-count').textContent = json.count === 1 ? "once" : `${json.count | 0} times`;
                 }
+                timeLastDbUpdate = reqStart;
             };
 
             if (isSolved)
@@ -595,7 +600,7 @@
             {
                 case false:
                     isSolved = false;
-                    if (puzzleDiv.dataset.showerrors === '1')
+                    if (showErrors)
                         document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.add('invalid-glow');
                     break;
 
@@ -615,7 +620,7 @@
                 {
                     case false:
                         isSolved = false;
-                        if (puzzleDiv.dataset.showerrors === '1')
+                        if (showErrors)
                             document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.add('invalid-glow');
                         break;
 
@@ -640,9 +645,9 @@
                 for (let cell = 0; cell < 36; cell++)
                 {
                     document.getElementById(`p-${puzzleId}-kyudo-${corner}-circle-${cell}`).setAttribute('opacity', state.circledDigits[corner][cell] === true ? '1' : '0');
-                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-x-${cell}`).setAttribute('opacity', (state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && isSolved)) ? '1' : '0');
+                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-x-${cell}`).setAttribute('opacity', (state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && isSolved)) ? (semitransparentXs ? '.3' : '1') : '0');
                     let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
-                    let isHighlighted = (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (state.circledDigits[corner][cell] !== false) && !isSolved;
+                    let isHighlighted = (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (state.circledDigits[corner][cell] !== false || semitransparentXs) && !isSolved;
                     document.getElementById(`p-${puzzleId}-kyudo-${corner}-cell-${cell}`).setAttribute('fill', cellColor(sudokuCell, isHighlighted));
                     document.getElementById(`p-${puzzleId}-kyudo-${corner}-text-${cell}`).setAttribute('fill', textColor(sudokuCell, isHighlighted));
                 }
@@ -843,6 +848,8 @@
                 updateVisuals(true);
             });
             cellRect.onmousedown = handler(function() { });
+            cellRect.onmouseenter = function() { hoveredKyDigit = [corner, cell]; };
+            cellRect.onmouseout = function() { hoveredKyDigit = null; };
         });
 
         var tooltip = null;
@@ -1110,6 +1117,17 @@
                     break;
 
                 case 'KeyF': autofill(); break;
+
+                case 'KeyQ':
+                case 'KeyW':
+                case 'KeyE':
+                    if (hoveredKyDigit !== null)
+                    {
+                        saveUndo();
+                        state.circledDigits[hoveredKyDigit[0]][hoveredKyDigit[1]] = (str === 'KeyE' ? null : str === 'KeyQ');
+                        updateVisuals(true);
+                    }
+                    break;
 
                 // Navigation
                 case 'KeyZ': mode = 'normal'; updateVisuals(); break;

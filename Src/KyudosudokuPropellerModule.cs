@@ -3,6 +3,7 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using KyudosudokuWebsite.Database;
 using RT.PropellerApi;
 using RT.Servers;
@@ -26,7 +27,7 @@ namespace KyudosudokuWebsite
             using (var db = new Db())
             {
                 foreach (var puzzle in db.Puzzles.Where(p => p.AverageTime == null && db.UserPuzzles.Any(up => up.Solved && up.PuzzleID == p.PuzzleID)).ToArray())
-                    puzzle.AverageTime = getAveragePuzzleTime(db, puzzle.PuzzleID);
+                    puzzle.AverageTime = db.CalculateAveragePuzzleTime(puzzle.PuzzleID);
                 db.SaveChanges();
             }
 
@@ -48,15 +49,6 @@ namespace KyudosudokuWebsite
                 // Catch-all 404
                 new UrlMapping(path: null, handler: page404));
         }
-
-        private static double getAveragePuzzleTime(Db db, int puzzleId) => db.Database.SqlQuery<int>(@"
-            DECLARE @c BIGINT = (SELECT COUNT(*) FROM UserPuzzles WHERE PuzzleID=@puzzleId AND Solved=1);
-            SELECT Time FROM UserPuzzles
-	            WHERE PuzzleID=@puzzleId AND Solved=1
-                ORDER BY Time
-                OFFSET (@c - 1) / 2 ROWS
-                FETCH NEXT 1 + (1 - @c % 2) ROWS ONLY
-        ", new SqlParameter("@puzzleId", puzzleId)).Average();
 
         private HttpResponse page404(HttpRequest req) => withSession(req, (session, db) =>
             RenderPage("Not found — Kyudosudoku", session.User, new PageOptions { StatusCode = HttpStatusCode._404_NotFound }, new DIV { class_ = "main" }._(new H1("404 — Not Found"))));

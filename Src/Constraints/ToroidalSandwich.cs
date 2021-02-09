@@ -193,21 +193,20 @@ namespace KyudosudokuWebsite
             foreach (var isCol in new[] { false, true })
                 for (var rowCol = 0; rowCol < 9; rowCol++)
                     for (var digit1 = 1; digit1 <= 9; digit1++)
-                        for (var digit2 = 1; digit2 <= 9; digit2++)
-                            if (digit1 != digit2)
+                        for (var digit2 = digit1 + 1; digit2 <= 9; digit2++)
+                        {
+                            var digits = Enumerable.Range(0, 9).Select(x => sudoku[isCol ? (rowCol + 9 * x) : (x + 9 * rowCol)]).ToArray();
+                            var p1 = Array.IndexOf(digits, digit1);
+                            var p2 = Array.IndexOf(digits, digit2);
+                            var sum = 0;
+                            var i = (p1 + 1) % digits.Length;
+                            while (i != p2)
                             {
-                                var digits = Enumerable.Range(0, 9).Select(x => sudoku[isCol ? (rowCol + 9 * x) : (x + 9 * rowCol)]).ToArray();
-                                var p1 = Array.IndexOf(digits, digit1);
-                                var p2 = Array.IndexOf(digits, digit2);
-                                var sum = 0;
-                                var i = (p1 + 1) % digits.Length;
-                                while (i != p2)
-                                {
-                                    sum += digits[i];
-                                    i = (i + 1) % digits.Length;
-                                }
-                                constraints.Add(new ToroidalSandwich(isCol, rowCol, digit1, digit2, sum));
+                                sum += digits[i];
+                                i = (i + 1) % digits.Length;
                             }
+                            constraints.Add(new ToroidalSandwich(isCol, rowCol, digit1, digit2, sum));
+                        }
             return constraints;
         }
     }
