@@ -1,6 +1,3 @@
 TODO
 
-• Front page:
-    • enter specific puzzle number
 • Halt timer when tab inactive
-• Use Q/W to circle/cross a Kyudoku digit hovered over
