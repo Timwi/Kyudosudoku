@@ -73,7 +73,6 @@
             }
 
             case 'AntiKing':
-                console.log(Adjacent(constr.Cell).join(', '));
                 return Adjacent(constr.Cell).some(c => grid[c] !== null && grid[c] === grid[constr.Cell]) ? false :
                     Adjacent(constr.Cell).some(c => grid[c] === null) ? null : true;
 
@@ -231,7 +230,6 @@
 
             case 'Battenburg': {
                 let offsets = [0, 1, 10, 9].map(c => constr.TopLeftCell + c);
-                console.log(offsets);
                 for (let i = 0; i < 4; i++)
                     if (grid[offsets[i]] !== null && grid[offsets[(i + 1) % offsets.length]] !== null && grid[offsets[i]] % 2 === grid[offsets[(i + 1) % offsets.length]] % 2)
                         return false;
@@ -456,15 +454,16 @@
         {
         }
 
-        let dbUpdater = setInterval(dbUpdate, 10000);
+        let dbUpdater = null;
         let timeLastDbUpdate = new Date();
+        let puzzleIsSolved = false;
 
         function dbUpdate(isSolved)
         {
             let req = new XMLHttpRequest();
             req.open('POST', `db-update/${puzzleId}`, true);
             req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            req.send(`progress=${encodeURIComponent(JSON.stringify(state))}${isSolved ? `&time=${((new Date() - timeLastDbUpdate) / 1000) | 0}&getdata=1` : ''}`);
+            req.send(`progress=${encodeURIComponent(JSON.stringify(state))}&time=${Math.round((new Date() - timeLastDbUpdate) / 1000)}${isSolved ? '&getdata=1' : ''}`);
             let reqStart = new Date();
             req.onload = function()
             {
@@ -479,8 +478,34 @@
             };
 
             if (isSolved)
+            {
                 clearInterval(dbUpdater);
+                puzzleIsSolved = true;
+            }
         }
+
+        function timerChanger()
+        {
+            if (puzzleIsSolved)
+                return;
+            if (document.hidden && dbUpdater !== null)
+            {
+                dbUpdate(false);
+                clearInterval(dbUpdater);
+                dbUpdater = null;
+                puzzleDiv.querySelector('.full-puzzle').style.filter = `url(#p-${puzzleId}-timer-paused)`;
+                puzzleDiv.querySelector('.timer-paused').style.opacity = '1';
+            }
+            else if (!document.hidden && dbUpdater === null)
+            {
+                timeLastDbUpdate = new Date();
+                dbUpdater = setInterval(dbUpdate, 10000);
+                puzzleDiv.querySelector('.full-puzzle').style.filter = null;
+                puzzleDiv.querySelector('.timer-paused').style.opacity = '0';
+            }
+        }
+        document.addEventListener('visibilitychange', timerChanger);
+        timerChanger();
 
         function cellColor(cell, isSelected)
         {
@@ -645,7 +670,7 @@
                 for (let cell = 0; cell < 36; cell++)
                 {
                     document.getElementById(`p-${puzzleId}-kyudo-${corner}-circle-${cell}`).setAttribute('opacity', state.circledDigits[corner][cell] === true ? '1' : '0');
-                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-x-${cell}`).setAttribute('opacity', (state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && isSolved)) ? (semitransparentXs ? '.3' : '1') : '0');
+                    document.getElementById(`p-${puzzleId}-kyudo-${corner}-x-${cell}`).setAttribute('opacity', (state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && isSolved)) ? (semitransparentXs ? '.5' : '1') : '0');
                     let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
                     let isHighlighted = (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (state.circledDigits[corner][cell] !== false || semitransparentXs) && !isSolved;
                     document.getElementById(`p-${puzzleId}-kyudo-${corner}-cell-${cell}`).setAttribute('fill', cellColor(sudokuCell, isHighlighted));
@@ -809,7 +834,7 @@
 
         function autofill()
         {
-            saveUndo();
+            var anyChanges = false;
             for (let cell of selectedCells)
                 if (getDisplayedSudokuDigit(state, cell) === null)
                 {
@@ -820,9 +845,15 @@
                         if (dd !== null && poss.includes(dd) && (cell % 9 === otherCell % 9 || ((cell / 9) | 0) === ((otherCell / 9) | 0) || ((((cell % 9) / 3) | 0) === (((otherCell % 9) / 3) | 0) && ((((cell / 9) | 0) / 3) | 0) === ((((otherCell / 9) | 0) / 3) | 0))))
                             poss.splice(poss.indexOf(dd), 1);
                     }
+                    if (!anyChanges && (poss.join(',') !== state.centerNotation[cell].join(',')))
+                    {
+                        anyChanges = true;
+                        saveUndo();
+                    }
                     state.centerNotation[cell] = poss;
                 }
-            updateVisuals(true);
+            if (anyChanges)
+                updateVisuals(true);
         }
 
         Array.from(puzzleDiv.getElementsByClassName('kyudo-cell')).forEach(cellRect =>
@@ -1200,7 +1231,7 @@
         };
 
         let puzzleSvg = puzzleDiv.getElementsByTagName('svg')[0];
-        window.onresize = function()
+        window.addEventListener('resize', function()
         {
             // Set the width to 100% in order to measure its height
             puzzleSvg.style.width = '100vw';
@@ -1215,7 +1246,8 @@
                 puzzleSvg.style.width = `${100 * availableHeight / puzzleHeight}vw`;
                 puzzleDiv.style.display = '';
             }
-        };
-        window.onresize();
+        });
     });
+
+    window.setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 1);
 });
