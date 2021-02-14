@@ -61,21 +61,43 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Css {
-            get {
-                object obj = ResourceManager.GetObject("Css", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to alert(&apos;yes&apos;);.
+        ///   Looks up a localized string similar to window.addEventListener(&apos;DOMContentLoaded&apos;, function()
+        ///{
+        ///    function handler(fnc)
+        ///    {
+        ///        return function(ev)
+        ///        {
+        ///            fnc(ev);
+        ///            ev.stopPropagation();
+        ///            ev.preventDefault();
+        ///            return false;
+        ///        };
+        ///    }
+        ///
+        ///    let curSort = &apos;your-time&apos;;
+        ///    let curAsc = false;
+        ///
+        ///    function submit(pg, pgCount)
+        ///    {
+        ///        if (pg !== undefined &amp;&amp; pgCount !== undefined &amp;&amp; (pg &lt; 0 || pg &gt;= pgCount))
+        ///            return;
+        ///
+        ///        let form = document.getE [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FindJs {
             get {
                 return ResourceManager.GetString("FindJs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to @font-face {
+        ///    font-family: Bitter;
+        ///    src: url(&apos;data:font/ttf;base64,AAEAAAAUAQAABABAR0RFRtue3BEAAa9YAAAEFEdQT1Op5WWkAAGzbAABYxhHU1VCC2FKsQADFoQAACaoSFZBUuyArIQAAz0sAAANK09TLzKDxleSAAFiVAAAAGBTVEFU+OrV2gADSlgAAAC4YXZhcsP14AEAA0uQAAAAMmNtYXCtiSpuAAFitAAACrZmdmFyj/t5uAADSxAAAAB+Z2FzcAAAABAAAa9QAAAACGdseWYUqCs5AAABTAABPfhndmFyI3CPbwADS8QAARP4aGVhZBjbbb0AAUrsAAAANmhoZWEHzAgWAAFiMAAAACRobXR4toItTAABSyQAABcMbG9jYT39jIEAAT9kAAALiG1heHAF1wDNAAE/RAAAACBuYW1lEnYlogABbXQAAAdMcG9zdBOjxhQAAXTAAAA6jXByZXBoBoyFAAFtb [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GeneralCss {
+            get {
+                return ResourceManager.GetString("GeneralCss", resourceCulture);
             }
         }
         
@@ -90,7 +112,45 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to window.addEventListener(&apos;DOMContentLoaded&apos;, function()
+        ///   Looks up a localized string similar to body.is-puzzle {
+        ///    overflow: hidden;
+        ///}
+        ///
+        ///    body.is-puzzle div.warning {
+        ///        border-left: none;
+        ///        border-right: none;
+        ///        padding: .2cm .4cm;
+        ///        font-size: 12pt;
+        ///    }
+        ///
+        ///.puzzle {
+        ///    outline: none;
+        ///    touch-action: none;
+        ///}
+        ///
+        ///    .puzzle.solved {
+        ///        background: hsl(115, 50%, 40%);
+        ///    }
+        ///
+        ///    .puzzle svg {
+        ///        user-select: none;
+        ///        margin: 0 auto;
+        ///        display: block;
+        ///    }
+        ///
+        ///        .puzzle svg .solve-glow {
+        ///            opacity: 0;
+        ///        }
+        ///        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PuzzleCss {
+            get {
+                return ResourceManager.GetString("PuzzleCss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to window.onload = (function()
         ///{
         ///    let colors = [
         ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
@@ -103,7 +163,7 @@ namespace KyudosudokuWebsite {
         ///        [&quot;hsl(103, 84%, 95%)&quot;, &quot;hsl(103, 50%, 50%)&quot;],
         ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;]
         ///    ];
-        ///    [rest of string was truncated]&quot;;.
+        ///    let invalidCellColor = &apos;#f [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleJs {
             get {

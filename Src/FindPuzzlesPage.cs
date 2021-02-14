@@ -15,7 +15,7 @@ namespace KyudosudokuWebsite
             if (session == null || session.User == null)
                 return RenderPage("Not logged in", null, new PageOptions { StatusCode = HttpStatusCode._401_Unauthorized }, new DIV { class_ = "main" }._(new H1("You are not logged in.")));
 
-            return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Js = JsFile.Find },
+            return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindJs } },
                 new DIV { class_ = "main" }._(
                     new FORM { method = method.get, id = "find-form" }._(
                         new H1("Find puzzles"),

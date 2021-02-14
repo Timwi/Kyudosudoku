@@ -1,0 +1,86 @@
+﻿body.is-puzzle {
+    overflow: hidden;
+}
+
+    body.is-puzzle div.warning {
+        border-left: none;
+        border-right: none;
+        padding: .2cm .4cm;
+        font-size: 12pt;
+    }
+
+.puzzle {
+    outline: none;
+    touch-action: none;
+}
+
+    .puzzle.solved {
+        background: hsl(115, 50%, 40%);
+    }
+
+    .puzzle svg {
+        user-select: none;
+        margin: 0 auto;
+        display: block;
+    }
+
+        .puzzle svg .solve-glow {
+            opacity: 0;
+        }
+
+    .puzzle.solved svg .solve-glow {
+        opacity: 1;
+    }
+
+        .puzzle.solved svg .solve-glow.frame {
+            stroke: #0f0;
+        }
+
+    .puzzle svg .invalid-glow {
+        opacity: 1;
+        stroke: #f00;
+    }
+
+    .puzzle svg * {
+        pointer-events: none;
+        touch-action: none;
+    }
+
+    .puzzle svg .clickable {
+        pointer-events: all;
+    }
+
+    .puzzle svg .button > rect {
+        fill: white;
+        stroke: black;
+        stroke-width: 0.025;
+    }
+
+    .puzzle svg .button > text.label {
+        fill: black;
+    }
+
+    .puzzle svg .button.selected > rect {
+        fill: hsl(212, 80%, 50%);
+    }
+
+    .puzzle svg .button.success > rect {
+        fill: #b8f9bd;
+    }
+
+    .puzzle svg .button.warning > rect {
+        fill: hsl(0, 80%, 40%);
+    }
+
+    .puzzle svg .button.selected > text.label, .puzzle svg .button.warning > text.label {
+        fill: white;
+    }
+
+    .puzzle svg .button:not(.selected):not(.warning):hover > rect {
+        fill: hsl(212, 90%, 90%);
+    }
+
+    .puzzle svg .edge-cell {
+        fill: transparent;
+        stroke: none;
+    }

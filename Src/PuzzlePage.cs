@@ -44,18 +44,35 @@ namespace KyudosudokuWebsite
                 <path fill='white' stroke='black' stroke-width='2' d='M53.238 33.237V73.17l9.513-9.513 7.499 18.106 5.272-2.184-7.38-17.818h13.62z'/>
             </g>";
             var fillSvg = @"<text x='.4' y='.35' font-size='.25'>Auto</text><text x='.4' y='.6' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
-            var buttons = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
-                ("Normal", false, "normal", 2.5, 1),
-                ("Corner", false, "corner", 2.5, 1),
-                ("Center", false, "center", 2.5, 1),
-                (fillSvg, true, "fill", .8, 1),
 
-                ("Restart", false, "restart", 2.5, 2),
-                ("Undo", false, "undo", 2.5, 2),
-                ("Redo", false, "redo", 2.5, 2),
-                (helpSvg, true, "help", .8, 2)
-            )
-                .Insert(0, Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .8, 0)));
+            var buttonsRight = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .8, 0))
+                .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
+                    ("Normal", false, "normal", 2.5, 1),
+                    ("Corner", false, "corner", 2.5, 1),
+                    ("Center", false, "center", 2.5, 1),
+                    (fillSvg, true, "fill", .8, 1),
+
+                    ("<path d='m 0.6,0.2 v 0.4 l -0.4,-0.2 z' />", true, "switch", .8, 2),
+                    ("Restart", false, "restart", 2.45, 2),
+                    ("Undo", false, "undo", 2, 2),
+                    ("Redo", false, "redo", 2, 2),
+                    (helpSvg, true, "help", .8, 2)));
+
+            var buttonsLeft = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, $"{btn + 1}-left", .8, 0))
+                .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
+                    ("Restart", false, "restart-left", 2.4, 1),
+                    ("Undo", false, "undo-left", 2.4, 1),
+                    ("Redo", false, "redo-left", 2.4, 1),
+                    ("<path d='m 0.2,0.2 v 0.4 l 0.4,-0.2 z' />", true, "switch-left", .8, 1)));
+
+            string renderButton(string id, double x, double y, double width, string label, bool isSvg = false) => $@"
+                <g class='button' id='{id}' transform='translate({x}, {y})'>
+                    <rect class='clickable' x='0' y='0' width='{width}' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
+                    {(isSvg ? label : $"<text class='label' x='{width / 2}' y='.6' font-size='.55' text-anchor='middle'>{label}</text>")}
+                </g>";
+
+            string renderButtonArea((string label, bool isSvg, string id, double width, int row)[] btns, double totalWidth) => btns.GroupBy(g => g.row).SelectMany(row => row.Select((btn, btnIx) =>
+                renderButton($"p-{puzzleId}-btn-{btn.id}", row.Take(btnIx).Sum(b => b.width) + btnIx * ((totalWidth - row.Sum(tup => tup.width)) / (row.Count() - 1)), 1.1 * btn.row, btn.width, btn.label, btn.isSvg))).JoinString();
 
             return RenderPage(
                 $"#{puzzleId}",
@@ -64,7 +81,7 @@ namespace KyudosudokuWebsite
                 {
                     IsPuzzlePage = true,
                     PuzzleID = puzzleId,
-                    Js = JsFile.Puzzle
+                    Resources = { Resource.PuzzleJs, Resource.PuzzleCss }
                 },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
                 new DIV { class_ = "puzzle", id = $"puzzle-{puzzleId}", tabindex = 0 }
@@ -72,17 +89,11 @@ namespace KyudosudokuWebsite
                     .Data("progress", userPuzzle.NullOr(up => up.Progess))
                     .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
                     .Data("semitransparentxs", (session?.User?.SemitransparentXs ?? false) ? "1" : "0")
-                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>
-                        <filter id='p-{puzzleId}-timer-paused'>
-                            <feGaussianBlur stdDeviation='.25' />
-                        </filter>
+                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65' data-extratop='{extraTop}' data-extraRight='{extraRight}'>
+                        <filter id='p-{puzzleId}-timer-paused'><feGaussianBlur stdDeviation='.25' /></filter>
                         <g class='full-puzzle'>
-                            <g transform='translate(14, 9.75)'>{buttons.GroupBy(g => g.row).SelectMany(row => row.Select((btn, btnIx) => $@"
-                                <g class='button' id='p-{puzzleId}-btn-{btn.id}' transform='translate({row.Take(btnIx).Sum(b => b.width) + btnIx * ((9 - row.Sum(tup => tup.width)) / (row.Count() - 1))}, {1.1 * btn.row})'>
-                                    <rect class='clickable' x='0' y='0' width='{btn.width}' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
-                                    {(btn.isSvg ? btn.label : $"<text class='label' x='{btn.width / 2}' y='.6' font-size='.55' text-anchor='middle'>{btn.label}</text>")}
-                                </g>")).JoinString()}
-                            </g>
+                            <g id='p-{puzzleId}-btns-numleft'>{renderButtonArea(buttonsLeft, 8.5)}</g>
+                            <g transform='translate(14, 9.75)'>{renderButtonArea(buttonsRight, 9)}</g>
 
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                             <g transform='translate(14, 0)' id='p-{puzzleId}-sudoku'>{sudokuGrid(puzzleId, puzzle.Constraints)}</g>
