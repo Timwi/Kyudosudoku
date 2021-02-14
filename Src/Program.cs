@@ -149,7 +149,7 @@ namespace KyudosudokuWebsite
                         var str = lk.GetType().Name;
                         if (notFound.Contains(str))
                         {
-                            puz.SaveToDb(seed);
+                            puz.SaveToDb(seed, null);
                             ConsoleUtil.WriteLine($" — {seed} has {str}".Color(ConsoleColor.White, ConsoleColor.DarkGreen));
                             notFound.Remove(str);
                         }

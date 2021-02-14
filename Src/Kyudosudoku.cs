@@ -295,7 +295,7 @@ namespace KyudosudokuWebsite
             return uniquenessRegions;
         }
 
-        public void SaveToDb(int puzzleId)
+        public void SaveToDb(int puzzleId, int? timeToGenerate)
         {
             using var db = new Db();
             db.Puzzles.Add(new Database.Puzzle
@@ -303,7 +303,8 @@ namespace KyudosudokuWebsite
                 PuzzleID = puzzleId,
                 KyudokuGrids = Grids.SelectMany(grid => grid.Select(i => (char) (i + '0'))).JoinString(),
                 Constraints = ClassifyJson.Serialize(Constraints).ToString(),
-                ConstraintNames = Constraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString()
+                ConstraintNames = Constraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString(),
+                TimeToGenerate = timeToGenerate
             });
             db.SaveChanges();
         }

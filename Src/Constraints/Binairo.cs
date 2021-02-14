@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PuzzleSolvers;
 using RT.Util;
 using RT.Util.ExtensionMethods;

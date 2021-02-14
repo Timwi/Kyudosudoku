@@ -47,7 +47,9 @@ namespace KyudosudokuWebsite
                     newPuzzleId += Rnd.Next(0, 1000);
             }
             Console.WriteLine($"Generating puzzle #{newPuzzleId}");
-            Kyudosudoku.Generate(newPuzzleId).SaveToDb(newPuzzleId);
+            var start = DateTime.UtcNow;
+            var puzzle = Kyudosudoku.Generate(newPuzzleId);
+            puzzle.SaveToDb(newPuzzleId, (int) (DateTime.UtcNow - start).TotalSeconds);
             return 0;
         }
     }
