@@ -909,6 +909,8 @@
             cellRect.onclick = handler(function() { });
             cellRect.onmousedown = handler(cellRect.ontouchstart = function(ev)
             {
+                if (draggingMode !== null)
+                    return;
                 let shift = ev.ctrlKey || ev.shiftKey;
                 draggingMode = shift && selectedCells.includes(cell) ? 'remove' : 'add';
                 highlightedDigit = null;
