@@ -1291,11 +1291,13 @@
                     'undo': { t: 'translate(2.73, 2.2)', w: 2.5 },
                     'redo': { t: 'translate(5.47, 2.2)', w: 2.5 }
                 };
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(11.5, 6) rotate(-15)');
             }
             else if (mobileLeft)
             {
                 setViewBox(-.5, -.5, 13.75, 17.5);
                 numBarLeft.setAttribute('transform', 'translate(0, 13.75) scale(1.5)');
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(6.375, 6.375) scale(.8) rotate(-15)');
             }
             else
             {
@@ -1306,6 +1308,7 @@
                     'undo': { t: 'translate(3.725, 2.2)', w: 2 },
                     'redo': { t: 'translate(5.9625, 2.2)', w: 2 }
                 };
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(18.5, 4.5) scale(.59) rotate(-15)');
             }
             if (btns)
             {

@@ -98,14 +98,14 @@ namespace KyudosudokuWebsite
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                             <g transform='translate(14, 0)' id='p-{puzzleId}-sudoku'>{sudokuGrid(puzzleId, puzzle.Constraints)}</g>
 
-                            <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow'>
+                            <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow' id='p-{puzzleId}-solved-sticker'>
                                 <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
                                     <stop stop-color='white' stop-opacity='1' offset='0'></stop> 
                                     <stop stop-color='hsl(216, 70%, 75%)' stop-opacity='1' offset='1'></stop> 
                                 </linearGradient>
-                                <rect x='-8' y='-1' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
-                                <text x='0' y='.72' text-anchor='middle' font-size='2' font-weight='bold'>PUZZLE SOLVED</text>
-                                <g font-size='.45' transform='translate(0, 1.3)'>
+                                <rect x='-8' y='-1.3' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
+                                <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold'>PUZZLE SOLVED</text>
+                                <g font-size='.45' transform='translate(0, 1)'>
                                     <text text-anchor='start' x='-7.7' y='0'>Solved:</text>
                                     <text class='inf-count' text-anchor='start' x='-6.1' y='0' font-weight='bold'></text>
                                     <text text-anchor='start' x='-4' y='0'>Your time:</text>
