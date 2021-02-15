@@ -23,19 +23,34 @@ namespace KyudosudokuWebsite
     [CommandName("generate"), Documentation("Can be used by a scheduled task to generate new puzzles in the background. Each invocation will only generate at most one puzzle. Through repeated invocation, the number of unsolved puzzles can be kept at a desired number.")]
     sealed class GeneratePuzzles : CommandLineBase
     {
-        [IsPositional, IsMandatory, Documentation("Maximum number of unsolved puzzles to keep in the database. The process will not generate any new puzzles if this number of unsolved puzzles is already in the database.")]
+        [IsPositional, IsMandatory, Documentation("If -s is not specified, maximum number of unsolved puzzles to keep in the database. The process will not generate any new puzzles if this number of unsolved puzzles is already in the database.")]
         public int MaxNumber = 100;
 
         [IsPositional, IsMandatory, Documentation("Database connection string.")]
         public string DbConnectionString = null;
 
+        [Option("--specific", "-s"), Documentation("Specifies that the number is instead a specific puzzle ID to be generated.")]
+        public bool Specific = false;
+
         // generate 30 "Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;"
         public override int Execute()
         {
             Db.ConnectionString = DbConnectionString;
-            var newPuzzleId = Rnd.Next(0, 1000);
-            using (var db = new Db())
+            int newPuzzleId;
+            if (Specific)
             {
+                newPuzzleId = MaxNumber;
+                using var db = new Db();
+                if (db.Puzzles.Any(p => p.PuzzleID == newPuzzleId))
+                {
+                    Console.WriteLine($"Puzzle #{newPuzzleId} is already in the DB.");
+                    return 1;
+                }
+            }
+            else
+            {
+                newPuzzleId = Rnd.Next(0, 1000);
+                using var db = new Db();
                 // How many puzzles are in the DB that nobody has solved yet?
                 var numUnsolvedPuzzles = db.Puzzles.Where(p => !db.UserPuzzles.Any(up => up.PuzzleID == p.PuzzleID && up.Solved)).Count();
                 Console.WriteLine($"There are currently {numUnsolvedPuzzles} unsolved puzzles in the database.");
