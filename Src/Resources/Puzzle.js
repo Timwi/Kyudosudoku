@@ -527,6 +527,8 @@
         {
             document.getElementById(`p-${puzzleId}-btn-restart`).classList.remove('warning');
             document.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Restart';
+            document.getElementById(`p-${puzzleId}-btn-restart-left`).classList.remove('warning');
+            document.querySelector(`#p-${puzzleId}-btn-restart-left>text`).textContent = 'Restart';
         }
 
         /// Returns:
@@ -726,9 +728,10 @@
 
             for (let digit = 0; digit < 9; digit++)
             {
-                let btn = document.getElementById(`p-${puzzleId}-btn-${digit + 1}`);
-                setClass(btn, 'selected', highlightedDigit === digit + 1);
-                setClass(btn, 'success', digitCounts[digit] === 9);
+                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}`), 'selected', highlightedDigit === digit + 1);
+                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}-left`), 'selected', highlightedDigit === digit + 1);
+                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}`), 'success', digitCounts[digit] === 9);
+                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}-left`), 'success', digitCounts[digit] === 9);
             }
 
             setClass(document.getElementById(`p-${puzzleId}-btn-help`), 'selected', helpEnabled);
@@ -1033,27 +1036,31 @@
                 localStorage.setItem('kyu-help', 'Off');
         });
 
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>rect`), function()
+        ['', '-left'].forEach(xtr =>
         {
-            var elem = document.getElementById(`p-${puzzleId}-btn-restart`);
-            if (!elem.classList.contains('warning'))
+            setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart${xtr}>rect`), function()
             {
-                elem.classList.add('warning');
-                puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Confirm?';
-            }
-            else
-            {
-                saveUndo();
-                elem.classList.remove('warning');
-                puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Restart';
-                state = {
-                    circledDigits: Array(4).fill(null).map(_ => Array(36).fill(null)),
-                    cornerNotation: Array(81).fill(null).map(_ => []),
-                    centerNotation: Array(81).fill(null).map(_ => []),
-                    enteredDigits: Array(81).fill(null)
-                };
-                updateVisuals(true);
-            }
+                let elem = document.getElementById(`p-${puzzleId}-btn-restart`);
+                if (!elem.classList.contains('warning'))
+                {
+                    elem.classList.add('warning');
+                    document.getElementById(`p-${puzzleId}-btn-restart-left`).classList.add('warning');
+                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Confirm?';
+                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart-left>text`).textContent = 'Confirm?';
+                }
+                else
+                {
+                    resetRestartButton();
+                    saveUndo();
+                    state = {
+                        circledDigits: Array(4).fill(null).map(_ => Array(36).fill(null)),
+                        cornerNotation: Array(81).fill(null).map(_ => []),
+                        centerNotation: Array(81).fill(null).map(_ => []),
+                        enteredDigits: Array(81).fill(null)
+                    };
+                    updateVisuals(true);
+                }
+            });
         });
 
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo>rect`), undo);
@@ -1276,7 +1283,7 @@
             let btns = null;
             if (!isMobile)
             {
-                setViewBox(-.5, -.5 - (puzzleSvg.dataset.extratop | 0), 24 + (puzzleSvg.dataset.extraright | 0), 13.75 + (puzzleSvg.dataset.extratop | 0));
+                setViewBox(-.5, -.5 - (+puzzleSvg.dataset.extratop), 24 + (+puzzleSvg.dataset.extraright), 13.75 + (+puzzleSvg.dataset.extratop));
                 numBarLeft.setAttribute('transform', 'translate(0, 20)');   // intentionally outside the viewBox
                 document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 20)'); // intentionally outside the viewBox
                 btns = {
@@ -1292,7 +1299,7 @@
             }
             else
             {
-                setViewBox(13.5, -.5 - (puzzleSvg.dataset.extratop | 0), 10 + (puzzleSvg.dataset.extraright | 0), 13.5 + (puzzleSvg.dataset.extratop | 0));
+                setViewBox(13.5, -.5 - (+puzzleSvg.dataset.extratop), 10 + (+puzzleSvg.dataset.extraright), 13.5 + (+puzzleSvg.dataset.extratop));
                 document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 2.2)');
                 btns = {
                     'restart': { t: 'translate(1.0375, 2.2)', w: 2.45 },

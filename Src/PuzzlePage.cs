@@ -89,7 +89,7 @@ namespace KyudosudokuWebsite
                     .Data("progress", userPuzzle.NullOr(up => up.Progess))
                     .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
                     .Data("semitransparentxs", (session?.User?.SemitransparentXs ?? false) ? "1" : "0")
-                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65' data-extratop='{extraTop}' data-extraRight='{extraRight}'>
+                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65' data-extratop='{extraTop}' data-extraright='{extraRight}'>
                         <filter id='p-{puzzleId}-timer-paused'><feGaussianBlur stdDeviation='.25' /></filter>
                         <g class='full-puzzle'>
                             <g id='p-{puzzleId}-btns-numleft'>{renderButtonArea(buttonsLeft, 8.5)}</g>

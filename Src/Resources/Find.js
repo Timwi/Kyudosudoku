@@ -11,7 +11,7 @@
         };
     }
 
-    let curSort = 'your-time';
+    let curSort = 'solvetime';
     let curAsc = false;
 
     function submit(pg, pgCount)

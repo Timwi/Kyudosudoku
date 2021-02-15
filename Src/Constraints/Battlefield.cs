@@ -2,7 +2,6 @@
 using System.Linq;
 using PuzzleSolvers;
 using RT.Util;
-using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
@@ -34,7 +33,7 @@ namespace KyudosudokuWebsite
 
         public override bool Verify(int[] grid) => BattlefieldUniquenessConstraint.CalculateBattlefieldClue(GetAffectedCells(false).Select(cell => grid[cell]).ToArray()) == Clue;
 
-        public override string Svg => $@"<g transform='translate({(IsCol ? RowCol : -1)}, {(IsCol ? -.85 : RowCol)}) scale(.001)'>
+        public override string Svg => $@"<g transform='translate({(IsCol ? RowCol : -1)}, {(IsCol ? -.9 : RowCol)}) scale(.001)'>
             <linearGradient id='battlefield-e'>
               <stop offset='0' stop-color='#fff'/>
               <stop offset='1' stop-color='#fff' stop-opacity='0'/>
