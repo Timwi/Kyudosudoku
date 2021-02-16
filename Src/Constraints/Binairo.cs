@@ -12,6 +12,7 @@ namespace KyudosudokuWebsite
         public override string Description => $"In this {(IsCol ? "column" : "row")}, no three adjacent digits can be all odd or all even.";
         public override bool ShownTopLeft => true;
         public override double ExtraTop => IsCol ? .5 : 0;
+        public override double ExtraLeft => IsCol ? 0 : .5;
         public static readonly Example Example = new Example
         {
             Constraints = { new Binairo(false, 0) },

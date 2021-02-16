@@ -18,14 +18,14 @@ namespace KyudosudokuWebsite
                 new[] { 8, 3, 8, 8, 1, 9, 6, 2, 9, 4, 3, 7, 1, 3, 5, 2, 9, 3, 5, 4, 3, 5, 2, 5, 9, 5, 8, 7, 1, 9, 2, 8, 7, 2, 7, 2 });
 
             static object kyudokuGrid(int[] grid, bool glowRed = false, int[] highlight = null, int[] circled = null, int[] xed = null, int corner = 0) =>
-                new RawTag($@"<svg style='width: 7cm' viewBox='{-.5 + 6.75 * (corner % 2)} {-.5 + 6.75 * (corner / 2)} 7 7' text-anchor='middle' font-family='Bitter' font-size='.65'>{kyudokuGridSvg(corner, 1, grid, true, highlight, circled, xed, glowRed)}</svg>");
+                new RawTag($@"<svg style='width: 7cm' viewBox='{-.5 + 6.75 * (corner % 2)} {-.5 + 6.75 * (corner / 2)} 7 7' text-anchor='middle' font-family='Bitter' font-size='.65'>{kyudokuGridSvg(corner, 1, grid, highlight, circled, xed, glowRed)}</svg>");
 
             object kyudokuGrids(int[][] highlight = null, int[][] circled = null, int[][] xed = null) =>
                 new RawTag($@"<svg style='width: 13.75cm' viewBox='-.5 -.5 13.75 13.75' text-anchor='middle' font-family='Bitter' font-size='.65'>
-                    {kyudokuGridSvg(0, 1, kyudoExample[0], true, highlight?[0], circled?[0], xed?[0])}
-                    {kyudokuGridSvg(1, 1, kyudoExample[1], true, highlight?[1], circled?[1], xed?[1])}
-                    {kyudokuGridSvg(2, 1, kyudoExample[2], true, highlight?[2], circled?[2], xed?[2])}
-                    {kyudokuGridSvg(3, 1, kyudoExample[3], true, highlight?[3], circled?[3], xed?[3])}
+                    {kyudokuGridSvg(0, 1, kyudoExample[0], highlight?[0], circled?[0], xed?[0])}
+                    {kyudokuGridSvg(1, 1, kyudoExample[1], highlight?[1], circled?[1], xed?[1])}
+                    {kyudokuGridSvg(2, 1, kyudoExample[2], highlight?[2], circled?[2], xed?[2])}
+                    {kyudokuGridSvg(3, 1, kyudoExample[3], highlight?[3], circled?[3], xed?[3])}
                 </svg>");
 
             return RenderPage("How to play Kyudosudoku", session.User, new PageOptions { AddFooter = true, Db = db },
@@ -166,6 +166,6 @@ namespace KyudosudokuWebsite
         }
 
         private object clippedSudokuGrid(IEnumerable<KyuConstraint> constraints, bool? glow = null, Dictionary<int, int?> givens = null, bool wide = false) =>
-            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGrid(1, constraints, true, givens, glow)}</svg>");
+            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGrid(1, constraints, true, givens)}</svg>");
     }
 }

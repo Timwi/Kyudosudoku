@@ -10,6 +10,7 @@ namespace KyudosudokuWebsite
     {
         public override string Description => $"The first and last number in the region represent the sizes of two armies, who march inward; the clue ({Clue}) specifies the sum of the digits that are either sandwiched between the armies or within the armies’ overlap.";
         public override double ExtraTop => IsCol ? .5 : 0;
+        public override double ExtraLeft => IsCol ? 0 : .5;
         public override bool ShownTopLeft => true;
         public static readonly Example Example = new Example
         {

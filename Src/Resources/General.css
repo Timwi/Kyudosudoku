@@ -333,6 +333,119 @@ table.example td.explanation {
         margin-top: .5cm;
     }
 
+svg .cell > .circle, svg .cell > .x {
+    opacity: 0;
+}
+
+svg .cell.circled > .circle {
+    opacity: 1;
+}
+
+svg .cell.xed > .x {
+    opacity: 1;
+}
+
+svg.semitransparent-xs .cell.xed > .x {
+    opacity: .5;
+}
+
+svg .cell rect.c0 {
+    fill: white;
+}
+
+svg .cell.highlighted rect.c0 {
+    fill: hsl(0, 0%, 50%);
+}
+
+svg .cell rect.c1 {
+    fill: hsl(0, 100%, 94%);
+}
+
+svg .cell.highlighted rect.c1 {
+    fill: hsl(0, 70%, 50%);
+}
+
+svg .cell rect.c2 {
+    fill: white;
+}
+
+svg .cell.highlighted rect.c2 {
+    fill: hsl(0, 0%, 50%);
+}
+
+svg .cell rect.c3 {
+    fill: hsl(52, 100%, 89%);
+}
+
+svg .cell.highlighted rect.c3 {
+    fill: hsl(52, 100%, 35%);
+}
+
+svg .cell rect.c4 {
+    fill: hsl(0, 0%, 94%);
+}
+
+svg .cell.highlighted rect.c4 {
+    fill: hsl(0, 0%, 40%);
+}
+
+svg .cell rect.c5 {
+    fill: hsl(226, 100%, 94%);
+}
+
+svg .cell.highlighted rect.c5 {
+    fill: hsl(226, 60%, 50%);
+}
+
+svg .cell rect.c6 {
+    fill: white;
+}
+
+svg .cell.highlighted rect.c6 {
+    fill: hsl(0, 0%, 50%);
+}
+
+svg .cell rect.c7 {
+    fill: hsl(103, 84%, 95%);
+}
+
+svg .cell.highlighted rect.c7 {
+    fill: hsl(103, 50%, 50%);
+}
+
+svg .cell rect.c8 {
+    fill: white;
+}
+
+svg .cell.highlighted rect.c8 {
+    fill: hsl(0, 0%, 50%);
+}
+
+svg .cell.highlighted text {
+    fill: white;
+}
+
+svg .cell.invalid rect {
+    fill: #f00;
+}
+
+svg .cell.highlighted.invalid rect {
+    fill: #800;
+}
+
+svg .cell .notation {
+    fill: #1d6ae5;
+}
+
+svg .cell.highlighted .notation {
+    fill: white;
+}
+
+svg .invalid-glow {
+    opacity: 1 !important;
+    stroke: #f00;
+}
+
 @media only screen and (max-width: 860px) {
     #topbar {
         height: 1cm;
@@ -343,7 +456,7 @@ table.example td.explanation {
         }
 
         #topbar .home {
-            padding: .1cm 0 0 1.25cm;
+            padding: .15cm .2cm 0 1.25cm;
             font-size: 18pt;
         }
 

@@ -36,11 +36,6 @@
             stroke: #0f0;
         }
 
-    .puzzle svg .invalid-glow {
-        opacity: 1;
-        stroke: #f00;
-    }
-
     .puzzle svg * {
         pointer-events: none;
         touch-action: none;

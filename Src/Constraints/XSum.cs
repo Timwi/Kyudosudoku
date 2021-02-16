@@ -12,6 +12,7 @@ namespace KyudosudokuWebsite
         public override string Description => $"The sum of the first X digits in this {(IsCol ? "column" : "row")} must add up to {Clue}, where X is the first digit in the {(IsCol ? "column" : "row")}.";
         public override double ExtraTop => IsCol && !Reverse ? .5 : 0;
         public override double ExtraRight => !IsCol && Reverse ? .25 : 0;
+        public override double ExtraLeft => !IsCol && !Reverse ? .5 : 0;
         public override bool ShownTopLeft => !Reverse;
         public static readonly Example Example = new Example
         {

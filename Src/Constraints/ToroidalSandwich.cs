@@ -12,6 +12,7 @@ namespace KyudosudokuWebsite
     {
         public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits after the {Digit1} and before the {Digit2}, wrapping around the edges of the grid if necessary, must add up to {Sum}.";
         public override double ExtraTop => IsCol ? .25 : 0;
+        public override double ExtraLeft => IsCol ? 0 : .5;
         public override bool ShownTopLeft => true;
         public static readonly Example Example = new Example
         {

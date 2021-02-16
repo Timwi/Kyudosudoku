@@ -24,6 +24,7 @@ namespace KyudosudokuWebsite
 
         public virtual double ExtraTop => 0;
         public virtual double ExtraRight => 0;
+        public virtual double ExtraLeft => 0;
 
         [ClassifyIgnore]
         private Constraint[] _cachedConstraint;

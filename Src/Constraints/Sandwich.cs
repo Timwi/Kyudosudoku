@@ -12,6 +12,7 @@ namespace KyudosudokuWebsite
     {
         public override string Description => $"Within this {(IsCol ? "column" : "row")}, the digits sandwiched between the {Digit1} and the {Digit2} must add up to {Sum}. The {Digit1} and {Digit2} can occur in either order.";
         public override double ExtraTop => IsCol ? .25 : 0;
+        public override double ExtraLeft => IsCol ? 0 : .5;
         public override bool ShownTopLeft => true;
         public static readonly Example Example = new Example
         {

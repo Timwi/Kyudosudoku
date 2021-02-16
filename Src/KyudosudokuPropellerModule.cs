@@ -39,6 +39,9 @@ namespace KyudosudokuWebsite
                 new UrlMapping(path: "/auth", handler: getAuthResolver().Handle),
                 new UrlMapping(path: "/puzzle", handler: req => withSession(req, (session, db) => PuzzlePage(req, session, db))),
                 new UrlMapping(path: "/logo", handler: req => HttpResponse.Create(Resources.Logo, "image/png")),
+#if DEBUG
+                new UrlMapping(path: "/remote-log", handler: remoteLog),
+#endif
 
                 // Catch-all 404
                 new UrlMapping(path: null, handler: page404));
