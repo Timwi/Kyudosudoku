@@ -26,7 +26,8 @@ namespace KyudosudokuWebsite
         public static readonly Resource PuzzleJs = new Resource(Resources.PuzzleJs, "Puzzle.js", isJs: true);
         public static readonly Resource FindJs = new Resource(Resources.FindJs, "Find.js", isJs: true);
 
-        public static readonly Resource PuzzleCss = new Resource(Resources.PuzzleCss, "Puzzle.css", isJs: false);
         public static readonly Resource GeneralCss = new Resource(Resources.GeneralCss, "General.css", isJs: false);
+        public static readonly Resource PuzzleCss = new Resource(Resources.PuzzleCss, "Puzzle.css", isJs: false);
+        public static readonly Resource FindCss = new Resource(Resources.FindCss, "Find.css", isJs: false);
     }
 }

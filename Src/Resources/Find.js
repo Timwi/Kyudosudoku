@@ -11,22 +11,25 @@
         };
     }
 
+    let form = document.getElementById('find-form');
+    let constraints = JSON.parse(form.dataset.constraints);
     let curSort = 'solvetime';
     let curAsc = false;
+    let constraintOptions = { 'include-constraints': [], 'exclude-constraints': [] };
 
     function submit(pg, pgCount)
     {
         if (pg !== undefined && pgCount !== undefined && (pg < 0 || pg >= pgCount))
             return;
 
-        let form = document.getElementById('find-form');
         let criteria = {
             sort: curSort,
             asc: curAsc,
             what: form.elements.what.value,
             page: pg | 0,
             filteravgmin: Math.min(form.elements.filteravgmin.value | 0, form.elements.filteravgmax.value | 0),
-            filteravgmax: Math.max(form.elements.filteravgmin.value | 0, form.elements.filteravgmax.value | 0)
+            filteravgmax: Math.max(form.elements.filteravgmin.value | 0, form.elements.filteravgmax.value | 0),
+            constraints: constraintOptions
         };
 
         let req = new XMLHttpRequest();
@@ -62,11 +65,15 @@
 
                         paginationControls = `
                             <div class='pagination'>
-                                <button id='pag-prev'>Prev</button>
-                                ${pageNums.map(p => p === null ? " ... " : `<button class="pag${p === pageNum ? ' selected' : ''}" data-page='${p}'>${p + 1}</button>`).join(' ')}
-                                <button id='pag-next'>Next</button>
-                                <span style='margin-left: 2cm'>Page:</span> <input id='pag-input' value='${pageNum + 1}' type='number' min='1' max='${pageCount}' />
-                                <button id='pag-go'>Go</button>
+                                <div>
+                                    <button id='pag-prev'>Prev</button>
+                                    ${pageNums.map(p => p === null ? " ... " : `<button class="pag${p === pageNum ? ' selected' : ''}" data-page='${p}'>${p + 1}</button>`).join(' ')}
+                                    <button id='pag-next'>Next</button>
+                                </div>
+                                <div>
+                                    <span class='page-label'>Page:</span> <input id='pag-input' value='${pageNum + 1}' type='number' min='1' max='${pageCount}' />
+                                    <button id='pag-go'>Go</button>
+                                </div>
                             </div>
                         `;
                     }
@@ -106,4 +113,45 @@
     submit(0, 1);
 
     Array.from(document.querySelectorAll('.trigger')).forEach(i => { i.onchange = function() { submit(); }; });
+
+    function setConstraintUI(elem)
+    {
+        let str = '';
+        let options = '';
+        for (let tup of constraints)
+        {
+            if (constraintOptions[elem.id].includes(tup.id))
+                str += `<button class='button remove-constraint' data-id='${tup.id}'>${tup.name}</button>`;
+            else
+                options += `<option value='${tup.id}'>${tup.name}</option>`;
+        }
+        elem.innerHTML = `${str}${options.length === 0 ? '' : `<select accesskey='${elem.id === 'include-constraints' ? ',' : '.'}'><option value=''>(pick one)</option>${options}</select>`}`;
+
+        Array.from(elem.getElementsByTagName('select')).forEach(slct =>
+        {
+            slct.onchange = function(ev)
+            {
+                if (ev.target.value === '')
+                    return;
+                if (!constraintOptions[elem.id].includes(ev.target.value))
+                    constraintOptions[elem.id].push(ev.target.value);
+                setConstraintUI(elem);
+                submit();
+            };
+        });
+
+        Array.from(elem.getElementsByClassName('remove-constraint')).forEach(rm =>
+        {
+            rm.onclick = function()
+            {
+                let p = constraintOptions[elem.id].indexOf(rm.dataset.id);
+                if (p !== -1)
+                    constraintOptions[elem.id].splice(p, 1);
+                setConstraintUI(elem);
+                submit();
+            };
+        });
+    }
+
+    ['include-constraints', 'exclude-constraints'].forEach(id => { setConstraintUI(document.getElementById(id)); });
 });

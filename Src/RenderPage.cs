@@ -28,8 +28,9 @@ namespace KyudosudokuWebsite
             var topbar = Ut.NewArray<object>(
                 new A { class_ = "home", href = "/" }._("Kyudosudoku"),
                 opt.PuzzleID == null ? null : new DIV { class_ = "puzzle-id" }._($"Puzzle #{opt.PuzzleID.Value}"),
-                new A { class_ = "right", href = "/auth" }._(loggedInUser == null ? "Log in" : "Settings"),
-                new A { class_ = "right", href = "/help" }._("How to play"));
+                new DIV { class_ = "right" }._(
+                    new A { href = "/help" }._("How to play"),
+                    new A { href = "/auth" }._(loggedInUser == null ? "Log in" : "Settings")));
 
             var sidebar = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
                 loggedInUser == null || opt.Db == null ? null : new DIV { class_ = "stats" }._(

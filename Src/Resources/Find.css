@@ -1,0 +1,136 @@
+﻿.controls {
+    font-size: 18pt;
+    margin: .5cm 0;
+}
+
+#find-form label, #find-form button, #find-form input, #find-form select {
+    padding: .1cm .4cm;
+    margin: 0 .25cm;
+    border-radius: .3cm;
+    border: 2px solid hsl(220, 50%, 75%);
+    background: transparent;
+    font: inherit;
+    font-size: 18pt;
+    cursor: pointer;
+}
+
+    #find-form input[type="radio"] {
+        display: none;
+    }
+
+    #find-form input[type="number"] {
+        width: 3cm;
+        padding: .1cm .2cm;
+    }
+
+    #find-form label:hover, #find-form button:hover {
+        background: hsl(220, 70%, 80%);
+    }
+
+
+    #find-form input:checked + label, #find-form button.selected {
+        background: hsl(220, 70%, 80%);
+        border-color: hsl(220, 30%, 50%);
+    }
+
+    #find-form button.remove-constraint {
+        padding-right: 1cm;
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 10"><path d="M2 2 8 8M8 2 2 8" stroke="black" opacity=".5" stroke-width="1" /></svg>');
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: .75cm .5cm;
+    }
+
+#results {
+    margin-top: 1.5cm;
+}
+
+    #results table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        #results table tr:nth-child(2n+1) {
+            background: hsl(220, 45%, 85%);
+        }
+
+        #results table tr.headers th {
+            background: hsl(220, 70%, 80%);
+            text-align: left;
+        }
+
+        #results table td, #results table th {
+            padding: .15cm .5cm;
+        }
+
+        #results table.small {
+            display: none;
+        }
+
+    #results .pagination {
+        margin-top: .5cm;
+    }
+
+        #results .pagination > div {
+            display: inline;
+        }
+
+    #results .page-label {
+        margin-left: 2cm;
+    }
+
+@media only screen and (max-width: 860px) {
+    .controls {
+        font-size: 10pt;
+        margin: .25cm 0;
+    }
+
+        .controls .inner {
+            display: block;
+            margin-top: .1cm;
+        }
+
+    #find-form label, #find-form button, #find-form input, #find-form select {
+        padding: .05cm .2cm;
+        margin: 0 .1cm;
+        border-radius: .3cm;
+        border: 2px solid hsl(220, 50%, 75%);
+        background: transparent;
+        font: inherit;
+        font-size: 10pt;
+    }
+
+        #find-form input[type="number"] {
+            width: 1.5cm;
+            padding: .1cm .2cm;
+        }
+
+    #results .pagination > div {
+        display: block;
+        margin-top: .1cm;
+    }
+
+    #results .page-label {
+        margin-left: .35cm;
+    }
+
+    #results th.extra, #results td.extra {
+        display: none;
+    }
+
+    #results table.big {
+        display: none;
+    }
+
+    #results table.small {
+        display: table;
+    }
+
+    #results table td, #results table th {
+        padding: .1cm .2cm;
+    }
+
+    #results .constraints {
+        font-size: 8pt;
+    }
+}

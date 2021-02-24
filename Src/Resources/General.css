@@ -42,39 +42,36 @@ th, td {
         color: black;
         height: 2cm;
         box-sizing: border-box;
+        padding: .725cm 1cm 0;
+        vertical-align: bottom;
     }
 
         #topbar a:hover {
             background: hsl(220, 70%, 70%);
         }
 
-    #topbar .home {
-        padding: .5cm 1cm 0 2.25cm;
-        left: 0;
-        font-size: 24pt;
-        font-weight: bold;
-    }
-
-        #topbar .home::before {
-            content: '';
-            position: absolute;
-            left: .75cm;
-            top: .5cm;
-            width: 1cm;
-            height: 1cm;
-            background-image: url(/logo);
-            background-size: 1cm 1cm;
-            background-repeat: no-repeat;
-            background-position: 0 0;
+        #topbar a.home {
+            padding: .5cm 1cm 0 2.25cm;
+            left: 0;
+            font-size: 24pt;
+            font-weight: bold;
         }
+
+            #topbar a.home::before {
+                content: '';
+                position: absolute;
+                left: .75cm;
+                top: .5cm;
+                width: 1cm;
+                height: 1cm;
+                background-image: url(/logo);
+                background-size: 1cm 1cm;
+                background-repeat: no-repeat;
+                background-position: 0 0;
+            }
 
     #topbar .right {
         float: right;
-    }
-
-    #topbar .right, #topbar .puzzle-id {
-        padding: .725cm 1cm 0;
-        vertical-align: bottom;
     }
 
 #footer {
@@ -273,206 +270,231 @@ table.example td.explanation {
         margin-top: .5cm;
     }
 
-.controls {
-    font-size: 18pt;
-    margin: .5cm 0;
+/* SVG rules that apply both to the Puzzle page as well as the Help page */
+svg {
 }
 
-#find-form label, #find-form button, #find-form input {
-    padding: .1cm .4cm;
-    margin: 0 .25cm;
-    border-radius: .3cm;
-    border: 2px solid hsl(220, 50%, 75%);
-    background: transparent;
-    font: inherit;
-    font-size: 18pt;
-    cursor: pointer;
-}
-
-    #find-form input[type="radio"] {
-        display: none;
+    svg .cell > .circle, svg .cell > .x {
+        opacity: 0;
     }
 
-    #find-form input[type="number"] {
-        width: 3cm;
-        padding: .1cm .2cm;
+    svg .cell.circled > .circle {
+        opacity: 1;
     }
 
-    #find-form label:hover, #find-form button:hover {
-        background: hsl(220, 70%, 80%);
+    svg .cell.xed > .x {
+        opacity: 1;
     }
 
-
-    #find-form input:checked + label, #find-form button.selected {
-        background: hsl(220, 70%, 80%);
-        border-color: hsl(220, 30%, 50%);
+    svg.semitransparent-xs .cell.xed > .x {
+        opacity: .5;
     }
 
-#results {
-    margin-top: 1.5cm;
-}
-
-    #results table {
-        border-collapse: collapse;
+    svg .cell rect.c0 {
+        fill: white;
     }
 
-        #results table tr:nth-child(2n+1) {
-            background: hsl(220, 45%, 85%);
-        }
-
-        #results table tr.headers th {
-            background: hsl(220, 70%, 80%);
-            text-align: left;
-        }
-
-        #results table td, #results table th {
-            padding: .15cm .5cm;
-        }
-
-    #results .pagination {
-        margin-top: .5cm;
+    svg .cell.highlighted rect.c0 {
+        fill: hsl(0, 0%, 50%);
     }
 
-svg .cell > .circle, svg .cell > .x {
-    opacity: 0;
-}
+    svg .cell rect.c1 {
+        fill: hsl(0, 100%, 94%);
+    }
 
-svg .cell.circled > .circle {
-    opacity: 1;
-}
+    svg .cell.highlighted rect.c1 {
+        fill: hsl(0, 70%, 50%);
+    }
 
-svg .cell.xed > .x {
-    opacity: 1;
-}
+    svg .cell rect.c2 {
+        fill: white;
+    }
 
-svg.semitransparent-xs .cell.xed > .x {
-    opacity: .5;
-}
+    svg .cell.highlighted rect.c2 {
+        fill: hsl(0, 0%, 50%);
+    }
 
-svg .cell rect.c0 {
-    fill: white;
-}
+    svg .cell rect.c3 {
+        fill: hsl(52, 100%, 89%);
+    }
 
-svg .cell.highlighted rect.c0 {
-    fill: hsl(0, 0%, 50%);
-}
+    svg .cell.highlighted rect.c3 {
+        fill: hsl(52, 100%, 35%);
+    }
 
-svg .cell rect.c1 {
-    fill: hsl(0, 100%, 94%);
-}
+    svg .cell rect.c4 {
+        fill: hsl(0, 0%, 94%);
+    }
 
-svg .cell.highlighted rect.c1 {
-    fill: hsl(0, 70%, 50%);
-}
+    svg .cell.highlighted rect.c4 {
+        fill: hsl(0, 0%, 40%);
+    }
 
-svg .cell rect.c2 {
-    fill: white;
-}
+    svg .cell rect.c5 {
+        fill: hsl(226, 100%, 94%);
+    }
 
-svg .cell.highlighted rect.c2 {
-    fill: hsl(0, 0%, 50%);
-}
+    svg .cell.highlighted rect.c5 {
+        fill: hsl(226, 60%, 50%);
+    }
 
-svg .cell rect.c3 {
-    fill: hsl(52, 100%, 89%);
-}
+    svg .cell rect.c6 {
+        fill: white;
+    }
 
-svg .cell.highlighted rect.c3 {
-    fill: hsl(52, 100%, 35%);
-}
+    svg .cell.highlighted rect.c6 {
+        fill: hsl(0, 0%, 50%);
+    }
 
-svg .cell rect.c4 {
-    fill: hsl(0, 0%, 94%);
-}
+    svg .cell rect.c7 {
+        fill: hsl(103, 84%, 95%);
+    }
 
-svg .cell.highlighted rect.c4 {
-    fill: hsl(0, 0%, 40%);
-}
+    svg .cell.highlighted rect.c7 {
+        fill: hsl(103, 50%, 50%);
+    }
 
-svg .cell rect.c5 {
-    fill: hsl(226, 100%, 94%);
-}
+    svg .cell rect.c8 {
+        fill: white;
+    }
 
-svg .cell.highlighted rect.c5 {
-    fill: hsl(226, 60%, 50%);
-}
+    svg .cell.highlighted rect.c8 {
+        fill: hsl(0, 0%, 50%);
+    }
 
-svg .cell rect.c6 {
-    fill: white;
-}
+    svg .cell.highlighted text {
+        fill: white;
+    }
 
-svg .cell.highlighted rect.c6 {
-    fill: hsl(0, 0%, 50%);
-}
+    svg .cell.invalid rect {
+        fill: #f00;
+    }
 
-svg .cell rect.c7 {
-    fill: hsl(103, 84%, 95%);
-}
+    svg .cell.highlighted.invalid rect {
+        fill: #800;
+    }
 
-svg .cell.highlighted rect.c7 {
-    fill: hsl(103, 50%, 50%);
-}
+    svg .cell .notation {
+        fill: #1d6ae5;
+    }
 
-svg .cell rect.c8 {
-    fill: white;
-}
+    svg .cell.highlighted .notation {
+        fill: white;
+    }
 
-svg .cell.highlighted rect.c8 {
-    fill: hsl(0, 0%, 50%);
-}
+    svg .frame.invalid {
+        opacity: 1;
+        stroke: #f00;
+    }
 
-svg .cell.highlighted text {
-    fill: white;
-}
-
-svg .cell.invalid rect {
-    fill: #f00;
-}
-
-svg .cell.highlighted.invalid rect {
-    fill: #800;
-}
-
-svg .cell .notation {
-    fill: #1d6ae5;
-}
-
-svg .cell.highlighted .notation {
-    fill: white;
-}
-
-svg .invalid-glow {
-    opacity: 1 !important;
-    stroke: #f00;
-}
+    svg .frame.solved {
+        opacity: 1;
+        stroke: #0f0;
+    }
 
 @media only screen and (max-width: 860px) {
+    #layout, #layout > tbody > tr, #layout > tbody > tr > td, #layout > tbody > tr > th {
+        display: block;
+    }
+
     #topbar {
         height: 1cm;
     }
 
-        #topbar a {
+        #topbar a, #topbar .puzzle-id {
             height: 1cm;
+            padding: .35cm .25cm 0;
+            font-size: 8pt;
         }
 
-        #topbar .home {
-            padding: .15cm .2cm 0 1.25cm;
+            #topbar a.home {
+                padding: .19cm .2cm 0 1.25cm;
+                font-size: 14pt;
+            }
+
+                #topbar a.home::before {
+                    top: 0;
+                    left: 0;
+                }
+
+    #sidebar {
+        height: .5cm;
+        margin: 0;
+        font-size: 8pt;
+        width: auto;
+    }
+
+        #sidebar .stats, #sidebar > a {
+            margin: 0;
+            padding: .05cm .25cm 0;
+            display: inline-block;
+            height: .5cm;
+            vertical-align: bottom;
+            box-sizing: border-box;
+        }
+
+            #sidebar .stats > div {
+                display: inline;
+            }
+
+            #sidebar .stats .solve-count {
+                font-size: 10pt;
+                margin: 0;
+            }
+
+        #sidebar > a {
+            padding: .1cm .25cm 0;
+        }
+
+    div.main {
+        padding: .25cm;
+        font-size: 10pt;
+    }
+
+    h1 {
+        margin-top: .5cm;
+        font-size: 18pt;
+    }
+
+    .choice > a {
+        display: inline-block;
+        width: 3.9cm;
+        height: 4.75cm;
+        margin: 0;
+    }
+
+        .choice > a > .puzzle-id {
+            margin-top: 1.2cm;
             font-size: 18pt;
         }
 
-            #topbar .home::before {
-                top: 0;
-                left: 0;
+        .choice > a > .average-time {
+            margin-top: 1.25cm;
+            font-size: 8pt;
+        }
+
+            .choice > a > .average-time > .label {
+                padding-right: .125cm;
+                margin-right: .5cm;
             }
 
-        #topbar a:not(.home) {
-            display: none;
+                .choice > a > .average-time > .label::after {
+                    width: .4cm;
+                    height: .4cm;
+                    top: -.03cm;
+                }
+
+    #footer {
+        font-size: 8pt;
+    }
+
+        #footer p.legal {
+            float: none;
+            margin: .25cm 0 0;
         }
 
-        #topbar .puzzle-id {
-            padding: .3cm .2cm 0 0;
-            float: right;
-            font-size: 10pt;
-            height: 1cm;
-        }
+    div.warning {
+        font-size: 9pt;
+        padding: .25cm .35cm;
+    }
 }

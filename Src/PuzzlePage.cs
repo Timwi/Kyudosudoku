@@ -101,7 +101,7 @@ namespace KyudosudokuWebsite
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                             <g transform='translate(14, 0)' id='p-{puzzleId}-sudoku'>{sudokuGrid(puzzleId, puzzle.Constraints)}</g>
 
-                            <g transform='translate(11.5, 6) rotate(-15)' class='solve-glow' id='p-{puzzleId}-solved-sticker'>
+                            <g transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' id='p-{puzzleId}-solved-sticker'>
                                 <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
                                     <stop stop-color='white' stop-opacity='1' offset='0'></stop> 
                                     <stop stop-color='hsl(216, 70%, 75%)' stop-opacity='1' offset='1'></stop> 
@@ -126,9 +126,9 @@ namespace KyudosudokuWebsite
                     </svg>")));
         }
 
-        private static string sudokuGrid(int puzzleId, IEnumerable<KyuConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null) => $@"
+        private static string sudokuGrid(int puzzleId, IEnumerable<KyuConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
             <filter id='p-{puzzleId}-blur'><feGaussianBlur stdDeviation='.1' /></filter>
-            <rect class='solve-glow frame' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
+            <rect class='solve-glow frame{(glowRed == null ? null : glowRed.Value ? " invalid" : " solved")}' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
             {(forHelpPage ? null : (from ix in Enumerable.Range(0, 9) from isCol in new[] { false, true } from topLeft in new[] { false, true } select (isCol, ix, topLeft))
                 .Where(inf => constraints.Any(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)))
                 .Select(inf => $@"<rect class='clickable edge-cell has-tooltip' x='{(inf.isCol ? inf.ix : inf.topLeft ? -1 : 9)}' y='{(inf.isCol ? inf.topLeft ? -1 : 9 : inf.ix)}' width='1' height='1'
@@ -157,9 +157,9 @@ namespace KyudosudokuWebsite
             {constraints.Where(c => c.SvgAboveLines).Select(c => c.Svg).JoinString()}
         ";
 
-        private static string kyudokuGridSvg(int corner, int puzzleId, int[] grid, int[] highlight = null, int[] circled = null, int[] xed = null, bool glowRed = false) => $@"
+        private static string kyudokuGridSvg(int corner, int puzzleId, int[] grid, int[] highlight = null, int[] circled = null, int[] xed = null, bool? glowRed = null) => $@"
             <filter id='p-{puzzleId}-blur'><feGaussianBlur stdDeviation='.1' /></filter>
-            <rect class='solve-glow frame{(glowRed ? " invalid-glow" : null)}' id='p-{puzzleId}-kyudo-{corner}-frame' x='{6.75 * (corner % 2)}' y='{6.75 * (corner / 2)}' width='6' height='6' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
+            <rect class='solve-glow frame{(glowRed == null ? null : glowRed.Value ? " invalid" : " solved")}' id='p-{puzzleId}-kyudo-{corner}-frame' x='{6.75 * (corner % 2)}' y='{6.75 * (corner / 2)}' width='6' height='6' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
             {Enumerable.Range(0, 36).Select(cell => $@"<g id='p-{puzzleId}-kyudo-{corner}-{cell}' class='cell{(circled != null && circled.Contains(cell) ? " circled" : null)}{(xed != null && xed.Contains(cell) ? " xed" : null)}{(highlight != null && highlight.Contains(cell) ? " highlighted" : null)}'>
                 <rect class='clickable kyudo-cell c{((cell % 6) / 3 + corner % 2) + 3 * ((cell / 6) / 3 + corner / 2)}' data-corner='{corner}' data-cell='{cell}' x='{cell % 6 + 6.75 * (corner % 2)}' y='{cell / 6 + 6.75 * (corner / 2)}' width='1' height='1' stroke='black' stroke-width='.005' />
                 <text x='{cell % 6 + 6.75 * (corner % 2) + .5}' y='{cell / 6 + 6.75 * (corner / 2) + .725}'>{grid[cell]}</text>

@@ -17,7 +17,7 @@ namespace KyudosudokuWebsite
                 new[] { 7, 8, 5, 1, 3, 2, 4, 1, 5, 6, 5, 2, 4, 5, 9, 9, 8, 8, 7, 8, 7, 9, 9, 8, 5, 3, 4, 3, 6, 6, 3, 8, 7, 6, 9, 2 },
                 new[] { 8, 3, 8, 8, 1, 9, 6, 2, 9, 4, 3, 7, 1, 3, 5, 2, 9, 3, 5, 4, 3, 5, 2, 5, 9, 5, 8, 7, 1, 9, 2, 8, 7, 2, 7, 2 });
 
-            static object kyudokuGrid(int[] grid, bool glowRed = false, int[] highlight = null, int[] circled = null, int[] xed = null, int corner = 0) =>
+            static object kyudokuGrid(int[] grid, bool? glowRed = null, int[] highlight = null, int[] circled = null, int[] xed = null, int corner = 0) =>
                 new RawTag($@"<svg style='width: 7cm' viewBox='{-.5 + 6.75 * (corner % 2)} {-.5 + 6.75 * (corner / 2)} 7 7' text-anchor='middle' font-family='Bitter' font-size='.65'>{kyudokuGridSvg(corner, 1, grid, highlight, circled, xed, glowRed)}</svg>");
 
             object kyudokuGrids(int[][] highlight = null, int[][] circled = null, int[][] xed = null) =>
@@ -36,11 +36,11 @@ namespace KyudosudokuWebsite
                     new P("Each puzzle consists of four 6×6 grids filled with digits 1–9, which we will call the ", new CITE("Kyudoku grids"), ", and a blank 9×9 grid, the ", new CITE("Sudoku grid"), ", usually with some extra graphics in or around it."),
                     new H2("The Kyudoku part"),
                     new P("In each Kyudoku grid, exactly one of each digit 1–9 must be circled in such a way that the circled digits in each row or column never add up to more than 9."),
-                    new TABLE { style = "width:100%", class_ = "puzzle examples" }._(
+                    new TABLE { style = "width:100%", class_ = "examples" }._(
                         new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 14, 23, 28, 30, 31 })), new TD(new P("Invalid: two 2’s are circled."))),
                         new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 23, 28, 30, 31 })), new TD(new P("Invalid: none of the 4’s are circled."))),
                         new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 29, 31 })), new TD(new P("Invalid: the last column has 2 and 8 circled, which add up to 10, which is more than 9."))),
-                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 30, 31 })), new TD(new P("Valid example.")))),
+                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: false, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 30, 31 })), new TD(new P("Valid example.")))),
                     new H2("The Sudoku part"),
                     new P("The Sudoku grid must be filled with digits 1–9 in such a way that every row, every column and every outlined 3×3 box contains the digits 1–9 exactly once."),
                     new P("Furthermore, each Kyudoku grid is linked with a 6×6 “corner” of the Sudoku grid (the coloring helps to visualize this). Every circled digit in a Kyudoku grid transfers that digit to the equivalent location on the Sudoku grid."),
@@ -116,12 +116,12 @@ namespace KyudosudokuWebsite
 
                     new H1 { id = "strategies" }._("Common strategies"),
                     new P("To get started, here are some common deductions that can help you get started on a Kyudosudoku puzzle:"),
-                    new TABLE { class_ = "puzzle examples" }._(
+                    new TABLE { class_ = "examples" }._(
                         new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, highlight: new[] { 6 })), new TD(new P("There is only a single 6 in this Kyudoku grid, so it must be circled."))),
                         new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: new[] { 6 }, highlight: new[] { 0, 8, 9, 11, 18, 24 })), new TD(new P("All values in the same row or column that would bring the sum above 9 can now be crossed out."))),
                         new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: new[] { 6 }, xed: new[] { 0, 8, 9, 11, 18, 24 }, highlight: new[] { 4, 12, 16, 28 })), new TD(new P("All of the 1’s in the grid are in a row or column with the highlighted 9. This means the 9 can be crossed out because circling it would rule out all of the 1’s."))),
                         new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: new[] { 6 }, xed: new[] { 0, 8, 9, 11, 16, 18, 24 }, highlight: new[] { 5, 29 })), new TD(new P("All of the remaining 9’s are in the same column. No matter which one ends up getting circled, the other digits in the same column would bring the column’s sum above 9, so they can all be crossed out.")))),
-                    new TABLE { class_ = "puzzle examples" }._(
+                    new TABLE { class_ = "examples" }._(
                         new TR(new TD(kyudokuGrids(
                             circled: new[] { null, null, null, new[] { 6 } },
                             xed: new[] { null, null, null, new[] { 0, 8, 9, 11, 16, 18, 24, 17, 23, 35 } },
@@ -143,9 +143,9 @@ namespace KyudosudokuWebsite
         {
             foreach (var example in examples)
             {
-                var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(example.Constraints, glow: false, givens: example.BadGivens, wide: example.Wide),
+                var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(example.Constraints, glowRed: true, givens: example.BadGivens, wide: example.Wide),
                     new DIV(new SPAN("✗ Invalid", example.Reason == null ? "." : ":"), example.Reason.NullOr(r => new DIV(r))));
-                var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(example.Constraints, glow: true, givens: example.GoodGivens, wide: example.Wide),
+                var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(example.Constraints, glowRed: false, givens: example.GoodGivens, wide: example.Wide),
                     new DIV(new SPAN("✓ Valid.")));
                 if (example.Wide)
                     yield return new TABLE { class_ = "example" }._(
@@ -165,7 +165,7 @@ namespace KyudosudokuWebsite
             }
         }
 
-        private object clippedSudokuGrid(IEnumerable<KyuConstraint> constraints, bool? glow = null, Dictionary<int, int?> givens = null, bool wide = false) =>
-            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGrid(1, constraints, true, givens)}</svg>");
+        private object clippedSudokuGrid(IEnumerable<KyuConstraint> constraints, bool? glowRed = null, Dictionary<int, int?> givens = null, bool wide = false) =>
+            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGrid(1, constraints, true, givens, glowRed)}</svg>");
     }
 }

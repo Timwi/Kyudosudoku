@@ -177,6 +177,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Find.js" />
+    <Content Include="Resources\Find.css">
+      <LastGenOutput>Kyudosudoku.Designer.cs</LastGenOutput>
+    </Content>
     <Content Include="Resources\General.css">
       <LastGenOutput>Kyudosudoku.Designer.cs</LastGenOutput>
     </Content>

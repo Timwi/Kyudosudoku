@@ -61,6 +61,17 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to @font-face {
+        ///    font-family: Bitter;
+        ///    src: url(&apos;data:font/ttf;base64,AAEAAAAUAQAABABAR0RFRtue3BEAAa9YAAAEFEdQT1Op5WWkAAGzbAABYxhHU1VCC2FKsQADFoQAACaoSFZBUuyArIQAAz0sAAANK09TLzKDxleSAAFiVAAAAGBTVEFU+OrV2gADSlgAAAC4YXZhcsP14AEAA0uQAAAAMmNtYXCtiSpuAAFitAAACrZmdmFyj/t5uAADSxAAAAB+Z2FzcAAAABAAAa9QAAAACGdseWYUqCs5AAABTAABPfhndmFyI3CPbwADS8QAARP4aGVhZBjbbb0AAUrsAAAANmhoZWEHzAgWAAFiMAAAACRobXR4toItTAABSyQAABcMbG9jYT39jIEAAT9kAAALiG1heHAF1wDNAAE/RAAAACBuYW1lEnYlogABbXQAAAdMcG9zdBOjxhQAAXTAAAA6jXByZXBoBoyFAAFtb [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string FindCss {
+            get {
+                return ResourceManager.GetString("FindCss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to window.addEventListener(&apos;DOMContentLoaded&apos;, function()
         ///{
         ///    function handler(fnc)
@@ -74,15 +85,13 @@ namespace KyudosudokuWebsite {
         ///        };
         ///    }
         ///
-        ///    let curSort = &apos;your-time&apos;;
+        ///    let curSort = &apos;solvetime&apos;;
         ///    let curAsc = false;
+        ///    let constraintOptions = { &apos;include-constraints&apos;: [], &apos;exclude-constraints&apos;: [] };
         ///
         ///    function submit(pg, pgCount)
         ///    {
-        ///        if (pg !== undefined &amp;&amp; pgCount !== undefined &amp;&amp; (pg &lt; 0 || pg &gt;= pgCount))
-        ///            return;
-        ///
-        ///        let form = document.getE [rest of string was truncated]&quot;;.
+        ///        if (pg !== undefined &amp;&amp; pgCount !== undefined [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FindJs {
             get {
@@ -152,18 +161,17 @@ namespace KyudosudokuWebsite {
         /// <summary>
         ///   Looks up a localized string similar to window.onload = (function()
         ///{
-        ///    let colors = [
-        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
-        ///        [&quot;hsl(0, 100%, 94%)&quot;, &quot;hsl(0, 70%, 50%)&quot;],
-        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
-        ///        [&quot;hsl(52, 100%, 89%)&quot;, &quot;hsl(52, 100%, 35%)&quot;],
-        ///        [&quot;hsl(0, 0%, 94%)&quot;, &quot;hsl(0, 0%, 40%)&quot;],
-        ///        [&quot;hsl(226, 100%, 94%)&quot;, &quot;hsl(226, 60%, 50%)&quot;],
-        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;],
-        ///        [&quot;hsl(103, 84%, 95%)&quot;, &quot;hsl(103, 50%, 50%)&quot;],
-        ///        [&quot;white&quot;, &quot;hsl(0, 0%, 50%)&quot;]
-        ///    ];
-        ///    let invalidCellColor = &apos;#f [rest of string was truncated]&quot;;.
+        ///    function remoteLog(msg)
+        ///    {
+        ///        //let req = new XMLHttpRequest();
+        ///        //req.open(&apos;POST&apos;, &apos;/remote-log&apos;, true);
+        ///        //req.setRequestHeader(&apos;Content-Type&apos;, &apos;application/x-www-form-urlencoded&apos;);
+        ///        //req.send(`msg=${encodeURIComponent(msg)}`);
+        ///    }
+        ///
+        ///    function inRange(x) { return x &gt;= 0 &amp;&amp; x &lt; 9; }
+        ///    function dx(dir) { return dir === &apos;Left&apos; ? -1 : dir === &apos;Right&apos; ? 1 : 0 }
+        ///    function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleJs {
             get {
