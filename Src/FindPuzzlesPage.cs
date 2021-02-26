@@ -115,8 +115,6 @@ namespace KyudosudokuWebsite
                 _ => puzzles
             };
 
-            puzzles.OrderByDescending(inf => inf.Puzzle.AverageTime).ThenBy(inf => inf.Puzzle.PuzzleID);
-
 
             /* PAGINATION */
 
@@ -165,10 +163,6 @@ namespace KyudosudokuWebsite
                             new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg"))),
                         puzzles.AsEnumerable().Select(inf => new TR(
                             new TD("▶ ", new A { href = $"/puzzle/{inf.Puzzle.PuzzleID}" }._("Puzzle #", inf.Puzzle.PuzzleID),
-                                //new DIV { class_ = "constraints" }._(
-                                //    inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(no constraints)" :
-                                //    inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><")
-                                //        .Select(cn => new SPAN { class_ = $"constr {cn}", title = KyuConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name }))),
                                 new DIV { class_ = "constraints" }._(
                                     inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(no constraints)" :
                                     inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><")
