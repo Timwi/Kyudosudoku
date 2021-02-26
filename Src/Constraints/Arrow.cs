@@ -30,15 +30,41 @@ namespace KyudosudokuWebsite
         {
             get
             {
+                // Try to reorder the cells so that there are fewer obtuse angles in it
+                IEnumerable<(int[] result, int numObtuse)> rearrange(int[] sofar, int ix, int numObtuse)
+                {
+                    if (ix == Cells.Length)
+                    {
+                        yield return (sofar.ToArray(), numObtuse);
+                        yield break;
+                    }
+                    for (var i = 0; i < Cells.Length; i++)
+                    {
+                        if (Math.Abs(Cells[i] % 9 - sofar[ix - 1] % 9) > 1 || Math.Abs(Cells[i] / 9 - sofar[ix - 1] / 9) > 1)
+                            continue;
+                        if (sofar.Take(ix).Contains(Cells[i]))
+                            continue;
+                        sofar[ix] = Cells[i];
+                        var nob = numObtuse;
+                        if (ix >= 2 && (
+                            (sofar[ix] % 9 == sofar[ix - 2] % 9 && Math.Abs(sofar[ix] / 9 - sofar[ix - 2] / 9) == 1) ||
+                            (sofar[ix] / 9 == sofar[ix - 2] / 9 && Math.Abs(sofar[ix] % 9 - sofar[ix - 2] % 9) == 1)))
+                            nob++;
+                        foreach (var res in rearrange(sofar, ix + 1, nob))
+                            yield return res;
+                    }
+                }
+                var (res, numOb) = rearrange(Cells.ToArray(), 1, 0).MinElement(tup => tup.numObtuse);
+
                 static int angleDeg(int c1, int c2) => (c2 % 9 - c1 % 9, c2 / 9 - c1 / 9) switch { (-1, -1) => 225, (0, -1) => 270, (1, -1) => 315, (-1, 0) => 180, (1, 0) => 0, (-1, 1) => 135, (0, 1) => 90, (1, 1) => 45, _ => 10 };
                 static double angle(int c1, int c2) => angleDeg(c1, c2) * Math.PI / 180;
-                var f = Cells[0];
-                var s = Cells[1];
-                var sl = Cells[Cells.Length - 2];
-                var l = Cells[Cells.Length - 1];
+                var f = res[0];
+                var s = res[1];
+                var sl = res[res.Length - 2];
+                var l = res[res.Length - 1];
                 return $@"<g fill='none' stroke='black' stroke-width='.05' opacity='.2'>
                     <circle cx='{svgX(f)}' cy='{svgY(f)}' r='.4' />
-                    <path d='M{svgX(f) + .4 * Math.Cos(angle(f, s))} {svgY(f) + .4 * Math.Sin(angle(f, s))} {Cells.Skip(1).SkipLast(1).Select(c => $"{svgX(c)} {svgY(c)}").JoinString(" ")} {svgX(l) + .3 * Math.Cos(angle(sl, l))} {svgY(l) + .3 * Math.Sin(angle(sl, l))}' />
+                    <path d='M{svgX(f) + .4 * Math.Cos(angle(f, s))} {svgY(f) + .4 * Math.Sin(angle(f, s))} {res.Skip(1).SkipLast(1).Select(c => $"{svgX(c)} {svgY(c)}").JoinString(" ")} {svgX(l) + .3 * Math.Cos(angle(sl, l))} {svgY(l) + .3 * Math.Sin(angle(sl, l))}' />
                     <path d='M -.2 -.2 .3 0 -.2 .2' transform='translate({svgX(l)}, {svgY(l)}) rotate({angleDeg(sl, l)})' />
                 </g>";
             }
