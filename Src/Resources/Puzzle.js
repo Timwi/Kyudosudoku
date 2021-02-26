@@ -611,16 +611,16 @@
                 case false:
                     isSolved = false;
                     if (showErrors)
-                        document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.add('invalid-glow');
+                        document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.add('invalid');
                     break;
 
                 case true:
-                    document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.remove('invalid-glow');
+                    document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.remove('invalid');
                     break;
 
                 case null:
                     isSolved = false;
-                    document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.remove('invalid-glow');
+                    document.getElementById(`p-${puzzleId}-sudoku-frame`).classList.remove('invalid');
                     break;
             }
 
@@ -631,16 +631,16 @@
                     case false:
                         isSolved = false;
                         if (showErrors)
-                            document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.add('invalid-glow');
+                            document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.add('invalid');
                         break;
 
                     case true:
-                        document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.remove('invalid-glow');
+                        document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.remove('invalid');
                         break;
 
                     case null:
                         isSolved = false;
-                        document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.remove('invalid-glow');
+                        document.getElementById(`p-${puzzleId}-kyudo-${corner}-frame`).classList.remove('invalid');
                         break;
                 }
             }

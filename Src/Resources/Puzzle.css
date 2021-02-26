@@ -68,6 +68,10 @@
             stroke: none;
         }
 
+        .puzzle svg .solved-sticker {
+            opacity: 0;
+        }
+
     .puzzle.solved {
         background: hsl(115, 50%, 40%);
     }
@@ -80,3 +84,17 @@
             opacity: 1;
             stroke: #0f0;
         }
+
+@media only screen and (max-width: 860px) {
+    body.is-puzzle #topbar .home {
+        padding-top: .08cm;
+    }
+
+    body.is-puzzle #topbar .puzzle-id {
+        position: absolute;
+        top: .255cm;
+        left: 1.8cm;
+        pointer-events: none;
+        touch-action: none;
+    }
+}
