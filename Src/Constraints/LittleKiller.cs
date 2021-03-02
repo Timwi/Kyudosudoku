@@ -11,6 +11,7 @@ namespace KyudosudokuWebsite
         public override string Description => "The digits along the indicated diagonal must sum to the specified total. (The digits need not necessarily be different.)";
         public override double ExtraRight => Direction == ClueDirection.SouthWest ? .25 : 0;
         public override double ExtraTop => Direction == ClueDirection.SouthEast ? .25 : 0;
+        public override double ExtraLeft => Direction == ClueDirection.NorthEast ? .25 : 0;
         public override bool IncludesCell(int cell) => false;
         public override bool IncludesRowCol(bool isCol, int rowCol, bool topLeft) => Direction switch
         {
