@@ -657,8 +657,9 @@
                     let elem = document.getElementById(`p-${puzzleId}-kyudo-${corner}-${cell}`);
                     let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
                     setClass(elem, 'circled', state.circledDigits[corner][cell] === true);
-                    setClass(elem, 'xed', state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && isSolved));
-                    setClass(elem, 'highlighted', (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (state.circledDigits[corner][cell] !== false || semitransparentXs) && !isSolved);
+                    let isXed = state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && (isSolved || (state.enteredDigits[sudokuCell] !== null && state.enteredDigits[sudokuCell] !== kyudokuGrids[corner][cell])));
+                    setClass(elem, 'xed', isXed);
+                    setClass(elem, 'highlighted', (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (!isXed || semitransparentXs) && !isSolved);
                 }
             }
 
