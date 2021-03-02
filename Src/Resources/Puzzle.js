@@ -583,7 +583,9 @@
                     rowSums[(cell / 6) | 0] += kyudokuGrids[corner][cell];
                     colSums[cell % 6] += kyudokuGrids[corner][cell];
                 }
-                if (state.circledDigits[corner][cell] !== false)
+                let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
+                let dgt = getDisplayedSudokuDigit(state, sudokuCell);
+                if (state.circledDigits[corner][cell] !== false && (!dgt || dgt === kyudokuGrids[corner][cell]))
                     availableDigitCounts[kyudokuGrids[corner][cell] - 1]++;
             }
             if (rowSums.some(r => r > 9) || colSums.some(r => r > 9) || digitCounts.some(c => c > 1) || availableDigitCounts.some(c => c === 0))
@@ -657,7 +659,8 @@
                     let elem = document.getElementById(`p-${puzzleId}-kyudo-${corner}-${cell}`);
                     let sudokuCell = cell % 6 + 3 * (corner % 2) + 9 * (((cell / 6) | 0) + 3 * ((corner / 2) | 0));
                     setClass(elem, 'circled', state.circledDigits[corner][cell] === true);
-                    let isXed = state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && (isSolved || (state.enteredDigits[sudokuCell] !== null && state.enteredDigits[sudokuCell] !== kyudokuGrids[corner][cell])));
+                    let dgt = getDisplayedSudokuDigit(state, sudokuCell);
+                    let isXed = state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && (isSolved || (dgt && dgt !== kyudokuGrids[corner][cell])));
                     setClass(elem, 'xed', isXed);
                     setClass(elem, 'highlighted', (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (!isXed || semitransparentXs) && !isSolved);
                 }
