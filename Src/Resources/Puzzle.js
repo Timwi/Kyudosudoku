@@ -813,10 +813,10 @@
             }
         }
 
-        function autofill(autoAll)
+        function autofill()
         {
             var anyChanges = false;
-            for (let cell of (autoAll ? Array(81).fill(null).map((_, c) => c) : selectedCells))
+            for (let cell of selectedCells)
                 if (!getDisplayedSudokuDigit(state, cell))
                 {
                     let poss = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -827,15 +827,12 @@
                             poss.splice(poss.indexOf(dd), 1);
                     }
 
-                    if (!anyChanges && (poss.length === 1 || poss.join(',') !== state.centerNotation[cell].join(',')))
+                    if (!anyChanges && poss.join(',') !== state.centerNotation[cell].join(','))
                     {
                         anyChanges = true;
                         saveUndo();
                     }
-                    if (poss.length === 1)
-                        state.enteredDigits[cell] = poss[0];
-                    else
-                        state.centerNotation[cell] = poss;
+                    state.centerNotation[cell] = poss;
                 }
             if (anyChanges)
                 updateVisuals(true);
@@ -1045,15 +1042,9 @@
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo-left>rect`), undo);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`), redo);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo-left>rect`), redo);
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-fill>rect`), autofill);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch>rect`), function() { mobileLeft = !mobileLeft; setView(); });
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch-left>rect`), function() { mobileLeft = !mobileLeft; setView(); });
-
-        let lastAutofillPress = null;
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-fill>rect`), function()
-        {
-            autofill(lastAutofillPress !== null && (new Date() - lastAutofillPress[0]) < 750 && lastAutofillPress[1] === selectedCells.join(','));
-            lastAutofillPress = [new Date(), selectedCells.join(',')];
-        });
 
         function selectCell(cell, mode)
         {
@@ -1169,8 +1160,7 @@
                     updateVisuals(true);
                     break;
 
-                case 'KeyF': autofill(false); break;
-                case 'Shift+KeyF': autofill(true); break;
+                case 'KeyF': autofill(); break;
 
                 case 'KeyQ':
                 case 'KeyW':
