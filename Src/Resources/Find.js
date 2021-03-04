@@ -11,11 +11,21 @@
         };
     }
 
+    let loadedCriteria = JSON.parse(localStorage.getItem('criteria'));
+
     let form = document.getElementById('find-form');
     let constraints = JSON.parse(form.dataset.constraints);
-    let curSort = 'solvetime';
-    let curAsc = false;
-    let constraintOptions = { 'include-constraints': [], 'exclude-constraints': [] };
+    let curSort = (loadedCriteria && loadedCriteria.sort) || 'solvetime';
+    let curAsc = (loadedCriteria && loadedCriteria.asc) || false;
+    let constraintOptions = (loadedCriteria && loadedCriteria.constraints) || { 'include-constraints': [], 'exclude-constraints': [] };
+
+    console.log(loadedCriteria);
+    if (loadedCriteria && loadedCriteria.what)
+        form.elements.what.value = loadedCriteria.what;
+    if (loadedCriteria && loadedCriteria.filteravgmin)
+        form.elements.filteravgmin.value = loadedCriteria.filteravgmin;
+    if (loadedCriteria && loadedCriteria.filteravgmax)
+        form.elements.filteravgmax.value = loadedCriteria.filteravgmax;
 
     function submit(pg, pgCount)
     {
@@ -107,7 +117,9 @@
                     });
                 }
             }
-        }
+        };
+
+        localStorage.setItem('criteria', JSON.stringify(criteria));
     }
 
     submit(0, 1);
