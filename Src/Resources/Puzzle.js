@@ -306,7 +306,7 @@
         let mode = 'normal';
         let helpEnabled = localStorage.getItem('kyu-help') !== 'Off';
         let selectedCells = [];
-        let highlightedDigit = null;
+        let highlightedDigits = [];
         let hoveredKyDigit = null;    // if not null, it’s an array of [corner, cell]
         let showErrors = puzzleDiv.dataset.showerrors === '1';
         let semitransparentXs = puzzleDiv.dataset.semitransparentxs === '1';
@@ -507,12 +507,12 @@
         document.addEventListener('visibilitychange', timerChanger);
         timerChanger();
 
-        function resetRestartButton()
+        function resetClearButton()
         {
-            document.getElementById(`p-${puzzleId}-btn-restart`).classList.remove('warning');
-            document.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Restart';
-            document.getElementById(`p-${puzzleId}-btn-restart-left`).classList.remove('warning');
-            document.querySelector(`#p-${puzzleId}-btn-restart-left>text`).textContent = 'Restart';
+            document.getElementById(`p-${puzzleId}-btn-clear`).classList.remove('warning');
+            document.querySelector(`#p-${puzzleId}-btn-clear>text`).textContent = 'Clear';
+            document.getElementById(`p-${puzzleId}-btn-clear-left`).classList.remove('warning');
+            document.querySelector(`#p-${puzzleId}-btn-clear-left>text`).textContent = 'Clear';
         }
 
         /// Returns:
@@ -604,7 +604,7 @@
                 localStorage.setItem(`ky${puzzleId}-undo`, undoBuffer.map(encodeState).join(' '));
                 localStorage.setItem(`ky${puzzleId}-redo`, redoBuffer.map(encodeState).join(' '));
             }
-            resetRestartButton();
+            resetClearButton();
 
             // Check if there are any conflicts (red glow) and/or the puzzle is solved
             let isSolved = true;
@@ -662,7 +662,7 @@
                     let dgt = getDisplayedSudokuDigit(state, sudokuCell);
                     let isXed = state.circledDigits[corner][cell] === false || (state.circledDigits[corner][cell] === null && (isSolved || (dgt && dgt !== kyudokuGrids[corner][cell])));
                     setClass(elem, 'xed', isXed);
-                    setClass(elem, 'highlighted', (selectedCells.includes(sudokuCell) || highlightedDigit === kyudokuGrids[corner][cell]) && (!isXed || semitransparentXs) && !isSolved);
+                    setClass(elem, 'highlighted', (selectedCells.includes(sudokuCell) || highlightedDigits.includes(kyudokuGrids[corner][cell])) && (!isXed || semitransparentXs) && !isSolved);
                 }
             }
 
@@ -674,7 +674,7 @@
                 digitCounts[digit - 1]++;
 
                 let sudokuCell = document.getElementById(`p-${puzzleId}-sudoku-${cell}`);
-                setClass(sudokuCell, 'highlighted', (selectedCells.includes(cell) || (highlightedDigit !== null && digit === highlightedDigit)) && !isSolved);
+                setClass(sudokuCell, 'highlighted', (selectedCells.includes(cell) || (highlightedDigits.includes(digit))) && !isSolved);
                 setClass(sudokuCell, 'invalid', digit === false);
 
                 let intendedText = null;
@@ -701,8 +701,8 @@
 
             for (let digit = 0; digit < 9; digit++)
             {
-                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}`), 'selected', highlightedDigit === digit + 1);
-                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}-left`), 'selected', highlightedDigit === digit + 1);
+                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}`), 'selected', highlightedDigits.includes(digit + 1));
+                setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}-left`), 'selected', highlightedDigits.includes(digit + 1));
                 setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}`), 'success', digitCounts[digit] === 9);
                 setClass(document.getElementById(`p-${puzzleId}-btn-${digit + 1}-left`), 'success', digitCounts[digit] === 9);
             }
@@ -777,16 +777,25 @@
             updateVisuals(true);
         }
 
-        function pressDigit(digit)
+        function pressDigit(digit, ev)
         {
             if (selectedCells.length === 0)
             {
-                // Highlight digits in the Kyudokus
-
-                if (highlightedDigit === digit)
-                    highlightedDigit = null;
+                // Highlight digits
+                if (ev && ev.shift)
+                {
+                    if (highlightedDigits.includes(digit))
+                        highlightedDigits.splice(highlightedDigits.indexOf(digit), 1);
+                    else
+                        highlightedDigits.push(digit);
+                }
                 else
-                    highlightedDigit = digit;
+                {
+                    if (highlightedDigits.includes(digit))
+                        highlightedDigits = [];
+                    else
+                        highlightedDigits = [digit];
+                }
                 updateVisuals();
             }
             else
@@ -883,7 +892,7 @@
                 }
                 let shift = ev.ctrlKey || ev.shiftKey;
                 draggingMode = shift && selectedCells.includes(cell) ? 'remove' : 'add';
-                highlightedDigit = null;
+                highlightedDigits = [];
                 selectCell(cell, shift ? draggingMode : 'toggle');
                 updateVisuals();
                 remoteLog2(`${ev.type} ${cell} (${ev.x}, ${ev.y})`);
@@ -991,8 +1000,8 @@
 
         Array(9).fill(null).forEach((_, btn) =>
         {
-            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}`), function() { pressDigit(btn + 1); });
-            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}-left`), function() { pressDigit(btn + 1); });
+            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}`), function(ev) { pressDigit(btn + 1, ev); });
+            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}-left`), function(ev) { pressDigit(btn + 1, ev); });
         });
 
         ["normal", "corner", "center"].forEach(btn => setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-${btn}>rect`), function()
@@ -1011,21 +1020,37 @@
                 localStorage.setItem('kyu-help', 'Off');
         });
 
+        function clearCells()
+        {
+            if (selectedCells.some(c => state.enteredDigits[c] !== null || state.centerNotation[c].length > 0 || state.cornerNotation[c].length > 0))
+            {
+                saveUndo();
+                selectedCells.forEach(c =>
+                {
+                    state.enteredDigits[c] = null;
+                    state.centerNotation[c] = [];
+                    state.cornerNotation[c] = [];
+                });
+                updateVisuals(true);
+            }
+        }
+
         ['', '-left'].forEach(xtr =>
         {
-            setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart${xtr}>rect`), function()
+            setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-clear${xtr}>rect`), function()
             {
-                let elem = document.getElementById(`p-${puzzleId}-btn-restart`);
+                let elem = document.getElementById(`p-${puzzleId}-btn-clear`);
                 if (!elem.classList.contains('warning'))
                 {
+                    clearCells();
                     elem.classList.add('warning');
-                    document.getElementById(`p-${puzzleId}-btn-restart-left`).classList.add('warning');
-                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart>text`).textContent = 'Confirm?';
-                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-restart-left>text`).textContent = 'Confirm?';
+                    document.getElementById(`p-${puzzleId}-btn-clear-left`).classList.add('warning');
+                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-clear>text`).textContent = 'Restart';
+                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-clear-left>text`).textContent = 'Restart';
                 }
                 else
                 {
-                    resetRestartButton();
+                    resetClearButton();
                     saveUndo();
                     state = {
                         circledDigits: Array(4).fill(null).map(_ => Array(36).fill(null)),
@@ -1096,7 +1121,7 @@
 
             function ArrowMovement(dx, dy, mode)
             {
-                highlightedDigit = null;
+                highlightedDigits = [];
                 if (selectedCells.length === 0)
                     selectedCells = [0];
                 else
@@ -1146,20 +1171,20 @@
                 case 'Shift+Digit7': case 'Shift+Numpad7':
                 case 'Shift+Digit8': case 'Shift+Numpad8':
                 case 'Shift+Digit9': case 'Shift+Numpad9':
-                    enterCornerNotation(parseInt(str.substr(str.length - 1)));
-                    break;
-
-                case 'Delete':
-                    saveUndo();
-                    selectedCells.forEach(selectedCell =>
+                    let digit = parseInt(str.substr(str.length - 1));
+                    if (selectedCells.length > 0)
+                        enterCornerNotation(digit);
+                    else
                     {
-                        state.enteredDigits[selectedCell] = null;
-                        state.centerNotation[selectedCell] = [];
-                        state.cornerNotation[selectedCell] = [];
-                    });
-                    updateVisuals(true);
+                        if (highlightedDigits.includes(digit))
+                            highlightedDigits.splice(highlightedDigits.indexOf(digit), 1);
+                        else
+                            highlightedDigits.push(digit);
+                        updateVisuals();
+                    }
                     break;
 
+                case 'Delete': clearCells(); break;
                 case 'KeyF': autofill(); break;
 
                 case 'KeyQ':
@@ -1192,13 +1217,13 @@
                 case 'Ctrl+ArrowRight': ArrowMovement(1, 0, 'move'); break;
                 case 'Ctrl+ControlLeft': case 'Ctrl+ControlRight': keepMove = true; break;
                 case 'Ctrl+Space':
-                    if (highlightedDigit !== null)
+                    if (highlightedDigits.length > 0)
                     {
                         selectedCells = [];
                         for (let cell = 0; cell < 81; cell++)
-                            if (getDisplayedSudokuDigit(state, cell) === highlightedDigit)
+                            if (highlightedDigits.includes(getDisplayedSudokuDigit(state, cell)))
                                 selectedCells.push(cell);
-                        highlightedDigit = null;
+                        highlightedDigits = [];
                     }
                     else if (selectedCells.length >= 2 && selectedCells[selectedCells.length - 2] === selectedCells[selectedCells.length - 1])
                         selectedCells.splice(selectedCells.length - 1, 1);
@@ -1206,7 +1231,7 @@
                         keepMove = !keepMove;
                     updateVisuals();
                     break;
-                case 'Escape': selectedCells = []; highlightedDigit = null; updateVisuals(); break;
+                case 'Escape': selectedCells = []; highlightedDigits = []; updateVisuals(); break;
 
                 // Undo/redo
                 case 'Backspace':
@@ -1217,6 +1242,11 @@
                 case 'Shift+Backspace':
                 case 'Ctrl+KeyY':
                     redo();
+                    break;
+
+                // Debug
+                case 'KeyL':
+                    console.log(selectedCells.join(", "));
                     break;
 
                 default:
@@ -1238,7 +1268,7 @@
             if (!ev.shiftKey && !ev.ctrlKey)
             {
                 selectedCells = [];
-                highlightedDigit = null;
+                highlightedDigits = [];
                 updateVisuals();
                 remoteLog2(`onmousedown puzzleDiv`);
             }
@@ -1265,7 +1295,7 @@
                 numBarLeft.setAttribute('transform', 'translate(0, 20)');   // intentionally outside the viewBox
                 document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 20)'); // intentionally outside the viewBox
                 btns = {
-                    'restart': { t: 'translate(0, 2.2)', w: 2.5 },
+                    'clear': { t: 'translate(0, 2.2)', w: 2.5 },
                     'undo': { t: 'translate(2.73, 2.2)', w: 2.5 },
                     'redo': { t: 'translate(5.47, 2.2)', w: 2.5 }
                 };
@@ -1282,7 +1312,7 @@
                 setViewBox(13.5 - (+puzzleSvg.dataset.extraleft), -.5 - (+puzzleSvg.dataset.extratop), 10 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.5 + (+puzzleSvg.dataset.extratop));
                 document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 2.2)');
                 btns = {
-                    'restart': { t: 'translate(1.0375, 2.2)', w: 2.45 },
+                    'clear': { t: 'translate(1.0375, 2.2)', w: 2.45 },
                     'undo': { t: 'translate(3.725, 2.2)', w: 2 },
                     'redo': { t: 'translate(5.9625, 2.2)', w: 2 }
                 };

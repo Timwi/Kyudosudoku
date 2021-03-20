@@ -52,14 +52,14 @@ namespace KyudosudokuWebsite
                     (fillSvg, true, "fill", .8, 1),
 
                     ("<path d='m 0.6,0.2 v 0.4 l -0.4,-0.2 z' />", true, "switch", .8, 2),
-                    ("Restart", false, "restart", 2.45, 2),
+                    ("Clear", false, "clear", 2.45, 2),
                     ("Undo", false, "undo", 2, 2),
                     ("Redo", false, "redo", 2, 2),
                     (helpSvg, true, "help", .8, 2)));
 
             var buttonsLeft = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, $"{btn + 1}-left", .8, 0))
                 .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
-                    ("Restart", false, "restart-left", 2.4, 1),
+                    ("Clear", false, "clear-left", 2.4, 1),
                     ("Undo", false, "undo-left", 2.4, 1),
                     ("Redo", false, "redo-left", 2.4, 1),
                     ("<path d='m 0.2,0.2 v 0.4 l 0.4,-0.2 z' />", true, "switch-left", .8, 1)));
