@@ -45,29 +45,29 @@
     <Reference Include="PropellerApi, Version=1.0.22.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\PropellerApi.1.0.22\lib\net472\PropellerApi.dll</HintPath>
     </Reference>
-    <Reference Include="RT.CommandLine, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.CommandLine.2.0.1683\lib\netstandard2.0\RT.CommandLine.dll</HintPath>
+    <Reference Include="RT.CommandLine, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.CommandLine.2.0.1684\lib\netstandard2.0\RT.CommandLine.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Json, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Json.2.0.1683\lib\netstandard2.0\RT.Json.dll</HintPath>
+    <Reference Include="RT.Json, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Json.2.0.1684\lib\netstandard2.0\RT.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Lingo.Base, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Lingo.Base.2.0.1683\lib\netstandard2.0\RT.Lingo.Base.dll</HintPath>
+    <Reference Include="RT.Lingo.Base, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Lingo.Base.2.0.1684\lib\netstandard2.0\RT.Lingo.Base.dll</HintPath>
     </Reference>
-    <Reference Include="RT.PostBuild, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.PostBuild.2.0.1683\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
+    <Reference Include="RT.PostBuild, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.PostBuild.2.0.1684\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.2.0.1683\lib\netstandard2.0\RT.Serialization.dll</HintPath>
+    <Reference Include="RT.Serialization, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.2.0.1684\lib\netstandard2.0\RT.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization.Binary, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.Binary.2.0.1683\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
+    <Reference Include="RT.Serialization.Binary, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Binary.2.0.1684\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization.Json, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.Json.2.0.1683\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
+    <Reference Include="RT.Serialization.Json, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Json.2.0.1684\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Serialization.Xml, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Serialization.Xml.2.0.1683\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
+    <Reference Include="RT.Serialization.Xml, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Serialization.Xml.2.0.1684\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
     </Reference>
     <Reference Include="RT.Servers, Version=1.0.1664.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RT.Servers.1.0.1664\lib\net472\RT.Servers.dll</HintPath>
@@ -75,11 +75,11 @@
     <Reference Include="RT.TagSoup, Version=1.0.1625.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RT.TagSoup.1.0.1625\lib\net472\RT.TagSoup.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Util, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Util.2.0.1683\lib\net472\RT.Util.dll</HintPath>
+    <Reference Include="RT.Util, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.2.0.1684\lib\net472\RT.Util.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Util.Core, Version=2.0.1683.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Util.Core.2.0.1683\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
+    <Reference Include="RT.Util.Core, Version=2.0.1684.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.Core.2.0.1684\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -98,46 +98,12 @@
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
     <Compile Include="CommandLine.cs" />
-    <Compile Include="Constraints\CappedLine.cs" />
-    <Compile Include="Constraints\Battenburg.cs" />
-    <Compile Include="Constraints\Binairo.cs" />
-    <Compile Include="Constraints\KyuConstraintInfoAttribute.cs" />
-    <Compile Include="Constraints\Clockface.cs" />
-    <Compile Include="Constraints\Inclusion.cs" />
-    <Compile Include="Constraints\KyuFourCellConstraint.cs" />
-    <Compile Include="Constraints\KyuNeighborConstraint.cs" />
-    <Compile Include="Constraints\DoubleNeighbors.cs" />
-    <Compile Include="Constraints\ConsecutiveNeighbors.cs" />
-    <Compile Include="Constraints\KyuRegionConstraint.cs" />
-    <Compile Include="Constraints\LittleKiller.cs" />
-    <Compile Include="Constraints\FindThe9.cs" />
-    <Compile Include="Constraints\MaximumCell.cs" />
-    <Compile Include="Constraints\Snowball.cs" />
-    <Compile Include="Constraints\RenbanCage.cs" />
-    <Compile Include="Constraints\NoConsecutive.cs" />
-    <Compile Include="Constraints\AntiKing.cs" />
-    <Compile Include="Constraints\AntiKnight.cs" />
-    <Compile Include="Constraints\KyuRowColConstraint.cs" />
-    <Compile Include="Constraints\KyuCellConstraint.cs" />
-    <Compile Include="Constraints\AntiBishop.cs" />
-    <Compile Include="Constraints\KillerCage.cs" />
-    <Compile Include="Constraints\Battlefield.cs" />
-    <Compile Include="Constraints\XSum.cs" />
-    <Compile Include="Constraints\ToroidalSandwich.cs" />
-    <Compile Include="Constraints\Skyscraper.cs" />
-    <Compile Include="Constraints\Sandwich.cs" />
-    <Compile Include="Constraints\OddEven.cs" />
-    <Compile Include="Constraints\Arrow.cs" />
-    <Compile Include="Constraints\Palindrome.cs" />
-    <Compile Include="Constraints\Thermometer.cs" />
     <Compile Include="Database\Configuration.cs" />
     <Compile Include="Database\Db.cs" />
     <Compile Include="Database\Session.cs" />
     <Compile Include="Database\UserPuzzle.cs" />
     <Compile Include="Database\Puzzle.cs" />
     <Compile Include="DbSession.cs" />
-    <Compile Include="Constraints\KyuConstraint.cs" />
-    <Compile Include="Example.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="Kyudosudoku.cs" />
     <Compile Include="KyudosudokuPropellerModule.cs" />
@@ -166,6 +132,10 @@
     <ProjectReference Include="..\..\PuzzleSolvers\PuzzleSolvers\PuzzleSolvers.csproj">
       <Project>{813EF7F3-6861-4A47-AD6D-C4C8B4AD6B75}</Project>
       <Name>PuzzleSolvers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SvgPuzzleConstraints\Src\SvgPuzzleConstraints.csproj">
+      <Project>{1444ac01-5fb9-4a7c-9ddd-98f3decbbd41}</Project>
+      <Name>SvgPuzzleConstraints</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

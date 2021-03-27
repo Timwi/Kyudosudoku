@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
-using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using KyudosudokuWebsite.Database;
 using RT.PropellerApi;
 using RT.Servers;

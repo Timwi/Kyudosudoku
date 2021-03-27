@@ -5,6 +5,7 @@ using RT.Json;
 using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
+using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite.Database
 {
@@ -14,7 +15,7 @@ namespace KyudosudokuWebsite.Database
         public int PuzzleID { get; set; }
         public string KyudokuGrids { get; set; }
         public bool Invalid { get; set; }
-        public string Constraints { get; set; }             // ClassifyJson of KyuConstraint[]
+        public string Constraints { get; set; }             // ClassifyJson of SvgConstraint[]
         public string ConstraintNames { get; set; }     // for searching/filtering
         public double? AverageTime { get; set; }
         public int? TimeToGenerate { get; set; }
@@ -23,7 +24,7 @@ namespace KyudosudokuWebsite.Database
         {
             var state = JsonValue.Parse(json);
             var kyudokuGrids = KyudokuGrids.Split(36).Select(grid => grid.Select(ch => ch - '0').ToArray()).ToArray();
-            var constraints = Constraints == null ? new KyuConstraint[0] : ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(Constraints));
+            var constraints = Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(Constraints));
 
             // Check that all cells in the Sudoku grid have a digit
             var sudokuDigits = new int[81];

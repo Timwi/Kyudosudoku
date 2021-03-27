@@ -9,6 +9,7 @@ using RT.Serialization;
 using RT.Util;
 using RT.Util.Consoles;
 using RT.Util.ExtensionMethods;
+using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {

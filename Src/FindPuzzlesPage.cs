@@ -7,6 +7,7 @@ using RT.Servers;
 using RT.TagSoup;
 using RT.Util;
 using RT.Util.ExtensionMethods;
+using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
@@ -19,7 +20,7 @@ namespace KyudosudokuWebsite
 
             return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindJs, Resource.FindCss } },
                 new DIV { class_ = "main" }._(
-                    new FORM { method = method.get, id = "find-form" }.Data("constraints", KyuConstraint.Constraints.OrderBy(c => c.name).ToJsonList(elem => new JsonDict { ["name"] = elem.name, ["id"] = elem.type.Name }).ToString())._(
+                    new FORM { method = method.get, id = "find-form" }.Data("constraints", SvgConstraint.Constraints.OrderBy(c => c.name).ToJsonList(elem => new JsonDict { ["name"] = elem.name, ["id"] = elem.type.Name }).ToString())._(
                         new H1("Find puzzles"),
                         new DIV { class_ = "controls" }._(
                             "Find puzzles that I’ve: ",
@@ -154,7 +155,7 @@ namespace KyudosudokuWebsite
                             new TD { class_ = "nowrap" }._(inf.SolveCount),
                             what != "solved" ? null : new TD { class_ = "nowrap" }._(solveTime(inf.UserPuzzle)),
                             what == "not-seen" ? null : new TD { class_ = "nowrap" }._(lastSeen(inf.UserPuzzle)),
-                            new TD(inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(none)" : inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><").Select(cn => KyuConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).JoinString(", "))))),
+                            new TD(inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(none)" : inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><").Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).JoinString(", "))))),
 
                     // Small version of the table for mobile view
                     new TABLE { class_ = "small" }._(
@@ -166,7 +167,7 @@ namespace KyudosudokuWebsite
                                 new DIV { class_ = "constraints" }._(
                                     inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(no constraints)" :
                                     inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><")
-                                        .Select(cn => KyuConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).Order().InsertBetween(", "))),
+                                        .Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).Order().InsertBetween(", "))),
                             new TD { class_ = "nowrap" }._(
                                 new DIV { class_ = "solve-count" }._("Solved: ", inf.SolveCount == 0 ? "never" : inf.SolveCount == 1 ? "once" : $"{inf.SolveCount} times"),
                                 new DIV { class_ = "avg" }._("Average time: ", time(inf.Puzzle)),

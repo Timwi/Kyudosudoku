@@ -9,6 +9,7 @@ using RT.Servers;
 using RT.TagSoup;
 using RT.Util;
 using RT.Util.ExtensionMethods;
+using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
@@ -29,7 +30,7 @@ namespace KyudosudokuWebsite
                 return page404(req);
 
             var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
-                dbPuzzle.Constraints == null ? new KyuConstraint[0] : ClassifyJson.Deserialize<KyuConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
+                dbPuzzle.Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 
@@ -126,7 +127,7 @@ namespace KyudosudokuWebsite
                     </svg>")));
         }
 
-        private static string sudokuGridSvg(int puzzleId, IEnumerable<KyuConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
+        private static string sudokuGridSvg(int puzzleId, IEnumerable<SvgConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
             <filter id='p-{puzzleId}-blur'><feGaussianBlur stdDeviation='.1' /></filter>
             <rect class='solve-glow frame{(glowRed == null ? null : glowRed.Value ? " invalid" : " solved")}' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
             {(forHelpPage ? null : (from ix in Enumerable.Range(0, 9) from isCol in new[] { false, true } from topLeft in new[] { false, true } select (isCol, ix, topLeft))

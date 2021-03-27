@@ -6,15 +6,16 @@ using PuzzleSolvers;
 using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
+using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
     sealed class Kyudosudoku
     {
         public int[][] Grids { get; private set; }
-        public KyuConstraint[] Constraints { get; private set; }
+        public SvgConstraint[] Constraints { get; private set; }
 
-        public Kyudosudoku(int[][] grids, KyuConstraint[] constraints)
+        public Kyudosudoku(int[][] grids, SvgConstraint[] constraints)
         {
             if (grids == null)
                 throw new ArgumentNullException(nameof(grids));
@@ -105,7 +106,7 @@ namespace KyudosudokuWebsite
                     continue;
 
                 // Check if the Sudoku works without any constraints.
-                var kyConstraints = new KyuConstraint[0];
+                var kyConstraints = new SvgConstraint[0];
                 if (new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).Solve().Take(2).Count() > 1)
                 {
                     // Remove constraints that would be redundant.
@@ -201,7 +202,7 @@ namespace KyudosudokuWebsite
             goto tryAgain;
         }
 
-        private static IEnumerable<KyuConstraint> GenerateConstraints(int[] sudoku, Random rnd)
+        private static IEnumerable<SvgConstraint> GenerateConstraints(int[] sudoku, Random rnd)
         {
             // Start by generating all orthogonally contiguous regions that contain unique digits.
             // Several constraints make use of these, so it makes sense to generate them only once.
@@ -211,7 +212,7 @@ namespace KyudosudokuWebsite
 
             // The numbers balance the relative probabilities of each constraint occurring so that they each occur reasonably similarly often.
 
-            var constraintGenerators = Ut.NewArray<(int? num, Func<int[], IList<KyuConstraint>> generator)>(
+            var constraintGenerators = Ut.NewArray<(int? num, Func<int[], IList<SvgConstraint>> generator)>(
                 // Cell constraints
                 (null, AntiBishop.Generate),
                 (null, AntiKing.Generate),
@@ -232,7 +233,7 @@ namespace KyudosudokuWebsite
 
                 // Row/column constraints
                 (37, Battlefield.Generate),
-                (null, Binairo.Generate),
+                (null, SvgPuzzleConstraints.Binairo.Generate),
                 (20, Sandwich.Generate),
                 (47, Skyscraper.Generate),
                 (20, ToroidalSandwich.Generate),
@@ -279,7 +280,7 @@ namespace KyudosudokuWebsite
 
                 for (var adj = 0; adj < 81; adj++)
                 {
-                    if (banned[adj] || !KyuConstraint.Orthogonal(adj).Any(a => sofar[a]) || sofar.Any((b, ix) => b && ix != adj && sudoku[ix] == sudoku[adj]))
+                    if (banned[adj] || !SvgConstraint.Orthogonal(adj).Any(a => sofar[a]) || sofar.Any((b, ix) => b && ix != adj && sudoku[ix] == sudoku[adj]))
                         continue;
                     sofar[adj] = true;
                     banned[adj] = true;
