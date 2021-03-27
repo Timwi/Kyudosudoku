@@ -93,7 +93,7 @@
                 if (p1 === -1 || p2 === -1)
                     return numbers.some(n => n === null) ? null : false;
                 let sandwich = numbers.slice(Math.min(p1, p2) + 1, Math.max(p1, p2));
-                return sandwich.some(n => n === null) ? null : sandwich.reduce((p, n) => p + n, 0) === constr.Sum;
+                return sandwich.some(n => n === null) ? null : sandwich.reduce((p, n) => p + n, 0) === constr.Clue;
             }
 
             case 'ToroidalSandwich': {
@@ -111,7 +111,7 @@
                     s += numbers[i];
                     i = (i + 1) % numbers.length;
                 }
-                return s === constr.Sum;
+                return s === constr.Clue;
             }
 
             case 'Skyscraper': {
