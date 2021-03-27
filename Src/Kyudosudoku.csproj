@@ -129,7 +129,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PuzzleSolvers\PuzzleSolvers\PuzzleSolvers.csproj">
+    <ProjectReference Include="..\..\PuzzleSolvers\Src\PuzzleSolvers.csproj">
       <Project>{813EF7F3-6861-4A47-AD6D-C4C8B4AD6B75}</Project>
       <Name>PuzzleSolvers</Name>
     </ProjectReference>

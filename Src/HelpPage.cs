@@ -84,6 +84,7 @@ namespace KyudosudokuWebsite
                         Battlefield.Example,
                         Binairo.Example,
                         XSum.Example,
+                        YSum.Example,
 
                         // Other
                         LittleKiller.Example

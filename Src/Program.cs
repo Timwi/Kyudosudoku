@@ -128,8 +128,8 @@ namespace KyudosudokuWebsite
             var lockObj = new object();
 
             Db.ConnectionString = @"Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;";
-            var notFound = new HashSet<string> { "CappedLine" };
-            Enumerable.Range(1, 100).ParallelForEach(Environment.ProcessorCount, seed =>
+            var notFound = new HashSet<string> { "YSum" };
+            Enumerable.Range(1, 1000).ParallelForEach(Environment.ProcessorCount, seed =>
             {
                 using (var db = new Db())
                     if (db.Puzzles.Any(p => p.PuzzleID == seed))

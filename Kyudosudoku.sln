@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kyudosudoku", "Src\Kyudosudoku.csproj", "{A1B6903E-173F-4252-86BF-C231B6D54732}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleSolvers", "..\PuzzleSolvers\PuzzleSolvers\PuzzleSolvers.csproj", "{813EF7F3-6861-4A47-AD6D-C4C8B4AD6B75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuzzleSolvers", "..\PuzzleSolvers\Src\PuzzleSolvers.csproj", "{813EF7F3-6861-4A47-AD6D-C4C8B4AD6B75}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SvgPuzzleConstraints", "..\SvgPuzzleConstraints\Src\SvgPuzzleConstraints.csproj", "{1444AC01-5FB9-4A7C-9DDD-98F3DECBBD41}"
 EndProject

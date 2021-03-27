@@ -237,7 +237,8 @@ namespace KyudosudokuWebsite
                 (20, Sandwich.Generate),
                 (47, Skyscraper.Generate),
                 (20, ToroidalSandwich.Generate),
-                (22, XSum.Generate),
+                (20, XSum.Generate),
+                (20, YSum.Generate),
 
                 // Four-cell constraints
                 (50, Clockface.Generate),
