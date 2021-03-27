@@ -166,6 +166,6 @@ namespace KyudosudokuWebsite
         }
 
         private object clippedSudokuGrid(IEnumerable<KyuConstraint> constraints, bool? glowRed = null, Dictionary<int, int?> givens = null, bool wide = false) =>
-            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGrid(1, constraints, true, givens, glowRed)}</svg>");
+            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'>{sudokuGridSvg(1, constraints, true, givens, glowRed)}</svg>");
     }
 }

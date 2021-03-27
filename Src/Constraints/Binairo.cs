@@ -26,7 +26,7 @@ namespace KyudosudokuWebsite
         public Binairo(bool isCol, int rowCol) : base(isCol, rowCol) { }
         private Binairo() { }   // for Classify
 
-        protected override IEnumerable<Constraint> getConstraints() { yield return new BinairoRowConstraint(GetAffectedCells(false)); }
+        protected override IEnumerable<Constraint> getConstraints() { yield return new ParityNoTripletsConstraint(GetAffectedCells(false)); }
 
         public override string Svg => $@"<g stroke='black' stroke-width='.075' fill='none' transform='translate({(IsCol ? RowCol + .5 : -.5)}, {(IsCol ? -.5 : RowCol + .5)}) scale(.7)'>
             <circle cx='.25' cy='-.25' r='.2' />
@@ -52,29 +52,6 @@ namespace KyudosudokuWebsite
                     if (VerifyBinairo(Ut.NewArray(9, x => isCol ? (rowCol + 9 * x) : (x + 9 * rowCol)).Select(ix => sudoku[ix]).ToArray()))
                         constraints.Add(new Binairo(isCol, rowCol));
             return constraints;
-        }
-
-        public sealed class BinairoRowConstraint : Constraint
-        {
-            private static readonly (int offset, int toEnforce)[] _combinations = new (int offset, int toEnforce)[] { (-2, -1), (-1, -2), (-1, 1), (1, -1), (1, 2), (2, 1) };
-            public BinairoRowConstraint(int[] affectedCells) : base(affectedCells) { }
-            public override IEnumerable<Constraint> MarkTakens(bool[][] takens, int?[] grid, int? ix, int minValue, int maxValue)
-            {
-                if (ix == null)
-                    return null;
-
-                var i = ix.Value;
-                var x = AffectedCells.IndexOf(i);
-
-                foreach (var (offset, toEnforce) in _combinations)
-                {
-                    if (x + offset >= 0 && x + offset < 9 && x + toEnforce >= 0 && x + toEnforce < 9 && grid[AffectedCells[x + offset]] != null && grid[AffectedCells[x + offset]].Value % 2 == grid[i].Value % 2 && grid[AffectedCells[x + toEnforce]] == null)
-                        for (var v = 0; v < takens[AffectedCells[x + toEnforce]].Length; v++)
-                            if (v % 2 == grid[i].Value % 2)
-                                takens[AffectedCells[x + toEnforce]][v] = true;
-                }
-                return null;
-            }
         }
     }
 }

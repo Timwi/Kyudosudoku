@@ -128,57 +128,52 @@ namespace KyudosudokuWebsite
                 InnerCells = innerCells ?? throw new ArgumentNullException(nameof(innerCells));
             }
 
-            public override IEnumerable<Constraint> MarkTakens(bool[][] takens, int?[] grid, int? ix, int minValue, int maxValue)
+            public override IEnumerable<Constraint> MarkTakens(SolverState state)
             {
-                if (ix == null)
+                var ix = state.LastPlacedCell;
+                if (state.LastPlacedCell == null)
                 {
+                    // The inside of the line cannot contain a 1 or a 9
                     for (var icIx = 0; icIx < InnerCells.Length; icIx++)
                     {
-                        takens[InnerCells[icIx]][0] = true;
-                        takens[InnerCells[icIx]][takens[InnerCells[icIx]].Length - 1] = true;
+                        state.MarkImpossible(InnerCells[icIx], 1);
+                        state.MarkImpossible(InnerCells[icIx], 9);
                     }
                     return null;
                 }
 
                 // If both caps are filled in, all the inner cells must simply be between them.
-                if (grid[Cap1] != null && grid[Cap2] != null)
+                if (state[Cap1] != null && state[Cap2] != null)
                 {
                     // We don’t need to recompute this multiple times.
                     if (!(ix == Cap1 || ix == Cap2))
                         return null;
-                    var min = Math.Min(grid[Cap1].Value, grid[Cap2].Value) + minValue;
-                    var max = Math.Max(grid[Cap1].Value, grid[Cap2].Value) + minValue;
+                    var min = Math.Min(state[Cap1].Value, state[Cap2].Value);
+                    var max = Math.Max(state[Cap1].Value, state[Cap2].Value);
                     for (var icIx = 0; icIx < InnerCells.Length; icIx++)
-                        if (grid[InnerCells[icIx]] == null)
-                            for (var v = 0; v < takens[InnerCells[icIx]].Length; v++)
-                                if (v + minValue <= min || v + minValue >= max)
-                                    takens[InnerCells[icIx]][v] = true;
+                        state.MarkImpossible(InnerCells[icIx], v => v <= min || v >= max);
                 }
                 // If one cap is filled in, all the inner cells must simply be different from it.
-                else if (grid[Cap1] != null || grid[Cap2] != null)
+                else if (state[Cap1] != null || state[Cap2] != null)
                 {
                     // We don’t need to recompute this multiple times.
                     if (!(ix == Cap1 || ix == Cap2))
                         return null;
-                    var v = grid[grid[Cap1] != null ? Cap1 : Cap2].Value;
+                    var v = state[Cap1] ?? state[Cap2].Value;
                     for (var icIx = 0; icIx < InnerCells.Length; icIx++)
-                        takens[InnerCells[icIx]][v] = true;
+                        state.MarkImpossible(InnerCells[icIx], v);
                 }
 
-                var curMin = InnerCells.Where(c => grid[c] != null).MinOrNull(c => grid[c].Value + minValue);
+                var curMin = InnerCells.Where(c => state[c] != null).MinOrNull(c => state[c].Value);
                 if (curMin == null)
                     return null;
-                var curMax = InnerCells.Where(c => grid[c] != null).Max(c => grid[c].Value) + minValue;
+                var curMax = InnerCells.Where(c => state[c] != null).Max(c => state[c].Value);
 
                 // If neither cap is filled in, both must be outside the range but we don’t yet know which one is the min and which one is the max
-                if (grid[Cap1] == null && grid[Cap2] == null)
+                if (state[Cap1] == null && state[Cap2] == null)
                 {
-                    for (var v = 0; v < takens[Cap1].Length; v++)
-                        if (v + minValue >= curMin.Value && v + minValue <= curMax)
-                            takens[Cap1][v] = true;
-                    for (var v = 0; v < takens[Cap2].Length; v++)
-                        if (v + minValue >= curMin.Value && v + minValue <= curMax)
-                            takens[Cap2][v] = true;
+                    state.MarkImpossible(Cap1, v => v >= curMin.Value && v <= curMax);
+                    state.MarkImpossible(Cap2, v => v >= curMin.Value && v <= curMax);
                 }
                 else
                 {
@@ -186,21 +181,17 @@ namespace KyudosudokuWebsite
                     var cap1 = Cap1;
                     var cap2 = Cap2;
                     iter:
-                    if (grid[cap1] == null && grid[cap2] != null)
+                    if (state[cap1] == null && state[cap2] != null)
                     {
-                        if (grid[cap2].Value + minValue > curMax)
+                        if (state[cap2].Value > curMax)
                         {
                             // grid[cap1] must be < curMin
-                            for (var v = 0; v < takens[cap1].Length; v++)
-                                if (v + minValue >= curMin.Value)
-                                    takens[cap1][v] = true;
+                            state.MarkImpossible(cap1, v => v >= curMin.Value);
                         }
-                        else if (grid[cap2].Value + minValue < curMin.Value)
+                        else if (state[cap2].Value < curMin.Value)
                         {
                             // grid[cap1] must be > curMax
-                            for (var v = 0; v < takens[cap1].Length; v++)
-                                if (v + minValue <= curMax)
-                                    takens[cap1][v] = true;
+                            state.MarkImpossible(cap1, v => v >= curMax);
                         }
                         else
                             throw new InternalErrorException("CappedLineConstraint encountered an internal bug.");

@@ -59,32 +59,23 @@ namespace KyudosudokuWebsite
                     yield return x + 9 * y;
             }
 
-            public override IEnumerable<Constraint> MarkTakens(bool[][] takens, int?[] grid, int? ix, int minValue, int maxValue)
+            public override IEnumerable<Constraint> MarkTakens(SolverState state)
             {
-                if (ix == null)
+                if (state.LastPlacedCell == null)
                 {
                     // The focus cell cannot be so large that it points outside the grid
-                    for (var v = 0; v < takens[AffectedCells[0]].Length; v++)
-                        if (v + minValue > AffectedCells.Length - 1)
-                            takens[AffectedCells[0]][v] = true;
+                    state.MarkImpossible(AffectedCells[0], v => v > AffectedCells.Length - 1);
                 }
-                else if (ix == AffectedCells[0])
+                else if (state.LastPlacedCell == AffectedCells[0])
                 {
                     // The focus cell has been set, therefore place the 9 in the correct position
-                    var dist = grid[ix.Value].Value + minValue;
-                    var target = AffectedCells[dist];
-
-                    for (var v = 0; v < takens[target].Length; v++)
-                        if (v + minValue != 9)
-                            takens[target][v] = true;
+                    state.MustBe(AffectedCells[state.LastPlacedValue], 9);
                 }
-                else if (AffectedCells.Contains(ix.Value) && grid[ix.Value].Value + minValue == 9)
+                else if (AffectedCells.Contains(state.LastPlacedCell.Value) && state.LastPlacedValue == 9)
                 {
                     // A 9 has been placed somewhere, therefore set the focus cell to the correct value
-                    var dist = AffectedCells.IndexOf(ix.Value);
-                    for (var v = 0; v < takens[AffectedCells[0]].Length; v++)
-                        if (v + minValue != dist)
-                            takens[AffectedCells[0]][v] = true;
+                    // (This is the main difference with FindTheValueConstraint; it’s an optimization that assumes uniqueness)
+                    state.MustBe(AffectedCells[0], AffectedCells.IndexOf(state.LastPlacedCell.Value));
                 }
 
                 return null;

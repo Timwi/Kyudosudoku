@@ -99,7 +99,7 @@ namespace KyudosudokuWebsite
                             <g transform='translate(14, 9.75)'>{renderButtonArea(buttonsRight, 9)}</g>
 
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
-                            <g transform='translate(14, 0)' id='p-{puzzleId}-sudoku'>{sudokuGrid(puzzleId, puzzle.Constraints)}</g>
+                            <g transform='translate(14, 0)' id='p-{puzzleId}-sudoku'>{sudokuGridSvg(puzzleId, puzzle.Constraints)}</g>
 
                             <g transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' id='p-{puzzleId}-solved-sticker'>
                                 <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
@@ -126,7 +126,7 @@ namespace KyudosudokuWebsite
                     </svg>")));
         }
 
-        private static string sudokuGrid(int puzzleId, IEnumerable<KyuConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
+        private static string sudokuGridSvg(int puzzleId, IEnumerable<KyuConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
             <filter id='p-{puzzleId}-blur'><feGaussianBlur stdDeviation='.1' /></filter>
             <rect class='solve-glow frame{(glowRed == null ? null : glowRed.Value ? " invalid" : " solved")}' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
             {(forHelpPage ? null : (from ix in Enumerable.Range(0, 9) from isCol in new[] { false, true } from topLeft in new[] { false, true } select (isCol, ix, topLeft))
