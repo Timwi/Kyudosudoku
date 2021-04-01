@@ -123,13 +123,13 @@ namespace KyudosudokuWebsite
             });
         }
 
-        private static void FindPuzzleWithConstraint()
+        private static int FindPuzzleWithConstraint()
         {
             var lockObj = new object();
 
             Db.ConnectionString = @"Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;";
             var notFound = new HashSet<string> { "YSum" };
-            Enumerable.Range(1, 1000).ParallelForEach(Environment.ProcessorCount, seed =>
+            Enumerable.Range(192, 1000).ParallelForEach(Environment.ProcessorCount, seed =>
             {
                 using (var db = new Db())
                     if (db.Puzzles.Any(p => p.PuzzleID == seed))
@@ -160,6 +160,7 @@ namespace KyudosudokuWebsite
 
             Console.WriteLine("Done.");
             Console.ReadLine();
+            return 0;
         }
 
         private static void GenerateConstraintFromExampleSudoku()

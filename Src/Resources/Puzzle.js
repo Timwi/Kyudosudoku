@@ -187,16 +187,19 @@
                 return constr.Cells.some(c => grid[c] === null) ? null : true;
 
             case 'KillerCage': {
-                for (let i = 0; i < constr.Cells.length; i++)
-                    for (let j = i + 1; j < constr.Cells.length; j++)
-                        if (grid[constr.Cells[i]] !== null && grid[constr.Cells[j]] !== null && grid[constr.Cells[i]] === grid[constr.Cells[j]])
-                            return false;
+                if (!constr.NonUnique)
+                {
+                    for (let i = 0; i < constr.Cells.length; i++)
+                        for (let j = i + 1; j < constr.Cells.length; j++)
+                            if (grid[constr.Cells[i]] !== null && grid[constr.Cells[j]] !== null && grid[constr.Cells[i]] === grid[constr.Cells[j]])
+                                return false;
+                }
                 return constr.Cells.some(c => grid[c] === null) ? null : (constr.Sum === null || constr.Cells.reduce((p, n) => p + grid[n], 0) === constr.Sum);
             }
 
             case 'RenbanCage': {
                 let numbers = constr.Cells.map(c => grid[c]);
-                return numbers.some(n => n === null) ? null : numbers.filter(n => !numbers.includes(n + 1)).length === 1;
+                return numbers.some(n => n === null) ? null : new Set(numbers).size === constr.Cells.length && numbers.filter(n => !numbers.includes(n + 1)).length === 1;
             }
 
             case 'Snowball': {
@@ -248,8 +251,19 @@
                     case 'NorthWest': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 80 - constr.Offset - 10 * i); break;
                     case 'NorthEast': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 72 - 9 * constr.Offset - 8 * i); break;
                 };
-                return affectedCells.some(c => grid[c] === null) ? null : affectedCells.reduce((p, n) => p + grid[n], 0) === constr.Sum;
+                return affectedCells.some(c => grid[c] === null) ? null : affectedCells.reduce((p, n) => p + grid[n], 0) === constr.Clue;
             }
+
+
+            // EXOTIC CONSTRAINTS
+
+            case 'YSum': {
+                let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
+                if (numbers[0] === null || numbers[numbers[0] - 1] === null || numbers.slice(0, numbers[numbers[0] - 1]).some(n => n === null))
+                    return null;
+                return constr.Clue === numbers.slice(0, numbers[numbers[0] - 1]).reduce((p, n) => p + n, 0);
+            }
+
         }
     }
 
@@ -1291,7 +1305,7 @@
             let btns = null;
             if (!isMobile)
             {
-                setViewBox(-.5, -.5 - (+puzzleSvg.dataset.extratop), 24 + (+puzzleSvg.dataset.extraright), 13.75 + (+puzzleSvg.dataset.extratop));
+                setViewBox(-.5, -.5 - (+puzzleSvg.dataset.extratop), 23.25 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.75 + (+puzzleSvg.dataset.extratop));
                 numBarLeft.setAttribute('transform', 'translate(0, 20)');   // intentionally outside the viewBox
                 document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 20)'); // intentionally outside the viewBox
                 btns = {
@@ -1299,7 +1313,7 @@
                     'undo': { t: 'translate(2.73, 2.2)', w: 2.5 },
                     'redo': { t: 'translate(5.47, 2.2)', w: 2.5 }
                 };
-                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(11.5, 6) rotate(-15)');
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', `translate(11.5, 6) rotate(-15)`);
             }
             else if (mobileLeft)
             {
@@ -1309,14 +1323,14 @@
             }
             else
             {
-                setViewBox(13.5 - (+puzzleSvg.dataset.extraleft), -.5 - (+puzzleSvg.dataset.extratop), 10 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.5 + (+puzzleSvg.dataset.extratop));
+                setViewBox(13, -.5 - (+puzzleSvg.dataset.extratop), 9.5 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.5 + (+puzzleSvg.dataset.extratop));
                 document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 2.2)');
                 btns = {
                     'clear': { t: 'translate(1.0375, 2.2)', w: 2.45 },
                     'undo': { t: 'translate(3.725, 2.2)', w: 2 },
                     'redo': { t: 'translate(5.9625, 2.2)', w: 2 }
                 };
-                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(18.5, 4.5) scale(.59) rotate(-15)');
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', `translate(${17.75 + (+puzzleSvg.dataset.extraleft)}, 4.5) scale(.57) rotate(-15)`);
             }
             if (btns)
             {

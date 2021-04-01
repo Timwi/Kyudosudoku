@@ -281,7 +281,7 @@ namespace KyudosudokuWebsite
 
                 for (var adj = 0; adj < 81; adj++)
                 {
-                    if (banned[adj] || !SvgConstraint.Orthogonal(adj).Any(a => sofar[a]) || sofar.Any((b, ix) => b && ix != adj && sudoku[ix] == sudoku[adj]))
+                    if (banned[adj] || !PuzzleUtil.Orthogonal(adj).Any(a => sofar[a]) || sofar.Any((b, ix) => b && ix != adj && sudoku[ix] == sudoku[adj]))
                         continue;
                     sofar[adj] = true;
                     banned[adj] = true;

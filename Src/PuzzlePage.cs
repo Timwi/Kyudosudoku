@@ -91,22 +91,25 @@ namespace KyudosudokuWebsite
                     .Data("progress", userPuzzle.NullOr(up => up.Progess))
                     .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
                     .Data("semitransparentxs", (session?.User?.SemitransparentXs ?? false) ? "1" : "0")
-                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {24 + extraRight} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'
+                    ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {23.25 + extraRight + extraLeft} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'
                                                         data-extratop='{extraTop}' data-extraright='{extraRight}' data-extraleft='{extraLeft}'
                                                         class='puzzle-svg{((session?.User?.SemitransparentXs ?? false) ? " semitransparent-xs" : null)}'>
-                        <filter id='p-{puzzleId}-timer-paused'><feGaussianBlur stdDeviation='.25' /></filter>
+                        <defs>
+                            <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
+                                <stop stop-color='white' stop-opacity='1' offset='0'></stop> 
+                                <stop stop-color='hsl(216, 70%, 75%)' stop-opacity='1' offset='1'></stop> 
+                            </linearGradient>
+                            <filter id='p-{puzzleId}-timer-paused'><feGaussianBlur stdDeviation='.25' /></filter>
+                            {puzzle.Constraints.SelectMany(c => c.SvgDefs).Distinct().JoinString()}
+                        </defs>
                         <g class='full-puzzle'>
                             <g id='p-{puzzleId}-btns-numleft'>{renderButtonArea(buttonsLeft, 8.5)}</g>
-                            <g transform='translate(14, 9.75)'>{renderButtonArea(buttonsRight, 9)}</g>
+                            <g transform='translate({13.25 + extraLeft}, 9.75)'>{renderButtonArea(buttonsRight, 9)}</g>
 
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
-                            <g transform='translate(14, 0)' id='p-{puzzleId}-sudoku'>{sudokuGridSvg(puzzleId, puzzle.Constraints)}</g>
+                            <g transform='translate({13.25 + extraLeft}, 0)' id='p-{puzzleId}-sudoku'>{sudokuGridSvg(puzzleId, puzzle.Constraints)}</g>
 
                             <g transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' id='p-{puzzleId}-solved-sticker'>
-                                <linearGradient id='p-{puzzleId}-gradient' x1='0' y1='-1' x2='0' y2='1' gradientUnits='userSpaceOnUse'>
-                                    <stop stop-color='white' stop-opacity='1' offset='0'></stop> 
-                                    <stop stop-color='hsl(216, 70%, 75%)' stop-opacity='1' offset='1'></stop> 
-                                </linearGradient>
                                 <rect x='-8' y='-1.3' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
                                 <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold'>PUZZLE SOLVED</text>
                                 <g font-size='.45' transform='translate(0, 1)'>
