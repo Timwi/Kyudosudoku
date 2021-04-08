@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using RT.Json;
@@ -19,6 +20,7 @@ namespace KyudosudokuWebsite.Database
         public string ConstraintNames { get; set; }     // for searching/filtering
         public double? AverageTime { get; set; }
         public int? TimeToGenerate { get; set; }
+        public DateTime? Generated { get; set; }
 
         public bool IsSolved(string json)
         {
