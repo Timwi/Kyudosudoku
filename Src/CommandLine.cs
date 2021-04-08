@@ -64,7 +64,9 @@ namespace KyudosudokuWebsite
             Console.WriteLine($"Generating puzzle #{newPuzzleId}");
             var start = DateTime.UtcNow;
             var puzzle = Kyudosudoku.Generate(newPuzzleId);
-            puzzle.SaveToDb(newPuzzleId, (int) (DateTime.UtcNow - start).TotalSeconds);
+            var took = (int) (DateTime.UtcNow - start).TotalSeconds;
+            puzzle.SaveToDb(newPuzzleId, took);
+            Console.WriteLine($"Took {took} seconds.");
             return 0;
         }
     }
