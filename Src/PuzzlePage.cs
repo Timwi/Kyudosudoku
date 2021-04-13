@@ -38,41 +38,41 @@ namespace KyudosudokuWebsite
             var extraRight = puzzle.Constraints.MaxOrDefault(c => c.ExtraRight, 0);
             var extraLeft = puzzle.Constraints.MaxOrDefault(c => c.ExtraLeft, 0);
 
-            var helpSvg = @"<g transform='scale(.008)'>
+            var helpSvg = @"<g transform='translate(.05, .05) scale(.008)'>
                 <path fill='#fcedca' stroke='black' stroke-width='2' d='M12.5 18.16h75v25h-75z'/>
                 <text class='label' x='50' y='33.4' font-size='24' text-anchor='middle' transform='translate(0 5.66)'>???</text>
                 <path fill='white' stroke='black' stroke-width='2' d='M53.238 33.237V73.17l9.513-9.513 7.499 18.106 5.272-2.184-7.38-17.818h13.62z'/>
             </g>";
-            var fillSvg = @"<text x='.4' y='.35' font-size='.25'>Auto</text><text x='.4' y='.6' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
+            var fillSvg = @"<text x='.45' y='.4' font-size='.25'>Auto</text><text x='.45' y='.65' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
 
-            var buttonsRight = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .8, 0))
+            var buttonsRight = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .9, 0))
                 .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
-                    ("Normal", false, "normal", 2.5, 1),
-                    ("Corner", false, "corner", 2.5, 1),
-                    ("Center", false, "center", 2.5, 1),
-                    (fillSvg, true, "fill", .8, 1),
+                    ("Normal", false, "normal", 2.6, 1),
+                    ("Corner", false, "corner", 2.6, 1),
+                    ("Center", false, "center", 2.6, 1),
+                    (fillSvg, true, "fill", .9, 1),
 
-                    ("<path d='m 0.6,0.2 v 0.4 l -0.4,-0.2 z' />", true, "switch", .8, 2),
-                    ("Clear", false, "clear", 2.45, 2),
-                    ("Undo", false, "undo", 2, 2),
-                    ("Redo", false, "redo", 2, 2),
-                    (helpSvg, true, "help", .8, 2)));
+                    ("<path d='m 0.65,0.25 v 0.4 l -0.4,-0.2 z' />", true, "switch", .9, 2),
+                    ("Clear", false, "clear", 2.55, 2),
+                    ("Undo", false, "undo", 2.1, 2),
+                    ("Redo", false, "redo", 2.1, 2),
+                    (helpSvg, true, "help", .9, 2)));
 
-            var buttonsLeft = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, $"{btn + 1}-left", .8, 0))
+            var buttonsLeft = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, $"{btn + 1}-left", .85, 0))
                 .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
-                    ("Clear", false, "clear-left", 2.4, 1),
-                    ("Undo", false, "undo-left", 2.4, 1),
-                    ("Redo", false, "redo-left", 2.4, 1),
-                    ("<path d='m 0.2,0.2 v 0.4 l 0.4,-0.2 z' />", true, "switch-left", .8, 1)));
+                    ("Clear", false, "clear-left", 2.45, 1),
+                    ("Undo", false, "undo-left", 2.45, 1),
+                    ("Redo", false, "redo-left", 2.45, 1),
+                    ("<path d='m 0.25,0.25 v 0.4 l 0.4,-0.2 z' />", true, "switch-left", .9, 1)));
 
             string renderButton(string id, double x, double y, double width, string label, bool isSvg = false) => $@"
                 <g class='button' id='{id}' transform='translate({x}, {y})'>
-                    <rect class='clickable' x='0' y='0' width='{width}' height='.8' stroke-width='.025' rx='.08' ry='.08'/>
-                    {(isSvg ? label : $"<text class='label' x='{width / 2}' y='.6' font-size='.55' text-anchor='middle'>{label}</text>")}
+                    <rect class='clickable' x='0' y='0' width='{width}' height='.9' stroke-width='.025' rx='.08' ry='.08'/>
+                    {(isSvg ? label : $"<text class='label' x='{width / 2}' y='.65' font-size='.55' text-anchor='middle'>{label}</text>")}
                 </g>";
 
             string renderButtonArea((string label, bool isSvg, string id, double width, int row)[] btns, double totalWidth) => btns.GroupBy(g => g.row).SelectMany(row => row.Select((btn, btnIx) =>
-                renderButton($"p-{puzzleId}-btn-{btn.id}", row.Take(btnIx).Sum(b => b.width) + btnIx * ((totalWidth - row.Sum(tup => tup.width)) / (row.Count() - 1)), 1.1 * btn.row, btn.width, btn.label, btn.isSvg))).JoinString();
+                renderButton($"p-{puzzleId}-btn-{btn.id}", row.Take(btnIx).Sum(b => b.width) + btnIx * ((totalWidth - row.Sum(tup => tup.width)) / (row.Count() - 1)), btn.row, btn.width, btn.label, btn.isSvg))).JoinString();
 
             return RenderPage(
                 $"#{puzzleId}",
@@ -104,7 +104,7 @@ namespace KyudosudokuWebsite
                         </defs>
                         <g class='full-puzzle'>
                             <g id='p-{puzzleId}-btns-numleft'>{renderButtonArea(buttonsLeft, 8.5)}</g>
-                            <g transform='translate({13.25 + extraLeft}, 9.75)'>{renderButtonArea(buttonsRight, 9)}</g>
+                            <g transform='translate({13.25 + extraLeft}, 9.85)'>{renderButtonArea(buttonsRight, 9)}</g>
 
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                             <g transform='translate({13.25 + extraLeft}, 0)' id='p-{puzzleId}-sudoku'>{sudokuGridSvg(puzzleId, puzzle.Constraints)}</g>

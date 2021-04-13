@@ -609,6 +609,8 @@
             return true;
         }
 
+        let ctrlPressed = false;
+        let shiftPressed = false;
         function updateVisuals(udpateStorage)
         {
             // Update localStorage (only do this when necessary because encodeState() is relatively slow on Firefox)
@@ -705,13 +707,14 @@
 
                 document.getElementById(`p-${puzzleId}-sudoku-text-${cell}`).textContent = intendedText !== null ? intendedText : '';
                 document.getElementById(`p-${puzzleId}-sudoku-center-text-${cell}`).textContent = intendedCenterDigits !== null ? intendedCenterDigits : '';
-                for (var i = 0; i < 8; i++)
+                for (let i = 0; i < 8; i++)
                     document.getElementById(`p-${puzzleId}-sudoku-corner-text-${cell}-${i}`).textContent = intendedCornerDigits !== null && i < intendedCornerDigits.length ? intendedCornerDigits[i] : '';
             }
 
             // Button highlights
+            let apparentMode = ctrlPressed === shiftPressed ? mode : ctrlPressed ? 'center' : 'corner';
             for (let btn of ["normal", "center", "corner"])
-                setClass(document.getElementById(`p-${puzzleId}-btn-${btn}`), 'selected', mode === btn);
+                setClass(document.getElementById(`p-${puzzleId}-btn-${btn}`), 'selected', apparentMode === btn);
 
             for (let digit = 0; digit < 9; digit++)
             {
@@ -1120,7 +1123,107 @@
             }
         }
 
+        puzzleDiv.onmousedown = function(ev)
+        {
+            if (!ev.shiftKey && !ev.ctrlKey)
+            {
+                selectedCells = [];
+                highlightedDigits = [];
+                updateVisuals();
+                remoteLog2(`onmousedown puzzleDiv`);
+            }
+            else
+                remoteLog2(`onmousedown puzzleDiv (canceled)`);
+        };
+
+        let puzzleSvg = puzzleDiv.getElementsByTagName('svg')[0];
+
+        function setViewBox(left, top, width, height)
+        {
+            puzzleSvg.setAttribute('viewBox', `${left} ${top} ${width} ${height}`);
+        }
+
+        function setView()
+        {
+            let isMobile = (window.innerWidth <= 860);
+
+            let numBarLeft = document.getElementById(`p-${puzzleId}-btns-numleft`);
+            let btns = null;
+            if (!isMobile)
+            {
+                setViewBox(-.5, -.5 - (+puzzleSvg.dataset.extratop), 23.25 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.75 + (+puzzleSvg.dataset.extratop));
+                numBarLeft.setAttribute('transform', 'translate(0, 20)');   // intentionally outside the viewBox
+                document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 20)'); // intentionally outside the viewBox
+                btns = {
+                    'clear': { t: 'translate(0, 2)', w: 2.6 },
+                    'undo': { t: 'translate(2.7, 2)', w: 2.6 },
+                    'redo': { t: 'translate(5.4, 2)', w: 2.6 }
+                };
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', `translate(11.5, 6) rotate(-15)`);
+            }
+            else if (mobileLeft)
+            {
+                setViewBox(-.25, -.25, 13.25, 17);
+                numBarLeft.setAttribute('transform', 'translate(0, 13.75) scale(1.5)');
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(6.375, 6.375) scale(.8) rotate(-15)');
+            }
+            else
+            {
+                setViewBox(13, -.5 - (+puzzleSvg.dataset.extratop), 9.5 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.5 + (+puzzleSvg.dataset.extratop));
+                document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 2)');
+                btns = {
+                    'clear': { t: 'translate(1.0125, 2)', w: 2.55 },
+                    'undo': { t: 'translate(3.675, 2)', w: 2.1 },
+                    'redo': { t: 'translate(5.8875, 2)', w: 2.1 }
+                };
+                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', `translate(${17.75 + (+puzzleSvg.dataset.extraleft)}, 4.5) scale(.57) rotate(-15)`);
+            }
+            if (btns)
+            {
+                for (let k in btns)
+                {
+                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-${k}`).setAttribute('transform', btns[k].t);
+                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-${k}>rect`).setAttribute('width', btns[k].w);
+                    let txt = puzzleDiv.querySelector(`#p-${puzzleId}-btn-${k}>text`);
+                    if (txt)
+                        txt.setAttribute('x', btns[k].w / 2);
+                }
+            }
+
+            // Set the width to 100% in order to measure its height, then dynamically resize if the SVG is too wide.
+            puzzleSvg.style.width = '100vw';
+            puzzleDiv.style.minHeight = '';
+            let puzzleHeight = puzzleDiv.offsetHeight;
+            let availableHeight = window.innerHeight - document.getElementById('topbar').offsetHeight;
+            let warning = document.querySelector('.warning');
+            if (warning !== null)
+                availableHeight -= warning.offsetHeight;
+            if (puzzleHeight > availableHeight)
+            {
+                puzzleDiv.style.display = 'none';
+                puzzleSvg.style.width = `${100 * availableHeight / puzzleHeight}vw`;
+                puzzleDiv.style.display = '';
+            }
+            puzzleDiv.style.minHeight = `calc(100vh - ${isMobile ? 1 : 2}cm)`;
+        };
+
+        window.addEventListener('resize', setView);
+
         let keepMove = false;
+        puzzleDiv.addEventListener("keyup", ev =>
+        {
+            switch (ev.key)
+            {
+                case 'Shift':
+                    shiftPressed = false;
+                    updateVisuals(false);
+                    break;
+                case 'Control':
+                    ctrlPressed = false;
+                    updateVisuals(false);
+                    break;
+            }
+        });
         puzzleDiv.addEventListener("keydown", ev =>
         {
             let str = ev.code;
@@ -1229,7 +1332,6 @@
                 case 'Ctrl+ArrowDown': ArrowMovement(0, 1, 'move'); break;
                 case 'Ctrl+ArrowLeft': ArrowMovement(-1, 0, 'move'); break;
                 case 'Ctrl+ArrowRight': ArrowMovement(1, 0, 'move'); break;
-                case 'Ctrl+ControlLeft': case 'Ctrl+ControlRight': keepMove = true; break;
                 case 'Ctrl+Space':
                     if (highlightedDigits.length > 0)
                     {
@@ -1245,7 +1347,21 @@
                         keepMove = !keepMove;
                     updateVisuals();
                     break;
-                case 'Escape': selectedCells = []; highlightedDigits = []; updateVisuals(); break;
+
+                case 'Escape':
+                    selectedCells = [];
+                    highlightedDigits = [];
+                    updateVisuals();
+                    break;
+                case 'Ctrl+ControlLeft': case 'Ctrl+ControlRight':
+                    keepMove = true;
+                    ctrlPressed = true;
+                    updateVisuals();
+                    break;
+                case 'Shift+ShiftLeft': case 'Shift+ShiftRight':
+                    shiftPressed = true;
+                    updateVisuals();
+                    break;
 
                 // Undo/redo
                 case 'Backspace':
@@ -1265,7 +1381,7 @@
 
                 default:
                     anyFunction = false;
-                    console.log(str, ev.code);
+                    console.log(`${str} / ${ev.code}`);
                     break;
             }
 
@@ -1276,92 +1392,6 @@
                 return false;
             }
         });
-
-        puzzleDiv.onmousedown = function(ev)
-        {
-            if (!ev.shiftKey && !ev.ctrlKey)
-            {
-                selectedCells = [];
-                highlightedDigits = [];
-                updateVisuals();
-                remoteLog2(`onmousedown puzzleDiv`);
-            }
-            else
-                remoteLog2(`onmousedown puzzleDiv (canceled)`);
-        };
-
-        let puzzleSvg = puzzleDiv.getElementsByTagName('svg')[0];
-
-        function setViewBox(left, top, width, height)
-        {
-            puzzleSvg.setAttribute('viewBox', `${left} ${top} ${width} ${height}`);
-        }
-
-        function setView()
-        {
-            let isMobile = (window.innerWidth <= 860);
-
-            let numBarLeft = document.getElementById(`p-${puzzleId}-btns-numleft`);
-            let btns = null;
-            if (!isMobile)
-            {
-                setViewBox(-.5, -.5 - (+puzzleSvg.dataset.extratop), 23.25 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.75 + (+puzzleSvg.dataset.extratop));
-                numBarLeft.setAttribute('transform', 'translate(0, 20)');   // intentionally outside the viewBox
-                document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 20)'); // intentionally outside the viewBox
-                btns = {
-                    'clear': { t: 'translate(0, 2.2)', w: 2.5 },
-                    'undo': { t: 'translate(2.73, 2.2)', w: 2.5 },
-                    'redo': { t: 'translate(5.47, 2.2)', w: 2.5 }
-                };
-                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', `translate(11.5, 6) rotate(-15)`);
-            }
-            else if (mobileLeft)
-            {
-                setViewBox(-.25, -.25, 13.25, 17);
-                numBarLeft.setAttribute('transform', 'translate(0, 13.75) scale(1.5)');
-                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', 'translate(6.375, 6.375) scale(.8) rotate(-15)');
-            }
-            else
-            {
-                setViewBox(13, -.5 - (+puzzleSvg.dataset.extratop), 9.5 + (+puzzleSvg.dataset.extraleft) + (+puzzleSvg.dataset.extraright), 13.5 + (+puzzleSvg.dataset.extratop));
-                document.getElementById(`p-${puzzleId}-btn-switch`).setAttribute('transform', 'translate(0, 2.2)');
-                btns = {
-                    'clear': { t: 'translate(1.0375, 2.2)', w: 2.45 },
-                    'undo': { t: 'translate(3.725, 2.2)', w: 2 },
-                    'redo': { t: 'translate(5.9625, 2.2)', w: 2 }
-                };
-                document.getElementById(`p-${puzzleId}-solved-sticker`).setAttribute('transform', `translate(${17.75 + (+puzzleSvg.dataset.extraleft)}, 4.5) scale(.57) rotate(-15)`);
-            }
-            if (btns)
-            {
-                for (let k in btns)
-                {
-                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-${k}`).setAttribute('transform', btns[k].t);
-                    puzzleDiv.querySelector(`#p-${puzzleId}-btn-${k}>rect`).setAttribute('width', btns[k].w);
-                    let txt = puzzleDiv.querySelector(`#p-${puzzleId}-btn-${k}>text`);
-                    if (txt)
-                        txt.setAttribute('x', btns[k].w / 2);
-                }
-            }
-
-            // Set the width to 100% in order to measure its height, then dynamically resize if the SVG is too wide.
-            puzzleSvg.style.width = '100vw';
-            puzzleDiv.style.minHeight = '';
-            let puzzleHeight = puzzleDiv.offsetHeight;
-            let availableHeight = window.innerHeight - document.getElementById('topbar').offsetHeight;
-            let warning = document.querySelector('.warning');
-            if (warning !== null)
-                availableHeight -= warning.offsetHeight;
-            if (puzzleHeight > availableHeight)
-            {
-                puzzleDiv.style.display = 'none';
-                puzzleSvg.style.width = `${100 * availableHeight / puzzleHeight}vw`;
-                puzzleDiv.style.display = '';
-            }
-            puzzleDiv.style.minHeight = `calc(100vh - ${isMobile ? 1 : 2}cm)`;
-        };
-
-        window.addEventListener('resize', setView);
     });
 
     window.setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 1);
