@@ -314,7 +314,7 @@
             centerNotation: Array(81).fill(null).map(_ => []),
             enteredDigits: Array(81).fill(null)
         };
-        let undoBuffer = [JSON.parse(JSON.stringify(state))];
+        let undoBuffer = [encodeState(state)];
         let redoBuffer = [];
 
         let mode = 'normal';
@@ -443,14 +443,14 @@
             let undoB = localStorage.getItem(`ky${puzzleId}-undo`);
             let redoB = localStorage.getItem(`ky${puzzleId}-redo`);
 
-            undoBuffer = undoB ? undoB.split(' ').map(decodeState) : [JSON.parse(JSON.stringify(state))];
-            redoBuffer = redoB ? redoB.split(' ').map(decodeState) : [];
+            undoBuffer = undoB ? undoB.split(' ') : [encodeState(state)];
+            redoBuffer = redoB ? redoB.split(' ') : [];
 
             let item = null;
             if (puzzleDiv.dataset.progress)
             {
                 item = JSON.parse(puzzleDiv.dataset.progress);
-                if (undoB && undoB.includes(encodeState(item)))
+                if (undoBuffer && undoBuffer.includes(encodeState(item)))
                     item = null;
             }
 
@@ -617,8 +617,8 @@
             if (localStorage && udpateStorage)
             {
                 localStorage.setItem(`ky${puzzleId}`, encodeState(state));
-                localStorage.setItem(`ky${puzzleId}-undo`, undoBuffer.map(encodeState).join(' '));
-                localStorage.setItem(`ky${puzzleId}-redo`, redoBuffer.map(encodeState).join(' '));
+                localStorage.setItem(`ky${puzzleId}-undo`, undoBuffer.join(' '));
+                localStorage.setItem(`ky${puzzleId}-redo`, redoBuffer.join(' '));
             }
             resetClearButton();
 
@@ -730,7 +730,7 @@
 
         function saveUndo()
         {
-            undoBuffer.push(JSON.parse(JSON.stringify(state)));
+            undoBuffer.push(encodeState(state));
             redoBuffer = [];
         }
 
@@ -738,9 +738,9 @@
         {
             if (undoBuffer.length > 0)
             {
-                redoBuffer.push(state);
+                redoBuffer.push(encodeState(state));
                 var item = undoBuffer.pop();
-                state = item;
+                state = decodeState(item);
                 updateVisuals(true);
             }
         }
@@ -749,9 +749,9 @@
         {
             if (redoBuffer.length > 0)
             {
-                undoBuffer.push(state);
+                undoBuffer.push(encodeState(state));
                 var item = redoBuffer.pop();
-                state = item;
+                state = decodeState(item);
                 updateVisuals(true);
             }
         }
