@@ -1085,8 +1085,8 @@
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`), redo);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo-left>rect`), redo);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-fill>rect`), autofill);
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch>rect`), function() { mobileLeft = !mobileLeft; setView(); });
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch-left>rect`), function() { mobileLeft = !mobileLeft; setView(); });
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch>rect`), function() { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch-left>rect`), function() { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
 
         function selectCell(cell, mode)
         {
