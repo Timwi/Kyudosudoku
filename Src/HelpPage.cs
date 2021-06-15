@@ -32,10 +32,10 @@ namespace KyudosudokuWebsite
 
             return RenderPage("How to play Kyudosudoku", session.User, new PageOptions { AddFooter = true, Db = db },
                 new DIV { class_ = "main" }._(
-                    new P { class_ = "jump" }._("Jump to: ", new A { href = "#rules" }._("Rules"), " | ", new A { href = "#constraints" }._("Constraints"), " | ", new A { href = "#controls" }._("Controls"), " | ", new A { href = "#strategies" }._("Common strategies")),
+                    new P { class_ = "jump" }._("Jump to: ", new A { href = "#rules" }._("Rules"), " | ", new A { href = "#controls" }._("Controls"), " | ", new A { href = "#strategies" }._("Common strategies")),
                     new H1 { id = "rules" }._("Rules of Kyudosudoku"),
                     new P("Kyudosudoku is a logic puzzle that combines Kyudoku with variety Sudoku."),
-                    new P("Each puzzle consists of four 6×6 grids filled with digits 1–9, which we will call the ", new CITE("Kyudoku grids"), ", and a blank 9×9 grid, the ", new CITE("Sudoku grid"), ", usually with some extra graphics in or around it."),
+                    new P("Each puzzle consists of four 6×6 grids filled with digits 1–9 — the ", new CITE("Kyudoku grids"), " — and a blank 9×9 grid, the ", new CITE("Sudoku grid"), ", often with some extra graphics in or around it."),
                     new H2("The Kyudoku part"),
                     new P("In each Kyudoku grid, exactly one of each digit 1–9 must be circled in such a way that the circled digits in each row or column never add up to more than 9."),
                     new TABLE { style = "width:100%", class_ = "examples" }._(
@@ -45,51 +45,27 @@ namespace KyudosudokuWebsite
                         new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: false, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 30, 31 })), new TD(new P("Valid example.")))),
                     new H2("The Sudoku part"),
                     new P("The Sudoku grid must be filled with digits 1–9 in such a way that every row, every column and every outlined 3×3 box contains the digits 1–9 exactly once."),
-                    new P("Furthermore, each Kyudoku grid is linked with a 6×6 “corner” of the Sudoku grid (the coloring helps to visualize this). Every circled digit in a Kyudoku grid transfers that digit to the equivalent location on the Sudoku grid."),
+                    new P("Furthermore, each Kyudoku grid is linked with a 6×6 “corner” of the Sudoku grid (the coloring helps to visualize this). Every circled digit in a Kyudoku grid transfers that digit to the equivalent location on the Sudoku grid, as shown below:"),
+                    new P(new RawTag($@"<svg viewBox='-.25 -.25 23 13.25' font-family='Bitter' font-size='.65' text-anchor='middle'>
+                        <defs><marker id='marker4663' orient='auto' overflow='visible'><path fill='#e33838' d='M-1.926-1.21L1.352-.005l-3.278 1.206a2.05 2.05 0 000-2.411z'/></marker></defs>
+                        {kyudokuGridSvg(0, 0, "273651445176484965991291788391968623".Select(ch => ch - '0').ToArray(), circled: new[] { 18 })}
+                        {kyudokuGridSvg(1, 0, "713137114328375481938675988428919599".Select(ch => ch - '0').ToArray(), circled: new[] { 25 })}
+                        {kyudokuGridSvg(2, 0, "331754629723365946582838679862457848".Select(ch => ch - '0').ToArray(), circled: new[] { 35 })}
+                        {kyudokuGridSvg(3, 0, "428935481829776637922249136259183762".Select(ch => ch - '0').ToArray(), circled: new[] { 13 })}
+                        <g transform='translate(13.5, 0)'>{sudokuGridSvg(0, Enumerable.Empty<SvgConstraint>(), forHelpPage: true, givens: new Dictionary<int, int?> { [27] = 9, [40] = 8, [77] = 8, [49] = 7 })}</g>
+                        <g fill='none' stroke='#e33838' stroke-width='.3' transform='translate(-.25 -.25)'>
+                            <path marker-end='url(#marker4663)' d='M1.46 3.45c4.028-1.6 8.054-1.6 12.081.001'/>
+                            <path marker-end='url(#marker4663)' d='M9.242 4.592a21.327 21.327 0 018.264 0'/>
+                            <path marker-end='url(#marker4663)' d='M9.063 8.967c2.43-2.17 5.232-3.078 8.405-3.202'/>
+                            <path marker-end='url(#marker4663)' d='M6.36 12.076c3.49-2.294 8.082-3.221 12.17-3.317'/>
+                        </g>
+                    </svg>")),
+                    new P("Note that the same is not true in reverse. If a digit you place in the Sudoku matches the corresponding digit in a Kyudoku grid, it does not necessarily follow that the digit must be circled. Similarly, a crossed-out digit in a Kyudoku grid does not necessarily imply that the corresponding Sudoku cell can’t have that digit in it."),
                     new P("Each Kyudoku grid in isolation may not have a unique solution, but there is only one way to solve the entire puzzle."),
                     new H2 { id = "constraints" }._("Variety Sudoku constraints"),
-                    new P("Each puzzle may have additional graphics in the Sudoku grid, which represent additional constraints that must be followed in order to arrive at the correct solution."),
-                    new P("These are explained in-game with a tooltip (which you can turn on and off by toggling the tooltip button). For the curious, here is a complete list of them."),
-                    renderExamples(
-                        // Single cells
-                        OddEven.Example,
-                        AntiBishop.Example,
-                        AntiKnight.Example,
-                        AntiKing.Example,
-                        NoConsecutive.Example,
-                        MaximumCell.Example,
-                        FindThe9.Example,
-
-                        // Two cells
-                        ConsecutiveNeighbors.Example,
-                        DoubleNeighbors.Example,
-
-                        // Four cells
-                        Clockface.Example,
-                        Inclusion.Example,
-                        Battenburg.Example,
-
-                        // Regions
-                        KillerCage.Example,
-                        RenbanCage.Example,
-                        Thermometer.Example,
-                        Arrow.Example,
-                        Palindrome.Example,
-                        CappedLine.Example,
-                        Snowball.Example,
-
-                        // Rows/columns
-                        Sandwich.Example,
-                        ToroidalSandwich.Example,
-                        Skyscraper.Example,
-                        Battlefield.Example,
-                        Binairo.Example,
-                        XSum.Example,
-                        YSum.Example,
-
-                        // Other
-                        LittleKiller.Example
-                    ),
+                    new P("Each puzzle may have additional graphics in or around the Sudoku grid, which represent additional constraints that must be followed in order to arrive at the correct solution."),
+                    new P("These are explained in-game with a tooltip (which you can turn on and off by toggling the tooltip button)."),
+                    new P(new A { href = "constraints", style = "font-weight: bold" }._("Complete list of variety constraints")),
 
                     new H1 { id = "controls" }._("Controls"),
                     new H2("Keyboard"),
@@ -140,6 +116,56 @@ namespace KyudosudokuWebsite
 
                     new P("These strategies should get you through some of the easiest puzzles. For some of the harder puzzles, many more advanced strategies can be discovered."),
                     new P("Enjoy!")));
+        });
+
+        private HttpResponse constraintsPage(HttpRequest req) => withSession(req, (session, db) =>
+        {
+            return RenderPage("How to play Kyudosudoku", session.User, new PageOptions { AddFooter = true, Db = db },
+                new DIV { class_ = "main" }._(
+                    new H1("Variety Sudoku constraints"),
+                    new P("Each puzzle may have additional graphics in or around the Sudoku grid, which represent additional constraints that must be followed in order to arrive at the correct solution."),
+                    new P("These are explained in-game with a tooltip (which you can turn on and off by toggling the tooltip button). For the curious, here is a complete list of them."),
+                    renderExamples(
+                        // Single cells
+                        OddEven.Example,
+                        AntiBishop.Example,
+                        AntiKnight.Example,
+                        AntiKing.Example,
+                        NoConsecutive.Example,
+                        MaximumCell.Example,
+                        FindThe9.Example,
+
+                        // Two cells
+                        ConsecutiveNeighbors.Example,
+                        DoubleNeighbors.Example,
+
+                        // Four cells
+                        Clockface.Example,
+                        Inclusion.Example,
+                        Battenburg.Example,
+
+                        // Regions
+                        KillerCage.Example,
+                        RenbanCage.Example,
+                        Thermometer.Example,
+                        Arrow.Example,
+                        Palindrome.Example,
+                        CappedLine.Example,
+                        Snowball.Example,
+
+                        // Other
+                        LittleKiller.Example,
+
+                        // Rows/columns
+                        Sandwich.Example,
+                        ToroidalSandwich.Example,
+                        Skyscraper.Example,
+                        SkyscraperSum.Example,
+                        Battlefield.Example,
+                        Binairo.Example,
+                        XSum.Example,
+                        YSum.Example
+                    )));
         });
 
         private IEnumerable<object> renderExamples(params Example[] examples)

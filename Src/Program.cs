@@ -128,33 +128,52 @@ namespace KyudosudokuWebsite
             var lockObj = new object();
 
             Db.ConnectionString = @"Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;";
-            var notFound = new HashSet<string> { "YSum" };
-            Enumerable.Range(192, 1000).ParallelForEach(Environment.ProcessorCount, seed =>
+            //var notFound = new HashSet<string> { "SkyscraperSum" };
+            var stats = new Dictionary<string, int>();
+            Enumerable.Range(2000, 3000).ParallelForEach(Environment.ProcessorCount, (seed, ix) =>
             {
-                using (var db = new Db())
-                    if (db.Puzzles.Any(p => p.PuzzleID == seed))
-                        return;
-                lock (lockObj)
+                try
                 {
-                    if (notFound.Count == 0)
-                        return;
-                    Console.WriteLine(seed);
-                }
-                var puz = Kyudosudoku.Generate(seed);
-                lock (lockObj)
-                {
-                    if (notFound.Count == 0)
-                        return;
-                    foreach (var lk in puz.Constraints)
+                    using (var db = new Db())
+                        if (db.Puzzles.Any(p => p.PuzzleID == seed))
+                            return;
+                    lock (lockObj)
                     {
-                        var str = lk.GetType().Name;
-                        if (notFound.Contains(str))
-                        {
-                            puz.SaveToDb(seed, null);
-                            ConsoleUtil.WriteLine($" — {seed} has {str}".Color(ConsoleColor.White, ConsoleColor.DarkGreen));
-                            notFound.Remove(str);
-                        }
+                        //if (notFound.Count == 0)
+                        //    return;
+                        Console.CursorTop = 0;
+                        Console.CursorLeft = 6 * ix;
+                        Console.Write(seed);
                     }
+                    var start = DateTime.UtcNow;
+                    var puz = Kyudosudoku.Generate(seed);
+                    var took = (DateTime.UtcNow - start).TotalSeconds;
+                    lock (lockObj)
+                    {
+                        foreach (var lk in puz.Constraints)
+                        {
+                            var str = lk.GetType().Name;
+                            stats.IncSafe(str);
+                            //if (notFound.Contains(str))
+                            //{
+                            //    puz.SaveToDb(seed, null);
+                            //    ConsoleUtil.WriteLine($" — {seed} has {str}".Color(ConsoleColor.White, ConsoleColor.DarkGreen));
+                            //    notFound.Remove(str);
+                            //}
+                        }
+                        Console.CursorTop = 2;
+                        Console.CursorLeft = 0;
+                        foreach (var kvp in stats.OrderByDescending(kvp => kvp.Value))
+                            Console.WriteLine($"{kvp.Key} = {kvp.Value}{new string(' ', 100)}");
+                        //if (notFound.Count == 0)
+                        //    return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    lock (lockObj)
+                        Console.WriteLine($"{seed}: {e.Message} ({e.GetType().FullName})".Color(ConsoleColor.Red));
+                    throw;
                 }
             });
 

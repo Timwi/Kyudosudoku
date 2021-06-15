@@ -223,12 +223,12 @@ namespace KyudosudokuWebsite
                 (null, OddEven.Generate),
 
                 // Area constraints
-                (25, Arrow.Generate),
+                (20, Arrow.Generate),
                 (20, s => KillerCage.Generate(s, uniquenessRegions)),
                 (15, Palindrome.Generate),
                 (20, CappedLine.Generate),
                 (20, s => RenbanCage.Generate(s, uniquenessRegions)),
-                (20, Snowball.Generate),
+                (17, Snowball.Generate),
                 (30, Thermometer.Generate),
 
                 // Row/column constraints
@@ -236,9 +236,10 @@ namespace KyudosudokuWebsite
                 (null, SvgPuzzleConstraints.Binairo.Generate),
                 (20, Sandwich.Generate),
                 (47, Skyscraper.Generate),
+                (20, SkyscraperSum.Generate),
                 (20, ToroidalSandwich.Generate),
                 (20, XSum.Generate),
-                (20, YSum.Generate),
+                (15, YSum.Generate),
 
                 // Four-cell constraints
                 (50, Clockface.Generate),
