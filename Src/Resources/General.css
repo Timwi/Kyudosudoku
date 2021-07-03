@@ -514,7 +514,7 @@ svg {
     .choice > a {
         display: inline-block;
         width: 3.9cm;
-        height: 4.75cm;
+        height: 5cm;
         margin: 0;
     }
 
@@ -538,6 +538,10 @@ svg {
                     height: .4cm;
                     top: -.03cm;
                 }
+
+        .choice > a > .constraints {
+            font-size: 8pt;
+        }
 
     #footer {
         font-size: 8pt;
