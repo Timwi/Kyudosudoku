@@ -1,4 +1,4 @@
-﻿window.onload = (function()
+﻿window.onload = (function ()
 {
     function remoteLog(msg)
     {
@@ -269,7 +269,7 @@
 
     function handler(fnc)
     {
-        return function(ev)
+        return function (ev)
         {
             fnc(ev);
             ev.stopPropagation();
@@ -288,7 +288,7 @@
 
     let first = true;
     let draggingMode = null;
-    document.body.onmouseup = handler(document.body.ontouchend = function(ev)
+    document.body.onmouseup = handler(document.body.ontouchend = function (ev)
     {
         if (ev.type !== 'touchend' || ev.touches.length === 0)
             draggingMode = null;
@@ -479,7 +479,7 @@
             req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             req.send(`progress=${encodeURIComponent(JSON.stringify(state))}&time=${Math.round((new Date() - timeLastDbUpdate) / 1000)}${isSolved ? '&getdata=1' : ''}`);
             let reqStart = new Date();
-            req.onload = function()
+            req.onload = function ()
             {
                 var json = req.responseText ? JSON.parse(req.responseText) : null;
                 if (json)
@@ -508,14 +508,14 @@
                 clearInterval(dbUpdater);
                 dbUpdater = null;
                 puzzleDiv.querySelector('.full-puzzle').style.filter = `url(#p-${puzzleId}-timer-paused)`;
-                puzzleDiv.querySelector('.timer-paused').style.opacity = '1';
+                puzzleDiv.querySelector('.timer-paused').style.visibility = 'visible';
             }
             else if (!document.hidden && dbUpdater === null)
             {
                 timeLastDbUpdate = new Date();
                 dbUpdater = setInterval(dbUpdate, 10000);
                 puzzleDiv.querySelector('.full-puzzle').style.filter = null;
-                puzzleDiv.querySelector('.timer-paused').style.opacity = '0';
+                puzzleDiv.querySelector('.timer-paused').style.visibility = 'hidden';
             }
         }
         document.addEventListener('visibilitychange', timerChanger);
@@ -880,9 +880,9 @@
                 updateVisuals(true);
             };
             cellRect.onclick = handler(doClick);
-            cellRect.onmousedown = handler(function() { });
-            cellRect.onmouseenter = function() { hoveredKyDigit = [corner, cell]; };
-            cellRect.onmouseout = function() { hoveredKyDigit = null; };
+            cellRect.onmousedown = handler(function () { });
+            cellRect.onmouseenter = function () { hoveredKyDigit = [corner, cell]; };
+            cellRect.onmouseout = function () { hoveredKyDigit = null; };
             cellRect.ontouchend = handler(doClick);
         });
 
@@ -899,8 +899,8 @@
         Array.from(puzzleDiv.getElementsByClassName('sudoku-cell')).forEach(cellRect =>
         {
             let cell = parseInt(cellRect.dataset.cell);
-            cellRect.onclick = handler(function() { remoteLog2(`onclick ${cell}`); });
-            cellRect.onmousedown = cellRect.ontouchstart = handler(function(ev)
+            cellRect.onclick = handler(function () { remoteLog2(`onclick ${cell}`); });
+            cellRect.onmousedown = cellRect.ontouchstart = handler(function (ev)
             {
                 if (draggingMode !== null)
                 {
@@ -914,7 +914,7 @@
                 updateVisuals();
                 remoteLog2(`${ev.type} ${cell} (${ev.x}, ${ev.y})`);
             });
-            cellRect.onmousemove = function(ev)
+            cellRect.onmousemove = function (ev)
             {
                 if (draggingMode === null)
                 {
@@ -925,7 +925,7 @@
                 updateVisuals();
                 remoteLog2(`onmousemove ${cell} (${ev.x}, ${ev.y})`);
             };
-            cellRect.ontouchmove = function(ev)
+            cellRect.ontouchmove = function (ev)
             {
                 if (draggingMode === null)
                 {
@@ -951,7 +951,7 @@
         Array.from(puzzleDiv.getElementsByClassName('has-tooltip')).forEach(rect =>
         {
             rect.onmouseout = handler(clearTooltip);
-            rect.onmouseenter = function()
+            rect.onmouseenter = function ()
             {
                 if (!helpEnabled || !rect.dataset.description)
                     return;
@@ -1012,22 +1012,22 @@
         function setButtonHandler(btn, click)
         {
             btn.onclick = handler(ev => click(ev));
-            btn.onmousedown = handler(function() { });
+            btn.onmousedown = handler(function () { });
         }
 
         Array(9).fill(null).forEach((_, btn) =>
         {
-            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}`), function(ev) { pressDigit(btn + 1, ev); });
-            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}-left`), function(ev) { pressDigit(btn + 1, ev); });
+            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}`), function (ev) { pressDigit(btn + 1, ev); });
+            setButtonHandler(document.getElementById(`p-${puzzleId}-btn-${btn + 1}-left`), function (ev) { pressDigit(btn + 1, ev); });
         });
 
-        ["normal", "corner", "center"].forEach(btn => setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-${btn}>rect`), function()
+        ["normal", "corner", "center"].forEach(btn => setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-${btn}>rect`), function ()
         {
             mode = btn;
             updateVisuals();
         }));
 
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-help>rect`), function()
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-help>rect`), function ()
         {
             helpEnabled = !helpEnabled;
             updateVisuals();
@@ -1054,7 +1054,7 @@
 
         ['', '-left'].forEach(xtr =>
         {
-            setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-clear${xtr}>rect`), function()
+            setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-clear${xtr}>rect`), function ()
             {
                 let elem = document.getElementById(`p-${puzzleId}-btn-clear`);
                 if (!elem.classList.contains('warning'))
@@ -1085,8 +1085,8 @@
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`), redo);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo-left>rect`), redo);
         setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-fill>rect`), autofill);
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch>rect`), function() { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
-        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch-left>rect`), function() { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch>rect`), function () { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
+        setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch-left>rect`), function () { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
 
         function selectCell(cell, mode)
         {
@@ -1123,7 +1123,7 @@
             }
         }
 
-        puzzleDiv.onmousedown = function(ev)
+        puzzleDiv.onmousedown = function (ev)
         {
             if (!ev.shiftKey && !ev.ctrlKey)
             {
@@ -1394,5 +1394,5 @@
         });
     });
 
-    window.setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 1);
+    window.setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 1);
 });

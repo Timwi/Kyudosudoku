@@ -89,6 +89,10 @@
             stroke: #0f0;
         }
 
+.timer-paused {
+    visibility: hidden;
+}
+
 @media only screen and (max-width: 860px) {
     body.is-puzzle #topbar .home {
         padding-top: .08cm;
