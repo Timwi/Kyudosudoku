@@ -21,7 +21,7 @@
     }
 
         .puzzle svg .solve-glow {
-            opacity: 0;
+            visibility: hidden;
         }
 
         .puzzle svg * {
@@ -69,7 +69,7 @@
         }
 
         .puzzle svg .solved-sticker {
-            opacity: 0;
+            visibility: hidden;
         }
 
     .puzzle.solved {
@@ -77,11 +77,15 @@
     }
 
         .puzzle.solved svg .solved-sticker {
-            opacity: 1;
+            visibility: visible;
+        }
+
+        .puzzle.solved.no-solve-time svg .solve-time, .puzzle.solved:not(.no-solve-time) svg .no-solve-time {
+            visibility: hidden;
         }
 
         .puzzle.solved svg .solve-glow.frame {
-            opacity: 1;
+            visibility: visible;
             stroke: #0f0;
         }
 

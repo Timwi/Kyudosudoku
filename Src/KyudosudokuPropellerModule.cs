@@ -52,7 +52,7 @@ namespace KyudosudokuWebsite
         private UrlResolver getAuthResolver()
         {
             var resolver = new UrlResolver(
-                new UrlMapping(path: "", specificPath: true, handler: req => authPage(req)),
+                new UrlMapping(path: "", specificPath: true, handler: authPage),
                 new UrlMapping(path: "/register", specificPath: true, handler: req => register(req, req.Url.WithPathParent().WithPathOnly(""))),
                 new UrlMapping(path: "/login", specificPath: true, handler: req => login(req, req.Url.WithPathParent().WithPathOnly(""))),
                 new UrlMapping(path: "/logout", specificPath: true, handler: req => logout(req, req.Url.WithPathParent().WithPathOnly(""))),

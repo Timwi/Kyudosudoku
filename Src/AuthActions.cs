@@ -51,7 +51,8 @@ namespace KyudosudokuWebsite
                 EmailAddress = string.IsNullOrWhiteSpace(req.Post["email"].Value) ? null : req.Post["email"].Value,
                 PasswordHash = createPasswordHash(password),
                 ShowErrors = true,
-                SemitransparentXs = false
+                SemitransparentXs = false,
+                ShowSolveTime = true
             });
             db.SaveChanges();
             session.User = newUser;
@@ -110,7 +111,8 @@ namespace KyudosudokuWebsite
             var changingGameOptions = false;
             foreach (var (curVal, setter, key) in Ut.NewArray<(bool curVal, Action<bool> setter, string key)>(
                 (session.User.ShowErrors, v => { session.User.ShowErrors = v; }, "opt-show-errors"),
-                (session.User.SemitransparentXs, v => { session.User.SemitransparentXs = v; }, "opt-semitransparent-xs")
+                (session.User.SemitransparentXs, v => { session.User.SemitransparentXs = v; }, "opt-semitransparent-xs"),
+                (session.User.ShowSolveTime, v => { session.User.ShowSolveTime = v; }, "opt-show-solve-time")
             ))
             {
                 var newVal = req.Post[key].Value == "1";

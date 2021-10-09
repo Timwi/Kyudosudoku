@@ -330,15 +330,15 @@ svg {
 }
 
     svg .cell > .circle, svg .cell > .x {
-        opacity: 0;
+        visibility: hidden;
     }
 
     svg .cell.circled > .circle {
-        opacity: 1;
+        visibility: visible;
     }
 
     svg .cell.xed > .x {
-        opacity: 1;
+        visibility: visible;
     }
 
     svg.semitransparent-xs .cell.xed > .x {
@@ -438,12 +438,12 @@ svg {
     }
 
     svg .frame.invalid {
-        opacity: 1;
+        visibility: visible;
         stroke: #f00;
     }
 
     svg .frame.solved {
-        opacity: 1;
+        visibility: visible;
         stroke: #0f0;
     }
 

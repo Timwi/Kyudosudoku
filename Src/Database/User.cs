@@ -13,5 +13,6 @@ namespace KyudosudokuWebsite.Database
         // Game options
         public bool ShowErrors { get; set; }
         public bool SemitransparentXs { get; set; }
+        public bool ShowSolveTime { get; set; }
     }
 }

@@ -84,7 +84,7 @@ namespace KyudosudokuWebsite
                     Resources = { Resource.PuzzleJs, Resource.PuzzleCss }
                 },
                 session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve solved."),
-                new DIV { class_ = "puzzle", tabindex = 0 }
+                new DIV { class_ = $"puzzle{((session?.User?.ShowSolveTime ?? true) ? "" : " no-solve-time")}", tabindex = 0 }
                     .Data("puzzleid", puzzleId)
                     .Data("kyudokus", dbPuzzle.KyudokuGrids)
                     .Data("constraints", dbPuzzle.Constraints)
@@ -112,13 +112,16 @@ namespace KyudosudokuWebsite
                             <g transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' id='p-{puzzleId}-solved-sticker'>
                                 <rect x='-8' y='-1.3' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
                                 <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold'>PUZZLE SOLVED</text>
-                                <g font-size='.45' transform='translate(0, 1)'>
+                                <g font-size='.45' transform='translate(0, 1)' class='solve-time'>
                                     <text text-anchor='start' x='-7.7' y='0'>Solved:</text>
                                     <text class='inf-count' text-anchor='start' x='-6.1' y='0' font-weight='bold'></text>
                                     <text text-anchor='start' x='-4' y='0'>Your time:</text>
                                     <text class='inf-time' text-anchor='start' x='-1.7' y='0' font-weight='bold'></text>
                                     <text text-anchor='start' x='2.05' y='0'>Average:</text>
                                     <text class='inf-avg' text-anchor='start' x='4' y='0' font-weight='bold'></text>
+                                </g>
+                                <g font-size='.45' transform='translate(0, 1)' class='no-solve-time'>
+                                    <text text-anchor='middle' x='0' y='0' font-weight='bold'>Congratulations!</text>
                                 </g>
                             </g>
                         </g>
