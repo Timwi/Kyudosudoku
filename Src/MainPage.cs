@@ -52,7 +52,7 @@ namespace KyudosudokuWebsite
             return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db },
                 new DIV { class_ = "main" }._(
                     session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " Your puzzle progress is only saved to your local browser. If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve already solved."),
-                    _news.FirstOrDefault().NullOr(n => new DIV { id = "news" }._(new DIV { class_ = "date" }._(n.Date.ToString("yyyy-MMM-dd")), new DIV { class_ = "title" }._(new A { href = "/news" }._(n.Title)))),
+                    _news.FirstOrDefault(n => (DateTime.UtcNow - n.Date).TotalDays < 30).NullOr(n => new DIV { id = "news" }._(new DIV { class_ = "date" }._(n.Date.ToString("yyyy-MMM-dd")), new DIV { class_ = "title" }._(new A { href = "/news" }._(n.Title)))),
                     new H1("Try these puzzles:"),
                     new DIV { class_ = "choice" }._(showUnsolvedPuzzles.Select(puzzleBox)),
                     unfinishedPuzzles.Length == 0 ? null : Ut.NewArray<object>(
