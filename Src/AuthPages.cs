@@ -31,6 +31,37 @@ namespace KyudosudokuWebsite
                         new TR(new TD(new LABEL { for_ = "register-email", accesskey = "e" }._("Email address: ".Accel('E'))), new TD(new INPUT { id = "register-email", name = "email", type = itype.text, value = req?.Post["email"].Value }, " (this is not used for anything right now, no emails are sent to this)")),
                         new TR(new TD(new BUTTON { type = btype.submit, accesskey = "r" }._("Register".Accel('R'))))))));
 
+        /*
+            USER PAGE accesskeys
+			A =
+			B =
+			C =
+			D =
+			E = Email address
+			F =
+			G =
+			H =
+			I =
+			J =
+			K =
+			L = Play sound when constraint is violated
+			M =
+			N = Username
+			O = Log out
+			P = Old password
+			Q =
+			R =
+			S = Show red glow
+			T = Show time at end of puzzle
+			U = Update (submit button)
+			V =
+			W =
+			X = Semitransparent X’s
+			Y =
+			Z =
+        	1 = Password 1
+        	2 = Password 2
+        */
         private HttpResponse userPage(HttpRequest req, IHttpUrl url, User user, Db db, string updateUserError = null, IEnumerable<string> updateUserSuccess = null, string teamError = null) => RenderPage(
             user.Username, user, null,
             new DIV { class_ = "main" }._(
@@ -48,7 +79,7 @@ namespace KyudosudokuWebsite
                             new TD(new INPUT { type = itype.checkbox, name = "opt-show-errors", value = "1", checked_ = user.ShowErrors, id = "opt-show-errors", accesskey = "s" }, new LABEL { for_ = "opt-show-errors" }._(" Show a red glow around grids with errors".Accel('S')))),
                         new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-semitransparent-xs", value = "1", checked_ = user.SemitransparentXs, id = "opt-semitransparent-xs", accesskey = "x" }, new LABEL { for_ = "opt-semitransparent-xs" }._(" Show semitransparent X’s so you can still see the digits underneath".Accel('X')))),
                         new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-show-solve-time", value = "1", checked_ = user.ShowSolveTime, id = "opt-show-solve-time", accesskey = "t" }, new LABEL { for_ = "opt-show-solve-time" }._(" Show time when puzzle is solved".Accel('t')))),
-                        new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-play-invalid-sound", value = "1", checked_ = user.PlayInvalidSound, id = "opt-play-invalid-sound", accesskey = "p" }, new LABEL { for_ = "opt-play-invalid-sound" }._(" Play a sound when a constraint is violated".Accel('P')))),
+                        new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-play-invalid-sound", value = "1", checked_ = user.PlayInvalidSound, id = "opt-play-invalid-sound", accesskey = "l" }, new LABEL { for_ = "opt-play-invalid-sound" }._(" Play a sound when a constraint is violated".Accel('l')))),
                         new TR(
                             new TH("Personal info"),
                             new TD(
