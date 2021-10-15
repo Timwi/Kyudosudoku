@@ -52,7 +52,8 @@ namespace KyudosudokuWebsite
                 PasswordHash = createPasswordHash(password),
                 ShowErrors = true,
                 SemitransparentXs = false,
-                ShowSolveTime = true
+                ShowSolveTime = true,
+                PlayInvalidSound = false
             });
             db.SaveChanges();
             session.User = newUser;
@@ -112,7 +113,8 @@ namespace KyudosudokuWebsite
             foreach (var (curVal, setter, key) in Ut.NewArray<(bool curVal, Action<bool> setter, string key)>(
                 (session.User.ShowErrors, v => { session.User.ShowErrors = v; }, "opt-show-errors"),
                 (session.User.SemitransparentXs, v => { session.User.SemitransparentXs = v; }, "opt-semitransparent-xs"),
-                (session.User.ShowSolveTime, v => { session.User.ShowSolveTime = v; }, "opt-show-solve-time")
+                (session.User.ShowSolveTime, v => { session.User.ShowSolveTime = v; }, "opt-show-solve-time"),
+                (session.User.PlayInvalidSound, v => { session.User.PlayInvalidSound = v; }, "opt-play-invalid-sound")
             ))
             {
                 var newVal = req.Post[key].Value == "1";

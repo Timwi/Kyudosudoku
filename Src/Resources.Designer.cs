@@ -19,7 +19,7 @@ namespace KyudosudokuWebsite {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,9 +61,30 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to @font-face {
-        ///    font-family: Bitter;
-        ///    src: url(&apos;data:font/ttf;base64,AAEAAAAUAQAABABAR0RFRtue3BEAAa9YAAAEFEdQT1Op5WWkAAGzbAABYxhHU1VCC2FKsQADFoQAACaoSFZBUuyArIQAAz0sAAANK09TLzKDxleSAAFiVAAAAGBTVEFU+OrV2gADSlgAAAC4YXZhcsP14AEAA0uQAAAAMmNtYXCtiSpuAAFitAAACrZmdmFyj/t5uAADSxAAAAB+Z2FzcAAAABAAAa9QAAAACGdseWYUqCs5AAABTAABPfhndmFyI3CPbwADS8QAARP4aGVhZBjbbb0AAUrsAAAANmhoZWEHzAgWAAFiMAAAACRobXR4toItTAABSyQAABcMbG9jYT39jIEAAT9kAAALiG1heHAF1wDNAAE/RAAAACBuYW1lEnYlogABbXQAAAdMcG9zdBOjxhQAAXTAAAA6jXByZXBoBoyFAAFtb [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to .controls {
+        ///    font-size: 18pt;
+        ///    margin: .5cm 0;
+        ///}
+        ///
+        ///#find-form label, #find-form button, #find-form input, #find-form select {
+        ///    padding: .1cm .4cm;
+        ///    margin: 0 .25cm;
+        ///    border-radius: .3cm;
+        ///    border: 2px solid hsl(220, 50%, 75%);
+        ///    background: transparent;
+        ///    font: inherit;
+        ///    font-size: 18pt;
+        ///    cursor: pointer;
+        ///}
+        ///
+        ///    #find-form input[type=&quot;radio&quot;] {
+        ///        display: none;
+        ///    }
+        ///
+        ///    #find-form input[type=&quot;number&quot;] {
+        ///        width: 3cm;
+        ///        padding: .1cm .2cm;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FindCss {
             get {
@@ -85,13 +106,11 @@ namespace KyudosudokuWebsite {
         ///        };
         ///    }
         ///
-        ///    let curSort = &apos;solvetime&apos;;
-        ///    let curAsc = false;
-        ///    let constraintOptions = { &apos;include-constraints&apos;: [], &apos;exclude-constraints&apos;: [] };
+        ///    let loadedCriteria = JSON.parse(localStorage.getItem(&apos;criteria&apos;));
         ///
-        ///    function submit(pg, pgCount)
-        ///    {
-        ///        if (pg !== undefined &amp;&amp; pgCount !== undefined [rest of string was truncated]&quot;;.
+        ///    let form = document.getElementById(&apos;find-form&apos;);
+        ///    let constraints = JSON.parse(form.dataset.constraints);
+        ///    let curSort = (loadedCriteria &amp;&amp; loadedCriteria [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string FindJs {
             get {
@@ -107,6 +126,16 @@ namespace KyudosudokuWebsite {
         internal static string GeneralCss {
             get {
                 return ResourceManager.GetString("GeneralCss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Invalid {
+            get {
+                object obj = ResourceManager.GetObject("Invalid", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -137,10 +166,6 @@ namespace KyudosudokuWebsite {
         ///    touch-action: none;
         ///}
         ///
-        ///    .puzzle.solved {
-        ///        background: hsl(115, 50%, 40%);
-        ///    }
-        ///
         ///    .puzzle svg {
         ///        user-select: none;
         ///        margin: 0 auto;
@@ -148,9 +173,12 @@ namespace KyudosudokuWebsite {
         ///    }
         ///
         ///        .puzzle svg .solve-glow {
-        ///            opacity: 0;
+        ///            visibility: hidden;
         ///        }
-        ///        /// [rest of string was truncated]&quot;;.
+        ///
+        ///        .puzzle svg * {
+        ///            pointer-events: none;
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleCss {
             get {
@@ -159,7 +187,7 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to window.onload = (function()
+        ///   Looks up a localized string similar to window.onload = (function ()
         ///{
         ///    function remoteLog(msg)
         ///    {
@@ -171,7 +199,7 @@ namespace KyudosudokuWebsite {
         ///
         ///    function inRange(x) { return x &gt;= 0 &amp;&amp; x &lt; 9; }
         ///    function dx(dir) { return dir === &apos;Left&apos; ? -1 : dir === &apos;Right&apos; ? 1 : 0 }
-        ///    function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1  [rest of string was truncated]&quot;;.
+        ///    function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleJs {
             get {

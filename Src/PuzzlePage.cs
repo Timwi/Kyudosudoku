@@ -15,6 +15,8 @@ namespace KyudosudokuWebsite
 {
     partial class KyudosudokuPropellerModule
     {
+        private readonly string _invalidAudioUrl = "data:audio/ogg;base64," + Convert.ToBase64String(Resources.Invalid);
+
         private HttpResponse PuzzlePage(HttpRequest req, DbSession session, Db db)
         {
             Match m;
@@ -90,6 +92,7 @@ namespace KyudosudokuWebsite
                     .Data("constraints", dbPuzzle.Constraints)
                     .Data("progress", userPuzzle.NullOr(up => up.Progess))
                     .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
+                    .Data("playinvalidsound", (session?.User?.PlayInvalidSound ?? false) ? "1" : "0")
                     .Data("semitransparentxs", (session?.User?.SemitransparentXs ?? false) ? "1" : "0")
                     ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {23.25 + extraRight + extraLeft} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'
                                                         data-extratop='{extraTop}' data-extraright='{extraRight}' data-extraleft='{extraLeft}'
@@ -130,7 +133,7 @@ namespace KyudosudokuWebsite
                             <rect x='-8' y='-1' width='16' height='2.6' fill='white' stroke-width='.1' stroke='black' />
                             <text x='0' y='.975' text-anchor='middle' font-size='2' font-weight='bold'>TIMER PAUSED</text>
                         </g>
-                    </svg>")));
+                    </svg>"), new AUDIO { src = _invalidAudioUrl, id = "invalid-audio" }));
         }
 
         private static string sudokuGridSvg(int puzzleId, IEnumerable<SvgConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"

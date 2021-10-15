@@ -155,6 +155,7 @@
     <Content Include="Resources\General.css">
       <LastGenOutput>Kyudosudoku.Designer.cs</LastGenOutput>
     </Content>
+    <Content Include="Resources\Invalid.ogg" />
     <Content Include="Resources\Puzzle.css">
       <LastGenOutput>Kyudosudoku.Designer.cs</LastGenOutput>
     </Content>

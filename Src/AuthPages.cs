@@ -44,10 +44,11 @@ namespace KyudosudokuWebsite
                     new INPUT { type = itype.hidden, name = "user", value = user.UserID.ToString() },
                     new TABLE { class_ = "options" }._(
                         new TR(
-                            new TH { rowspan = 3 }._("Game options"),
+                            new TH { rowspan = 4 }._("Game options"),
                             new TD(new INPUT { type = itype.checkbox, name = "opt-show-errors", value = "1", checked_ = user.ShowErrors, id = "opt-show-errors", accesskey = "s" }, new LABEL { for_ = "opt-show-errors" }._(" Show a red glow around grids with errors".Accel('S')))),
                         new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-semitransparent-xs", value = "1", checked_ = user.SemitransparentXs, id = "opt-semitransparent-xs", accesskey = "x" }, new LABEL { for_ = "opt-semitransparent-xs" }._(" Show semitransparent X’s so you can still see the digits underneath".Accel('X')))),
                         new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-show-solve-time", value = "1", checked_ = user.ShowSolveTime, id = "opt-show-solve-time", accesskey = "t" }, new LABEL { for_ = "opt-show-solve-time" }._(" Show time when puzzle is solved".Accel('t')))),
+                        new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-play-invalid-sound", value = "1", checked_ = user.PlayInvalidSound, id = "opt-play-invalid-sound", accesskey = "p" }, new LABEL { for_ = "opt-play-invalid-sound" }._(" Play a sound when a constraint is violated".Accel('P')))),
                         new TR(
                             new TH("Personal info"),
                             new TD(
