@@ -207,6 +207,22 @@
                 return offsets.length > 1 ? false : constr.Cells1.some(n => grid[n] === null) || constr.Cells2.some(n => grid[n] === null) ? null : true;
             }
 
+            case 'CappedLine': {
+                let first = constr.Cells[0];
+                let last = constr.Cells[constr.Cells.length - 1];
+                if (grid[first] === null || grid[last] === null)
+                    return null;
+                let min = Math.min(grid[first], grid[last]);
+                let max = Math.max(grid[first], grid[last]);
+                let anyNull = false;
+                for (let i = 1; i < constr.Cells.length - 1; i++)
+                    if (grid[constr.Cells[i]] === null)
+                        anyNull = true;
+                    else if (grid[constr.Cells[i]] >= max || grid[constr.Cells[i]] <= min)
+                        return false;
+                return anyNull ? null : true;
+            }
+
             // FOUR-CELL CONSTRAINTS
 
             case 'Clockface': {
