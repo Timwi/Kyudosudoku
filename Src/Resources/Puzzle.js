@@ -114,7 +114,8 @@
                 return s === constr.Clue;
             }
 
-            case 'Skyscraper': {
+            case 'Skyscraper':
+            case 'SkyscraperSum': {
                 let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
                 if (numbers.some(n => n === null))
                     return null;
@@ -123,7 +124,7 @@
                     if (n > p)
                     {
                         p = n;
-                        c++;
+                        c += (constr[':type'] === 'Skyscraper' ? 1 : n);
                     }
                 return c === constr.Clue;
             }
