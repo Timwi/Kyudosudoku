@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Math;
 using System.Reflection;
 using KyudosudokuWebsite.Database;
 using RT.CommandLine;
@@ -59,7 +60,7 @@ namespace KyudosudokuWebsite
 
                 // Choose a random number for a new puzzle
                 while (db.Puzzles.Any(p => p.PuzzleID == newPuzzleId))
-                    newPuzzleId += Rnd.Next(0, 1000);
+                    newPuzzleId += Rnd.Next(0, Math.Max(1000, newPuzzleId));
             }
             Console.WriteLine($"Generating puzzle #{newPuzzleId}");
             var start = DateTime.UtcNow;
