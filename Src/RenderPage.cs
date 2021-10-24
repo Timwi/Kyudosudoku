@@ -32,11 +32,12 @@ namespace KyudosudokuWebsite
                     new A { href = "/help" }._("How to play"),
                     new A { href = "/auth" }._(loggedInUser == null ? "Log in" : "Settings")));
 
-            var sidebar = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
+			var puzzlesSolved = opt.Db.UserPuzzles.Where(up => up.UserID == loggedInUser.UserID && up.Solved).Count();
+			var sidebar = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
                 loggedInUser == null || opt.Db == null ? null : new DIV { class_ = "stats" }._(
                     new DIV("You’ve solved"),
-                    new DIV { class_ = "solve-count" }._(opt.Db.UserPuzzles.Where(up => up.UserID == loggedInUser.UserID && up.Solved).Count()),
-                    new DIV("puzzles.")),
+                    new DIV { class_ = "solve-count" }._(puzzlesSolved),
+                    new DIV($"puzzle{(puzzles != 1 ? "s" : "")}.")),
                 new A { href = "/find" }._("Find puzzles"));
 
             var footer = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
