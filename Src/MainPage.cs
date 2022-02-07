@@ -42,7 +42,7 @@ namespace KyudosudokuWebsite
             var unfinishedPuzzleIds = unfinishedPuzzles.Select(p => p.PuzzleID).ToArray();
             var unsolvedPuzzles = (session.User == null ? db.Puzzles : db.Puzzles.Where(p => !db.UserPuzzles.Any(up => up.UserID == session.User.UserID && up.PuzzleID == p.PuzzleID))).Where(p => !unfinishedPuzzleIds.Contains(p.PuzzleID)).ToArray();
             var tmpUnsolvedPuzzles = unsolvedPuzzles.Shuffle().OrderBy(p => !string.IsNullOrEmpty(p.ConstraintNames)).ToArray();
-            var showUnsolvedPuzzles = tmpUnsolvedPuzzles.Take(1).Concat(tmpUnsolvedPuzzles.TakeLast(2)).ToArray();
+            var showUnsolvedPuzzles = tmpUnsolvedPuzzles.Take(1).Concat(tmpUnsolvedPuzzles.Subarray(tmpUnsolvedPuzzles.Length - 2)).ToArray();
 
             static object puzzleBox(Puzzle pz) => new A { href = $"/puzzle/{pz.PuzzleID}" }._(
                 new DIV { class_ = "puzzle-id" }._("Puzzle", new BR(), $"#{pz.PuzzleID}"),
