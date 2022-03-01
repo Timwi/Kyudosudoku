@@ -139,7 +139,7 @@ namespace KyudosudokuWebsite
         private static string sudokuGridSvg(int puzzleId, IEnumerable<SvgConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
             <filter id='p-{puzzleId}-blur'><feGaussianBlur stdDeviation='.1' /></filter>
             <rect class='solve-glow frame{(glowRed == null ? null : glowRed.Value ? " invalid" : " solved")}' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
-            {(forHelpPage ? null : (from ix in Enumerable.Range(0, 9) from isCol in new[] { false, true } from topLeft in new[] { false, true } select (isCol, ix, topLeft))
+            {(forHelpPage ? null : (from ix in Enumerable.Range(-1, 11) from isCol in new[] { false, true } from topLeft in new[] { false, true } select (isCol, ix, topLeft))
                 .Where(inf => constraints.Any(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)))
                 .Select(inf => $@"<rect class='clickable edge-cell has-tooltip' x='{(inf.isCol ? inf.ix : inf.topLeft ? -1 : 9)}' y='{(inf.isCol ? inf.topLeft ? -1 : 9 : inf.ix)}' width='1' height='1'
                     data-name='{constraints.Where(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)).Select(c => c.Name).ToJsonList()}'
