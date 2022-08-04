@@ -40,12 +40,12 @@ namespace KyudosudokuWebsite
             var extraRight = puzzle.Constraints.MaxOrDefault(c => c.ExtraRight, 0);
             var extraLeft = puzzle.Constraints.MaxOrDefault(c => c.ExtraLeft, 0);
 
-            var helpSvg = @"<g transform='translate(.05, .05) scale(.008)'>
+            const string helpSvg = @"<g transform='translate(.05, .05) scale(.008)'>
                 <path fill='#fcedca' stroke='black' stroke-width='2' d='M12.5 18.16h75v25h-75z'/>
                 <text class='label' x='50' y='33.4' font-size='24' text-anchor='middle' transform='translate(0 5.66)'>???</text>
                 <path fill='white' stroke='black' stroke-width='2' d='M53.238 33.237V73.17l9.513-9.513 7.499 18.106 5.272-2.184-7.38-17.818h13.62z'/>
             </g>";
-            var fillSvg = @"<text x='.45' y='.4' font-size='.25'>Auto</text><text x='.45' y='.65' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
+            const string fillSvg = @"<text x='.45' y='.4' font-size='.25'>Auto</text><text x='.45' y='.65' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
 
             var buttonsRight = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .9, 0))
                 .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
@@ -112,21 +112,28 @@ namespace KyudosudokuWebsite
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                             <g transform='translate({13.25 + extraLeft}, 0)' id='p-{puzzleId}-sudoku'>{sudokuGridSvg(puzzleId, puzzle.Constraints)}</g>
 
-                            <g transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' id='p-{puzzleId}-solved-sticker'>
+                            <g id='p-{puzzleId}-solved-sticker-template' class='solved-sticker-template'>
                                 <rect x='-8' y='-1.3' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
-                                <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold'>PUZZLE SOLVED</text>
-                                <g font-size='.45' transform='translate(0, 1)' class='solve-time'>
-                                    <text text-anchor='start' x='-7.7' y='0'>Solved:</text>
-                                    <text class='inf-count' text-anchor='start' x='-6.1' y='0' font-weight='bold'></text>
-                                    <text text-anchor='start' x='-4' y='0'>Your time:</text>
-                                    <text class='inf-time' text-anchor='start' x='-1.7' y='0' font-weight='bold'></text>
-                                    <text text-anchor='start' x='2.05' y='0'>Average:</text>
-                                    <text class='inf-avg' text-anchor='start' x='4' y='0' font-weight='bold'></text>
+                                <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold' class='solve-text'>PUZZLE SOLVED</text>
+                                <g font-size='.45' class='solve-time'>
+                                    <g class='solve-time-1'>
+                                        <text text-anchor='start' x='-7.6' y='1'>Solved:</text>
+                                        <text class='inf-count' text-anchor='start' x='-6' y='1' font-weight='bold'></text>
+                                    </g>
+                                    <g class='solve-time-2'>
+                                        <text text-anchor='start' x='-3.9' y='1'>Your time:</text>
+                                        <text class='inf-time' text-anchor='start' x='-1.6' y='1' font-weight='bold'></text>
+                                    </g>
+                                    <g class='solve-time-3'>
+                                        <text text-anchor='start' x='2.05' y='1'>Average:</text>
+                                        <text class='inf-avg' text-anchor='start' x='4' y='1' font-weight='bold'></text>
+                                    </g>
                                 </g>
-                                <g font-size='.45' transform='translate(0, 1)' class='no-solve-time'>
-                                    <text text-anchor='middle' x='0' y='0' font-weight='bold'>Congratulations!</text>
+                                <g font-size='.45' class='no-solve-time'>
+                                    <text text-anchor='middle' x='0' y='1' font-weight='bold'>Congratulations!</text>
                                 </g>
                             </g>
+                            <use href='#p-{puzzleId}-solved-sticker-template' id='p-{puzzleId}-solved-sticker' transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' />
                         </g>
 
                         <g transform='translate(11.5, 6)' class='timer-paused'>
