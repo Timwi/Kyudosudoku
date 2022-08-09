@@ -113,6 +113,7 @@ namespace KyudosudokuWebsite
                 "solves" => asc ? puzzles.OrderBy(p => p.SolveCount) : puzzles.OrderByDescending(p => p.SolveCount),
                 "your-time" => nu ? puzzles : asc ? puzzles.OrderBy(p => p.UserPuzzle.Time) : puzzles.OrderByDescending(p => p.UserPuzzle.Time),
                 "solvetime" => nu ? puzzles : asc ? puzzles.OrderBy(p => p.UserPuzzle.SolveTime) : puzzles.OrderByDescending(p => p.UserPuzzle.SolveTime),
+                "numconstr" => asc ? puzzles.OrderBy(p => p.Puzzle.NumConstraints) : puzzles.OrderByDescending(p => p.Puzzle.NumConstraints),
                 _ => puzzles
             };
 
@@ -148,14 +149,14 @@ namespace KyudosudokuWebsite
                             new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("# solves").Data("sort", "solves")),
                             what != "solved" ? null : new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Your time").Data("sort", "your-time")),
                             what == "not-seen" ? null : new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._(what == "solved" ? "When solved" : "Last seen").Data("sort", "solvetime")),
-                            new TH("Constraints")),
+                            new TH(new A { href = "#", class_ = "sorter" }._("Constraints").Data("sort", "numconstr"))),
                         puzzles.AsEnumerable().Select(inf => new TR(
                             new TD { class_ = "nowrap" }._("▶ ", new A { href = $"/puzzle/{inf.Puzzle.PuzzleID}" }._("Puzzle #", inf.Puzzle.PuzzleID)),
                             new TD { class_ = "nowrap" }._(time(inf.Puzzle)),
                             new TD { class_ = "nowrap" }._(inf.SolveCount),
                             what != "solved" ? null : new TD { class_ = "nowrap" }._(solveTime(inf.UserPuzzle)),
                             what == "not-seen" ? null : new TD { class_ = "nowrap" }._(lastSeen(inf.UserPuzzle)),
-                            new TD(inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(none)" : inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><").Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).JoinString(", "))))),
+                            new TD(inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(none)" : $"{inf.Puzzle.NumConstraints}: {inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><").Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).JoinString(", ")}")))),
 
                     // Small version of the table for mobile view
                     new TABLE { class_ = "small" }._(

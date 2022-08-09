@@ -18,6 +18,7 @@ namespace KyudosudokuWebsite.Database
         public bool Invalid { get; set; }
         public string Constraints { get; set; }             // ClassifyJson of SvgConstraint[]
         public string ConstraintNames { get; set; }     // for searching/filtering
+        public int NumConstraints { get; set; }
         public double? AverageTime { get; set; }
         public int? TimeToGenerate { get; set; }
         public DateTime? Generated { get; set; }

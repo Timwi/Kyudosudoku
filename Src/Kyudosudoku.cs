@@ -307,6 +307,7 @@ namespace KyudosudokuWebsite
                 KyudokuGrids = Grids.SelectMany(grid => grid.Select(i => (char) (i + '0'))).JoinString(),
                 Constraints = ClassifyJson.Serialize(Constraints).ToString(),
                 ConstraintNames = Constraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString(),
+                NumConstraints = Constraints.Length,
                 TimeToGenerate = timeToGenerate,
                 Generated = DateTime.UtcNow
             });
