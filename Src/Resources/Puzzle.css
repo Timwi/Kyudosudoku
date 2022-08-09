@@ -68,7 +68,7 @@
 			stroke: none;
 		}
 
-		.puzzle svg .solved-sticker, .puzzle svg .solved-sticker-template {
+		.puzzle svg .solved-sticker, .puzzle svg .solved-sticker-template-wrap {
 			visibility: hidden;
 		}
 

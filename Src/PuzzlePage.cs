@@ -112,25 +112,27 @@ namespace KyudosudokuWebsite
                             {Enumerable.Range(0, 4).Select(corner => kyudokuGridSvg(corner, puzzleId, puzzle.Grids[corner])).JoinString()}
                             <g transform='translate({13.25 + extraLeft}, 0)' id='p-{puzzleId}-sudoku'>{sudokuGridSvg(puzzleId, puzzle.Constraints)}</g>
 
-                            <g id='p-{puzzleId}-solved-sticker-template' class='solved-sticker-template'>
-                                <rect x='-8' y='-1.3' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
-                                <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold' class='solve-text'>PUZZLE SOLVED</text>
-                                <g font-size='.45' class='solve-time'>
-                                    <g class='solve-time-1'>
-                                        <text text-anchor='start' x='-7.6' y='1'>Solved:</text>
-                                        <text class='inf-count' text-anchor='start' x='-6' y='1' font-weight='bold'></text>
+                            <g class='solved-sticker-template-wrap'>
+                                <g id='p-{puzzleId}-solved-sticker-template' class='solved-sticker-template'>
+                                    <rect x='-8' y='-1.3' width='16' height='2.6' fill='url(#p-{puzzleId}-gradient)' stroke-width='.1' stroke='black' />
+                                    <text x='0' y='.42' text-anchor='middle' font-size='2' font-weight='bold' class='solve-text'>PUZZLE SOLVED</text>
+                                    <g font-size='.45' class='solve-time'>
+                                        <g class='solve-time-1'>
+                                            <text text-anchor='start' x='-7.6' y='1'>Solved:</text>
+                                            <text class='inf-count' text-anchor='start' x='-6' y='1' font-weight='bold'></text>
+                                        </g>
+                                        <g class='solve-time-2'>
+                                            <text text-anchor='start' x='-3.9' y='1'>Your time:</text>
+                                            <text class='inf-time' text-anchor='start' x='-1.6' y='1' font-weight='bold'></text>
+                                        </g>
+                                        <g class='solve-time-3'>
+                                            <text text-anchor='start' x='2.05' y='1'>Average:</text>
+                                            <text class='inf-avg' text-anchor='start' x='4' y='1' font-weight='bold'></text>
+                                        </g>
                                     </g>
-                                    <g class='solve-time-2'>
-                                        <text text-anchor='start' x='-3.9' y='1'>Your time:</text>
-                                        <text class='inf-time' text-anchor='start' x='-1.6' y='1' font-weight='bold'></text>
+                                    <g font-size='.45' class='no-solve-time'>
+                                        <text text-anchor='middle' x='0' y='1' font-weight='bold'>Congratulations!</text>
                                     </g>
-                                    <g class='solve-time-3'>
-                                        <text text-anchor='start' x='2.05' y='1'>Average:</text>
-                                        <text class='inf-avg' text-anchor='start' x='4' y='1' font-weight='bold'></text>
-                                    </g>
-                                </g>
-                                <g font-size='.45' class='no-solve-time'>
-                                    <text text-anchor='middle' x='0' y='1' font-weight='bold'>Congratulations!</text>
                                 </g>
                             </g>
                             <use href='#p-{puzzleId}-solved-sticker-template' id='p-{puzzleId}-solved-sticker' transform='translate(11.5, 6) rotate(-15)' class='solved-sticker' />
