@@ -72,7 +72,6 @@ namespace KyudosudokuWebsite
 
         public static Kyudosudoku Generate(int seed)
         {
-            var lockObj = new object();
             var rnd = new Random(seed);
 
             tryAgain:
@@ -312,6 +311,87 @@ namespace KyudosudokuWebsite
                 Generated = DateTime.UtcNow
             });
             db.SaveChanges();
+        }
+
+        public abstract class ReevaluateResult { }
+        public sealed class ReevaluateError : ReevaluateResult { public string Error; }
+        public sealed class CanReduce : ReevaluateResult { public SvgConstraint[] NewConstraints; }
+        public ReevaluateResult Reevaluate()
+        {
+            // Find all possible Kyudoku solutions
+            var cornerSolutions = new int[4][][];
+            for (var corner = 0; corner < 4; corner++)
+            {
+                var kyudoku = new PuzzleSolvers.Puzzle(36, 0, 1);
+                kyudoku.AddConstraint(new Kyudoku6x6Constraint(Grids[corner]));
+                cornerSolutions[corner] = kyudoku.Solve().Select(solution => solution.SelectIndexWhere(v => v == 0).ToArray()).ToArray();
+                if (cornerSolutions[corner].Length == 0)
+                    return new ReevaluateError { Error = $"Corner {corner} is unsolvable." };
+            }
+
+            var givenGrids = new List<int?[]>();
+            foreach (var topLeft in cornerSolutions[0])
+                foreach (var topRight in cornerSolutions[1])
+                    foreach (var bottomLeft in cornerSolutions[2])
+                        foreach (var bottomRight in cornerSolutions[3])
+                        {
+                            var grid = new int?[9 * 9];
+                            for (var cell = 0; cell < 81; cell++)
+                            {
+                                var values = new HashSet<int>();
+                                if (cell % 9 < 6 && cell / 9 < 6 && topLeft.Contains(cell % 9 + 6 * (cell / 9)))
+                                    values.Add(Grids[0][cell % 9 + 6 * (cell / 9)]);
+                                if (cell % 9 >= 3 && cell / 9 < 6 && topRight.Contains(cell % 9 - 3 + 6 * (cell / 9)))
+                                    values.Add(Grids[1][cell % 9 - 3 + 6 * (cell / 9)]);
+                                if (cell % 9 < 6 && cell / 9 >= 3 && bottomLeft.Contains(cell % 9 + 6 * (cell / 9 - 3)))
+                                    values.Add(Grids[2][cell % 9 + 6 * (cell / 9 - 3)]);
+                                if (cell % 9 >= 3 && cell / 9 >= 3 && bottomRight.Contains(cell % 9 - 3 + 6 * (cell / 9 - 3)))
+                                    values.Add(Grids[3][cell % 9 - 3 + 6 * (cell / 9 - 3)]);
+                                if (values.Count > 1)
+                                    goto busted;
+                                grid[cell] = values.FirstOrNull();
+                            }
+                            givenGrids.Add(grid);
+                            busted:;
+                        }
+
+            // Reduce the constraints
+            var reqConstraints = Ut.ReduceRequiredSet(Enumerable.Range(0, Constraints.Length), skipConsistencyTest: true, test: state =>
+            {
+                //Console.WriteLine(Enumerable.Range(0, Constraints.Length).Select(c => state.SetToTest.Contains(c) ? "█" : "░").JoinString());
+                var found = false;
+                var busted = false;
+                var lockObj = new object();
+                Enumerable.Range(0, givenGrids.Count).ParallelForEach(Environment.ProcessorCount, ggIx =>
+                //for (var ggIx = 0; ggIx < givenGrids.Count; ggIx++)
+                {
+                    lock (lockObj)
+                    {
+                        if (busted)
+                            goto loopOut;
+                    }
+                    var givenGrid = givenGrids[ggIx];
+                    var sudoku = new Sudoku().AddGivens(givenGrid);
+                    foreach (var constrIx in state.SetToTest)
+                        sudoku.AddConstraints(Constraints[constrIx].GetConstraints());
+                    var sol = sudoku.Solve().Take(2).Count();
+                    lock (lockObj)
+                    {
+                        if (sol > 1 || (sol == 1 && found))
+                            busted = true;
+                        else if (sol == 1)
+                            found = true;
+                    }
+                    loopOut:;
+                });
+                if (busted)
+                    return false;
+                if (found)
+                    return true;
+                throw new InvalidOperationException($"Puzzle looks unsolvable.");
+            }).ToArray();
+
+            return reqConstraints.Length == Constraints.Length ? null : new CanReduce { NewConstraints = reqConstraints.Select(c => Constraints[c]).ToArray() };
         }
     }
 }

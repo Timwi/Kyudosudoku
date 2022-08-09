@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using KyudosudokuWebsite.Database;
 using RT.CommandLine;
 using RT.PostBuild;
 using RT.PropellerApi;
+using RT.Serialization;
 using RT.Util;
+using RT.Util.Consoles;
+using RT.Util.ExtensionMethods;
+using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
@@ -17,6 +24,57 @@ namespace KyudosudokuWebsite
         public static void PostBuildCheck(IPostBuildReporter rep)
         {
             CommandLineParser.PostBuildStep<CommandLineBase>(rep, null);
+        }
+    }
+
+    [CommandName("reeval"), Undocumented]
+    sealed class Reeval : CommandLineBase
+    {
+        [IsPositional, IsMandatory, Documentation("Database connection string.")]
+        public string DbConnectionString = null;
+
+        public override int Execute()
+        {
+            Db.ConnectionString = DbConnectionString;
+            var db = new Db();
+            var examine = db.Puzzles.Where(p => DbFunctions.Like(p.ConstraintNames, "%<CappedLine>%")).ToArray();
+            Console.WriteLine($"Examining {examine.Length} puzzles:");
+            string escape(string str) => str.Select(c => c == '\'' ? "''" : c.ToString()).JoinString();
+            var sql = new List<string>();
+            for (var exIx = 0; exIx < examine.Length; exIx++)
+            {
+                var dbPuzzle = examine[exIx];
+                Console.Write($"Puzzle {dbPuzzle.PuzzleID} ({exIx}/{examine.Length})\r");
+
+                var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
+                    dbPuzzle.Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(dbPuzzle.Constraints));
+                var result = puzzle.Reevaluate();
+
+                switch (result)
+                {
+                    case Kyudosudoku.CanReduce cr:
+                        ConsoleUtil.WriteLine($"Puzzle {dbPuzzle.PuzzleID} can be reduced:".Color(ConsoleColor.Yellow));
+                        Console.WriteLine($"    Prev constraints:");
+                        foreach (var c in puzzle.Constraints)
+                            ConsoleUtil.WriteLine($"        • {c.Name}".Color(cr.NewConstraints.Contains(c) ? ConsoleColor.White : ConsoleColor.DarkCyan));
+                        Console.WriteLine($"    New constraints:");
+                        foreach (var c in cr.NewConstraints)
+                            Console.WriteLine($"        • {c.Name}");
+                        Console.WriteLine();
+                        sql.Add($"UPDATE Puzzles SET Constraints='{escape(ClassifyJson.Serialize(cr.NewConstraints).ToString())}', NumConstraints={cr.NewConstraints.Length}, ConstraintNames='{cr.NewConstraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString()}' WHERE PuzzleID={dbPuzzle.PuzzleID}");
+                        break;
+
+                    case Kyudosudoku.ReevaluateError re:
+                        ConsoleUtil.WriteLine($"Puzzle {dbPuzzle.PuzzleID} error: {re.Error}".Color(ConsoleColor.Red));
+                        break;
+                }
+            }
+            Console.WriteLine();
+            foreach (var s in sql)
+                Console.WriteLine(s);
+            Console.WriteLine();
+            Debugger.Break();
+            return 0;
         }
     }
 
