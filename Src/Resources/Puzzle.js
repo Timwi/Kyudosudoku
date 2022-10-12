@@ -520,11 +520,11 @@
 					var bb1 = t1.getBBox();
 					var bb2 = t2.getBBox();
 					var bb3 = t3.getBBox();
-					var sep = (bbt.width - .2 - bb1.width - bb2.width - bb3.width)/2;
+					var sep = (bbt.width - .2 - bb1.width - bb2.width - bb3.width) / 2;
 
 					t1.setAttribute('transform', `translate(${bbt.x + .1 - bb1.x}, 0)`);
 					t2.setAttribute('transform', `translate(${bbt.x + .1 + bb1.width + sep - bb2.x}, 0)`);
-					t3.setAttribute('transform', `translate(${bbt.x + .1 + bb1.width + bb2.width + 2*sep - bb3.x}, 0)`);
+					t3.setAttribute('transform', `translate(${bbt.x + .1 + bb1.width + bb2.width + 2 * sep - bb3.x}, 0)`);
 				}
 				timeLastDbUpdate = reqStart;
 			};
@@ -805,43 +805,31 @@
 			}
 		}
 
-		function enterCenterNotation(digit)
+		function enterNotation(digit, getNotation)
 		{
 			if (selectedCells.every(c => getDisplayedSudokuDigit(state, c)))
 				return;
 			saveUndo();
-			let allHaveDigit = selectedCells.filter(c => !getDisplayedSudokuDigit(state, c)).every(c => state.centerNotation[c].includes(digit));
-			selectedCells.forEach(cell =>
+			let allHaveDigit = selectedCells.filter(c => !getDisplayedSudokuDigit(state, c)).every(c => getNotation(c).includes(digit));
+			selectedCells.forEach((cell, ix) =>
 			{
+				// ignore cells with a full digit in them, and duplicated entries of ‘selectedCells’
+				if (getDisplayedSudokuDigit(state, cell) || selectedCells.indexOf(cell) !== ix)
+					return;
+				var notation = getNotation(cell);
 				if (allHaveDigit)
-					state.centerNotation[cell].splice(state.centerNotation[cell].indexOf(digit), 1);
-				else if (!state.centerNotation[cell].includes(digit))
+					notation.splice(notation.indexOf(digit), 1);
+				else if (!notation.includes(digit))
 				{
-					state.centerNotation[cell].push(digit);
-					state.centerNotation[cell].sort();
+					notation.push(digit);
+					notation.sort();
 				}
 			});
 			updateVisuals(true);
 		}
 
-		function enterCornerNotation(digit)
-		{
-			if (selectedCells.every(c => getDisplayedSudokuDigit(state, c)))
-				return;
-			saveUndo();
-			let allHaveDigit = selectedCells.filter(c => !getDisplayedSudokuDigit(state, c)).every(c => state.cornerNotation[c].includes(digit));
-			selectedCells.forEach(cell =>
-			{
-				if (allHaveDigit)
-					state.cornerNotation[cell].splice(state.cornerNotation[cell].indexOf(digit), 1);
-				else if (!state.cornerNotation[cell].includes(digit))
-				{
-					state.cornerNotation[cell].push(digit);
-					state.cornerNotation[cell].sort();
-				}
-			});
-			updateVisuals(true);
-		}
+		function enterCenterNotation(digit) { enterNotation(digit, cell => state.centerNotation[cell]); }
+		function enterCornerNotation(digit) { enterNotation(digit, cell => state.cornerNotation[cell]); }
 
 		function pressDigit(digit, ev)
 		{
@@ -1430,7 +1418,7 @@
 
 				default:
 					anyFunction = false;
-					console.log(`${str} / ${ev.code}`);
+					//console.log(`${str} / ${ev.code}`);
 					break;
 			}
 
