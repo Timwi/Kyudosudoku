@@ -355,6 +355,9 @@ namespace KyudosudokuWebsite
                             busted:;
                         }
 
+            if (Constraints.Length == 0)
+                return null;
+
             // Reduce the constraints
             var reqConstraints = Ut.ReduceRequiredSet(Enumerable.Range(0, Constraints.Length), skipConsistencyTest: true, test: state =>
             {
@@ -365,13 +368,9 @@ namespace KyudosudokuWebsite
                 Enumerable.Range(0, givenGrids.Count).ParallelForEach(Environment.ProcessorCount, ggIx =>
                 //for (var ggIx = 0; ggIx < givenGrids.Count; ggIx++)
                 {
-                    lock (lockObj)
-                    {
-                        if (busted)
-                            goto loopOut;
-                    }
-                    var givenGrid = givenGrids[ggIx];
-                    var sudoku = new Sudoku().AddGivens(givenGrid);
+                    if (busted)
+                        goto loopOut;
+                    var sudoku = new Sudoku().AddGivens(givenGrids[ggIx]);
                     foreach (var constrIx in state.SetToTest)
                         sudoku.AddConstraints(Constraints[constrIx].GetConstraints());
                     var sol = sudoku.Solve().Take(2).Count();

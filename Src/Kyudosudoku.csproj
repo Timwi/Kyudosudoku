@@ -79,8 +79,8 @@
     <Reference Include="RT.Util, Version=2.0.1705.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RT.Util.2.0.1705\lib\net472\RT.Util.dll</HintPath>
     </Reference>
-    <Reference Include="RT.Util.Core, Version=2.0.1705.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RT.Util.Core.2.0.1705\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
+    <Reference Include="RT.Util.Core, Version=2.0.1719.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RT.Util.Core.2.0.1719\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

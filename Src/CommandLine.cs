@@ -27,17 +27,24 @@ namespace KyudosudokuWebsite
         }
     }
 
-    [CommandName("reeval"), Undocumented]
-    sealed class Reeval : CommandLineBase
+    [CommandName("reeval"), DocumentationLiteral("Re-evaluates puzzles to check for redundant constraints.")]
+    sealed class Reeval : CommandLineBase, ICommandLineValidatable
     {
         [IsPositional, IsMandatory, Documentation("Database connection string.")]
         public string DbConnectionString = null;
+
+        [Option("-d"), Documentation("Specify a date. Only puzzles generated since that date are re-evaluated.")]
+        public string SinceDate;
 
         public override int Execute()
         {
             Db.ConnectionString = DbConnectionString;
             var db = new Db();
-            var examine = db.Puzzles.Where(p => DbFunctions.Like(p.ConstraintNames, "%<CappedLine>%")).ToArray();
+
+            var since = SinceDate.NullOr(DateTime.Parse);
+            var examine = since == null
+                ? db.Puzzles.Where(p => !p.Invalid).ToArray()
+                : db.Puzzles.Where(p => !p.Invalid && p.Generated != null && p.Generated.Value >= since).ToArray();
             Console.WriteLine($"Examining {examine.Length} puzzles:");
             string escape(string str) => str.Select(c => c == '\'' ? "''" : c.ToString()).JoinString();
             var sql = new List<string>();
@@ -48,34 +55,46 @@ namespace KyudosudokuWebsite
 
                 var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
                     dbPuzzle.Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(dbPuzzle.Constraints));
-                var result = puzzle.Reevaluate();
 
-                switch (result)
+                try
                 {
-                    case Kyudosudoku.CanReduce cr:
-                        ConsoleUtil.WriteLine($"Puzzle {dbPuzzle.PuzzleID} can be reduced:".Color(ConsoleColor.Yellow));
-                        Console.WriteLine($"    Prev constraints:");
-                        foreach (var c in puzzle.Constraints)
-                            ConsoleUtil.WriteLine($"        • {c.Name}".Color(cr.NewConstraints.Contains(c) ? ConsoleColor.White : ConsoleColor.DarkCyan));
-                        Console.WriteLine($"    New constraints:");
-                        foreach (var c in cr.NewConstraints)
-                            Console.WriteLine($"        • {c.Name}");
-                        Console.WriteLine();
-                        sql.Add($"UPDATE Puzzles SET Constraints='{escape(ClassifyJson.Serialize(cr.NewConstraints).ToString())}', NumConstraints={cr.NewConstraints.Length}, ConstraintNames='{cr.NewConstraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString()}' WHERE PuzzleID={dbPuzzle.PuzzleID}");
-                        break;
+                    var result = puzzle.Reevaluate();
 
-                    case Kyudosudoku.ReevaluateError re:
-                        ConsoleUtil.WriteLine($"Puzzle {dbPuzzle.PuzzleID} error: {re.Error}".Color(ConsoleColor.Red));
-                        break;
+                    switch (result)
+                    {
+                        case Kyudosudoku.CanReduce cr:
+                            ConsoleUtil.WriteLine(new ConsoleColoredString($@"{$"Puzzle {dbPuzzle.PuzzleID}:".Color(ConsoleColor.Yellow)} {puzzle.Constraints.Union(cr.NewConstraints).Select(c => $@"{(puzzle.Constraints.Contains(c) && cr.NewConstraints.Contains(c) ? "✓" : puzzle.Constraints.Contains(c) ? "✗" : "+")} {c.Name}".Color(puzzle.Constraints.Contains(c) && cr.NewConstraints.Contains(c) ? ConsoleColor.Green : puzzle.Constraints.Contains(c) ? ConsoleColor.Red : ConsoleColor.Yellow)).JoinColoredString(" | ".Color(ConsoleColor.DarkGray))}"));
+                            sql.Add($"UPDATE Puzzles SET Constraints='{escape(ClassifyJson.Serialize(cr.NewConstraints).ToString())}', NumConstraints={cr.NewConstraints.Length}, ConstraintNames='{cr.NewConstraints.Select(c => $"<{c.GetType().Name}>").Distinct().Order().JoinString()}' WHERE PuzzleID={dbPuzzle.PuzzleID}");
+                            break;
+
+                        case Kyudosudoku.ReevaluateError re:
+                            ConsoleUtil.WriteLine($"Puzzle {dbPuzzle.PuzzleID} error: {re.Error}".Color(ConsoleColor.Red));
+                            break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    ConsoleUtil.WriteLine($"Puzzle {dbPuzzle.PuzzleID} error:".Color(ConsoleColor.Magenta));
+                    var e = exception;
+                    var indent = 0;
+                    while (e != null)
+                    {
+                        indent += 4;
+                        ConsoleUtil.WriteLine($"{new string(' ', indent)}{e.Message} ({e.GetType().FullName})".Color(ConsoleColor.Red));
+                        ConsoleUtil.WriteLine(e.StackTrace.Indent(indent).Color(ConsoleColor.DarkRed));
+                        e = e.InnerException;
+                    }
                 }
             }
             Console.WriteLine();
             foreach (var s in sql)
                 Console.WriteLine(s);
-            Console.WriteLine();
-            Debugger.Break();
             return 0;
         }
+
+        ConsoleColoredString ICommandLineValidatable.Validate() => SinceDate != null && !DateTime.TryParse(SinceDate, out _)
+                ? new ConsoleColoredString($"{SinceDate.Color(ConsoleColor.White)} is not a valid date/time stamp.")
+                : null;
     }
 
     [CommandName("generate"), Documentation("Can be used by a scheduled task to generate new puzzles in the background. Each invocation will only generate at most one puzzle. Through repeated invocation, the number of unsolved puzzles can be kept at a desired number.")]
