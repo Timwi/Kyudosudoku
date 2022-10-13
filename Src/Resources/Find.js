@@ -18,8 +18,9 @@
     let curSort = (loadedCriteria && loadedCriteria.sort) || 'solvetime';
     let curAsc = (loadedCriteria && loadedCriteria.asc) || false;
     let constraintOptions = (loadedCriteria && loadedCriteria.constraints) || { 'include-constraints': [], 'exclude-constraints': [] };
+    constraintOptions['include-constraints'] = constraintOptions['include-constraints'].filter(c => constraints.some(c2 => c2.id === c));
+    constraintOptions['exclude-constraints'] = constraintOptions['exclude-constraints'].filter(c => constraints.some(c2 => c2.id === c));
 
-    console.log(loadedCriteria);
     if (loadedCriteria && loadedCriteria.what)
         form.elements.what.value = loadedCriteria.what;
     if (loadedCriteria && loadedCriteria.filteravgmin)

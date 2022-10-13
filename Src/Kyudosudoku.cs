@@ -205,66 +205,18 @@ namespace KyudosudokuWebsite
         {
             // Start by generating all orthogonally contiguous regions that contain unique digits.
             // Several constraints make use of these, so it makes sense to generate them only once.
-
             var uniquenessRegions = GenerateUniqueContiguousRegions(sudoku);
 
-
-            // The numbers balance the relative probabilities of each constraint occurring so that they each occur reasonably similarly often.
-
-            var constraintGenerators = Ut.NewArray<(int? num, Func<int[], IList<SvgConstraint>> generator)>(
-                // Cell constraints
-                (null, AntiBishop.Generate),
-                (null, AntiKing.Generate),
-                (null, AntiKnight.Generate),
-                (null, NoConsecutive.Generate),
-                (null, MaximumCell.Generate),
-                (null, FindThe9.Generate),
-                (null, OddEven.Generate),
-
-                // Area constraints
-                (20, Arrow.Generate),
-                (20, s => KillerCage.Generate(s, uniquenessRegions)),
-                (15, Palindrome.Generate),
-                (20, CappedLine.Generate),
-                (20, s => RenbanCage.Generate(s, uniquenessRegions)),
-                (17, Snowball.Generate),
-                (30, Thermometer.Generate),
-
-                // Row/column constraints
-                (37, Battlefield.Generate),
-                (null, SvgPuzzleConstraints.Binairo.Generate),
-                (20, Sandwich.Generate),
-                (47, Skyscraper.Generate),
-                (20, SkyscraperSum.Generate),
-                (20, ToroidalSandwich.Generate),
-                (20, XSum.Generate),
-                (15, YSum.Generate),
-
-                // Four-cell constraints
-                (50, Clockface.Generate),
-                (40, Inclusion.Generate),
-                (60, Battenburg.Generate),
-
-                // Other
-                (null, ConsecutiveNeighbors.Generate),
-                (null, DoubleNeighbors.Generate),
-                (13, LittleKiller.Generate)
-            );
-
-            foreach (var (num, generator) in constraintGenerators)
+            foreach (var gen in ConstraintGenerator.All)
             {
-                var generated = generator(sudoku);
+                var generated = gen.generator(sudoku, uniquenessRegions);
 
                 // Variant of Fisher-Yates shuffle that stops once we have the required number of elements
-                for (int j = 0; j < generated.Count && (num == null || j < num.Value); j++)
+                for (int j = 0; j < generated.Count && (gen.probability == null || j < gen.probability.Value); j++)
                 {
                     int item = rnd.Next(j, generated.Count);
                     if (item > j)
-                    {
-                        var t = generated[item];
-                        generated[item] = generated[j];
-                        generated[j] = t;
-                    }
+                        (generated[j], generated[item]) = (generated[item], generated[j]);
                     yield return generated[j];
                 }
             }

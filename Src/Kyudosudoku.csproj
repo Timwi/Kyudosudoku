@@ -99,6 +99,7 @@
   <ItemGroup>
     <Compile Include="AuthActions.cs" />
     <Compile Include="CommandLine.cs" />
+    <Compile Include="ConstraintGenerator.cs" />
     <Compile Include="Database\Configuration.cs" />
     <Compile Include="Database\Db.cs" />
     <Compile Include="Database\Session.cs" />

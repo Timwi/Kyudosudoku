@@ -20,7 +20,7 @@ namespace KyudosudokuWebsite
 
             return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindJs, Resource.FindCss } },
                 new DIV { class_ = "main" }._(
-                    new FORM { method = method.get, id = "find-form" }.Data("constraints", SvgConstraint.Constraints.OrderBy(c => c.name).ToJsonList(elem => new JsonDict { ["name"] = elem.name, ["id"] = elem.type.Name }).ToString())._(
+                    new FORM { method = method.get, id = "find-form" }.Data("constraints", SvgConstraint.Constraints.OrderBy(c => c.name).Where(c => ConstraintGenerator.All.Any(g => g.type.Equals(c.type))).ToJsonList(elem => new JsonDict { ["name"] = elem.name, ["id"] = elem.type.Name }).ToString())._(
                         new H1("Find puzzles"),
                         new DIV { class_ = "controls" }._(
                             "Find puzzles that I’ve: ",
