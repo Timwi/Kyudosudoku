@@ -21,7 +21,7 @@
     constraintOptions['include-constraints'] = constraintOptions['include-constraints'].filter(c => constraints.some(c2 => c2.id === c));
     constraintOptions['exclude-constraints'] = constraintOptions['exclude-constraints'].filter(c => constraints.some(c2 => c2.id === c));
 
-    if (loadedCriteria && loadedCriteria.what)
+    if (loadedCriteria && loadedCriteria.what && form.elements.what)
         form.elements.what.value = loadedCriteria.what;
     if (loadedCriteria && loadedCriteria.filteravgmin)
         form.elements.filteravgmin.value = loadedCriteria.filteravgmin;
@@ -36,7 +36,7 @@
         let criteria = {
             sort: curSort,
             asc: curAsc,
-            what: form.elements.what.value,
+            what: form.elements.what && form.elements.what.value,
             page: pg | 0,
             filteravgmin: Math.min(form.elements.filteravgmin.value | 0, form.elements.filteravgmax.value | 0),
             filteravgmax: Math.max(form.elements.filteravgmin.value | 0, form.elements.filteravgmax.value | 0),

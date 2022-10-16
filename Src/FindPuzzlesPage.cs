@@ -15,14 +15,11 @@ namespace KyudosudokuWebsite
     {
         private HttpResponse findPuzzlesPage(HttpRequest req) => withSession(req, (session, db) =>
         {
-            if (session == null || session.User == null)
-                return RenderPage("Not logged in", null, new PageOptions { StatusCode = HttpStatusCode._401_Unauthorized }, new DIV { class_ = "main" }._(new H1("You are not logged in.")));
-
             return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindJs, Resource.FindCss } },
                 new DIV { class_ = "main" }._(
                     new FORM { method = method.get, id = "find-form" }.Data("constraints", SvgConstraint.Constraints.OrderBy(c => c.name).Where(c => ConstraintGenerator.All.Any(g => g.type.Equals(c.type))).ToJsonList(elem => new JsonDict { ["name"] = elem.name, ["id"] = elem.type.Name }).ToString())._(
                         new H1("Find puzzles"),
-                        new DIV { class_ = "controls" }._(
+                        session == null || session.User == null ? null : new DIV { class_ = "controls" }._(
                             "Find puzzles that I’ve: ",
                             new SPAN { class_ = "inner" }._(
                                 new INPUT { class_ = "trigger", type = itype.radio, name = "what", value = "solved", id = "solved", accesskey = "1", checked_ = true },
@@ -56,9 +53,10 @@ namespace KyudosudokuWebsite
 
             /* FILTERS */
 
-            var what = json["what"].GetString();
+            var what = "not-seen";
             if (session.User != null)
             {
+                what = json["what"].GetString();
                 switch (what)
                 {
                     case "solved":
