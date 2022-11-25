@@ -34,7 +34,7 @@ namespace KyudosudokuWebsite
         public string DbConnectionString = null;
 
         [Option("-d"), Documentation("Specify a date. Only puzzles generated since that date are re-evaluated.")]
-        public string SinceDate;
+        public string SinceDate = null;
 
         public override int Execute()
         {

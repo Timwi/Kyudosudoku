@@ -42,7 +42,7 @@ namespace KyudosudokuWebsite
             var unfinishedPuzzleIds = unfinishedPuzzles.Select(p => p.PuzzleID).ToArray();
             var unsolvedPuzzles = (session.User == null ? db.Puzzles : db.Puzzles.Where(p => !db.UserPuzzles.Any(up => up.UserID == session.User.UserID && up.PuzzleID == p.PuzzleID))).Where(p => !unfinishedPuzzleIds.Contains(p.PuzzleID)).ToArray();
             var tmpUnsolvedPuzzles = unsolvedPuzzles.Shuffle().OrderBy(p => !string.IsNullOrEmpty(p.ConstraintNames)).ToArray();
-            var showUnsolvedPuzzles = tmpUnsolvedPuzzles.Take(1).Concat(tmpUnsolvedPuzzles.Subarray(tmpUnsolvedPuzzles.Length - 2)).ToArray();
+            var showUnsolvedPuzzles = tmpUnsolvedPuzzles.Take(1).Concat(tmpUnsolvedPuzzles.Subarray((tmpUnsolvedPuzzles.Length - 2).ClipMin(0))).ToArray();
 
             static object puzzleBox(Puzzle pz) => new A { href = $"/puzzle/{pz.PuzzleID}" }._(
                 new DIV { class_ = "puzzle-id" }._("Puzzle", new BR(), $"#{pz.PuzzleID}"),
@@ -53,11 +53,14 @@ namespace KyudosudokuWebsite
                 new DIV { class_ = "main" }._(
                     session.User != null ? null : new DIV { class_ = "warning" }._(new STRONG("You are not logged in."), " Your puzzle progress is only saved to your local browser. If you log in with an account, the website can restore your puzzle progress across multiple devices and keep track of which puzzles you’ve already solved."),
                     _news.FirstOrDefault(n => (DateTime.UtcNow - n.Date).TotalDays < 30).NullOr(n => new DIV { id = "news" }._(new DIV { class_ = "date" }._(n.Date.ToString("yyyy-MMM-dd")), new DIV { class_ = "title" }._(new A { href = "/news" }._(n.Title)))),
-                    new H1("Try these puzzles:"),
-                    new DIV { class_ = "choice" }._(showUnsolvedPuzzles.Select(puzzleBox)),
-                    unfinishedPuzzles.Length == 0 ? null : Ut.NewArray<object>(
-                        new H1("Finish these puzzles:"),
-                        new DIV { class_ = "choice" }._(unfinishedPuzzles.Shuffle().Take(3).Select(puzzleBox)))));
+                    showUnsolvedPuzzles.Length == 0 && unfinishedPuzzles.Length == 0
+                        ? new P("Looks like you’ve solved all puzzles on this website. Come back in an hour and a wild new puzzle may appear!")
+                        : Ut.NewArray<object>(
+                            new H1("Try these puzzles:"),
+                            new DIV { class_ = "choice" }._(showUnsolvedPuzzles.Select(puzzleBox)),
+                            unfinishedPuzzles.Length == 0 ? null : Ut.NewArray<object>(
+                                new H1("Finish these puzzles:"),
+                                new DIV { class_ = "choice" }._(unfinishedPuzzles.Shuffle().Take(3).Select(puzzleBox))))));
         });
 
         private HttpResponse newsPage(HttpRequest req) => withSession(req, (session, db) =>

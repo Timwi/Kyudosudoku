@@ -10,7 +10,7 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    sealed class Kyudosudoku
+    public sealed class Kyudosudoku
     {
         public int[][] Grids { get; private set; }
         public SvgConstraint[] Constraints { get; private set; }
