@@ -91,7 +91,7 @@ namespace KyudosudokuWebsite
                 var strs = lst.Select(v => v.GetStringSafe().NullOr(s => $"%<{s}>%")).ToArray();
                 foreach (var val in strs)
                     if (val != null)
-                        puzzles = puzzles.Where(p => !DbFunctions.Like(p.Puzzle.ConstraintNames, val));
+                        puzzles = puzzles.Where(p => p.Puzzle.ConstraintNames == null || !DbFunctions.Like(p.Puzzle.ConstraintNames, val));
             }
 
             var count = puzzles.Count();
