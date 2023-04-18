@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using KyudosudokuWebsite.Database;
@@ -27,10 +25,39 @@ namespace KyudosudokuWebsite
         }
     }
 
+    [CommandName("resetpassword"), DocumentationLiteral("Resets a user’s password.")]
+    sealed class ResetPassword : CommandLineBase, ICommandLineValidatable
+    {
+        [IsMandatory, IsPositional, DocumentationLiteral("The new password for the user.")]
+        public string NewPassword = null;
+
+        [IsMandatory, IsPositional, DocumentationLiteral("Database connection string.")]
+        public string DbConnectionString = null;
+
+        [Option("-i"), DocumentationLiteral("The numerical ID of the user.")]
+        public int? UserID = null;
+
+        [Option("-n"), DocumentationLiteral("The login name of the user.")]
+        public string Username = null;
+
+        public override int Execute()
+        {
+            Db.ConnectionString = DbConnectionString;
+            var db = new Db();
+            var user = UserID == null ? db.Users.Single(u => u.Username == Username) : db.Users.Single(u => u.UserID == UserID.Value);
+            user.PasswordHash = KyudosudokuPropellerModule.CreatePasswordHash(NewPassword);
+            db.SaveChanges();
+            Console.WriteLine($"Password for user {user.Username} ({user.UserID}) changed.");
+            return 0;
+        }
+
+        public ConsoleColoredString Validate() => UserID == null ^ Username == null ? null : "Either UserID or UserName must be specified, but not both.";
+    }
+
     [CommandName("reeval"), DocumentationLiteral("Re-evaluates puzzles to check for redundant constraints.")]
     sealed class Reeval : CommandLineBase, ICommandLineValidatable
     {
-        [IsPositional, IsMandatory, Documentation("Database connection string.")]
+        [IsPositional, IsMandatory, DocumentationLiteral("Database connection string.")]
         public string DbConnectionString = null;
 
         [Option("-d"), Documentation("Specify a date. Only puzzles generated since that date are re-evaluated.")]

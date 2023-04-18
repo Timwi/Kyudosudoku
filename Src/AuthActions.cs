@@ -49,7 +49,7 @@ namespace KyudosudokuWebsite
             {
                 Username = username,
                 EmailAddress = string.IsNullOrWhiteSpace(req.Post["email"].Value) ? null : req.Post["email"].Value,
-                PasswordHash = createPasswordHash(password),
+                PasswordHash = CreatePasswordHash(password),
                 ShowErrors = true,
                 SemitransparentXs = false,
                 ShowSolveTime = true,
@@ -105,7 +105,7 @@ namespace KyudosudokuWebsite
             }
             if (changingPassword)
             {
-                session.User.PasswordHash = createPasswordHash(req.Post["password1"].Value);
+                session.User.PasswordHash = CreatePasswordHash(req.Post["password1"].Value);
                 messages.Add("Password updated.");
             }
 
@@ -135,7 +135,7 @@ namespace KyudosudokuWebsite
             return userPage(req, redirectTo, session.User, db, updateUserSuccess: messages);
         });
 
-        private static string createPasswordHash(string password)
+        public static string CreatePasswordHash(string password)
         {
             var salt = new byte[8];
             new RNGCryptoServiceProvider().GetBytes(salt);
