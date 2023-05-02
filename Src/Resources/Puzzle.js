@@ -755,7 +755,10 @@
 				}
 
 				document.getElementById(`p-${puzzleId}-sudoku-text-${cell}`).textContent = intendedText !== null ? intendedText : '';
-				document.getElementById(`p-${puzzleId}-sudoku-center-text-${cell}`).textContent = intendedCenterDigits !== null ? intendedCenterDigits : '';
+				let centerText = document.getElementById(`p-${puzzleId}-sudoku-center-text-${cell}`);
+				centerText.textContent = intendedCenterDigits !== null ? intendedCenterDigits : '';
+				let bb = centerText.getBBox();
+				centerText.setAttribute('transform', `translate(${cell % 9 + .5} ${((cell / 9) | 0) + .5})${bb.width > .85 ? ` scale(${.85 / bb.width})` : ''}`);
 				for (let i = 0; i < 8; i++)
 					document.getElementById(`p-${puzzleId}-sudoku-corner-text-${cell}-${i}`).textContent = intendedCornerDigits !== null && i < intendedCornerDigits.length ? intendedCornerDigits[i] : '';
 			}

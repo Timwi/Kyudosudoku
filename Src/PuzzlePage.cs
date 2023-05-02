@@ -158,7 +158,7 @@ namespace KyudosudokuWebsite
                     {(hasTooltip ? $"data-name='{constraints.Where(c => c.IncludesCell(cell)).Select(c => c.Name).ToJsonList()}' data-description='{constraints.Where(c => c.IncludesCell(cell)).Select(c => c.Description).ToJsonList()}'" : null)} />
                 <text id='p-{puzzleId}-sudoku-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .725}'>{givens?.Get(cell, null)}</text>
                 {(forHelpPage ? null : $@"
-                    <text class='notation' id='p-{puzzleId}-sudoku-center-text-{cell}' x='{cell % 9 + .5}' y='{cell / 9 + .62}' font-size='.3'></text>
+                    <text class='notation' id='p-{puzzleId}-sudoku-center-text-{cell}' font-size='.3' y='.12'></text>
                     <text class='notation' id='p-{puzzleId}-sudoku-corner-text-{cell}-0' x='{cell % 9 + .1}' y='{cell / 9 + .3}' font-size='.25' text-anchor='start'></text>
                     <text class='notation' id='p-{puzzleId}-sudoku-corner-text-{cell}-1' x='{cell % 9 + .9}' y='{cell / 9 + .3}' font-size='.25' text-anchor='end'></text>
                     <text class='notation' id='p-{puzzleId}-sudoku-corner-text-{cell}-2' x='{cell % 9 + .1}' y='{cell / 9 + .875}' font-size='.25' text-anchor='start'></text>
