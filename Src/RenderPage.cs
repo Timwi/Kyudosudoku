@@ -41,7 +41,7 @@ namespace KyudosudokuWebsite
 
             var footer = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
                 new P { class_ = "legal" }._(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")),
-                new P("Send feedback and suggestions to Timwi#0551 or Goofy#1262 on Discord, or post a ticket to ", new A { href = "https://github.com/Timwi/Kyudosudoku/issues" }._("Kyudosudoku on GitHub"), "."));
+                new P("Send feedback and suggestions to Timwi on Discord, or post a ticket to ", new A { href = "https://github.com/Timwi/Kyudosudoku/issues" }._("Kyudosudoku on GitHub"), "."));
 
             return HttpResponse.Html(Tag.ToString(new HTML(
                 new HEAD(
