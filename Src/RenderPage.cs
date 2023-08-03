@@ -17,7 +17,7 @@ namespace KyudosudokuWebsite
             public int? PuzzleID;
             public bool AddFooter;
             public Db Db;
-            public List<Resource> Resources = new List<Resource>();
+            public List<Resource> Resources = new();
         }
 
         private HttpResponse RenderPage(string title, User loggedInUser, PageOptions opt, params object[] body)
@@ -32,12 +32,11 @@ namespace KyudosudokuWebsite
                     new A { href = "/help" }._("How to play"),
                     new A { href = "/auth" }._(loggedInUser == null ? "Log in" : "Settings")));
 
-            var solveCount = loggedInUser == null ? 0 : opt.Db.UserPuzzles.Where(up => up.UserID == loggedInUser.UserID && up.Solved).Count();
             var sidebar = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
-                loggedInUser == null || opt.Db == null ? null : new DIV { class_ = "stats" }._(
+                loggedInUser == null || opt.Db == null ? null : opt.Db.UserPuzzles.Where(up => up.UserID == loggedInUser.UserID && up.Solved).Count().Apply(solveCount => new DIV { class_ = "stats" }._(
                     new DIV("You’ve solved"),
                     new DIV { class_ = "solve-count" }._(solveCount),
-                    new DIV(solveCount == 1 ? "puzzle." : "puzzles.")),
+                    new DIV(solveCount == 1 ? "puzzle." : "puzzles."))),
                 new A { href = "/find" }._("Find puzzles"));
 
             var footer = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
