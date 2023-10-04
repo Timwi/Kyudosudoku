@@ -104,21 +104,20 @@ namespace KyudosudokuWebsite
             /* SORT */
 
             var asc = json["asc"].GetBool();
-            puzzles = json["sort"].GetString() switch
+            var sortedPuzzles = json["sort"].GetString() switch
             {
-                "puzzleId" => asc ? puzzles.OrderBy(p => p.Puzzle.PuzzleID) : puzzles.OrderByDescending(p => p.Puzzle.PuzzleID),
                 "avg" => asc ? puzzles.OrderBy(p => p.Puzzle.AverageTime) : puzzles.OrderByDescending(p => p.Puzzle.AverageTime),
                 "solves" => asc ? puzzles.OrderBy(p => p.SolveCount) : puzzles.OrderByDescending(p => p.SolveCount),
-                "your-time" => nu ? puzzles : asc ? puzzles.OrderBy(p => p.UserPuzzle.Time) : puzzles.OrderByDescending(p => p.UserPuzzle.Time),
-                "solvetime" => nu ? puzzles : asc ? puzzles.OrderBy(p => p.UserPuzzle.SolveTime) : puzzles.OrderByDescending(p => p.UserPuzzle.SolveTime),
+                "your-time" => nu ? puzzles.OrderBy(p => p.Puzzle.PuzzleID) : asc ? puzzles.OrderBy(p => p.UserPuzzle.Time) : puzzles.OrderByDescending(p => p.UserPuzzle.Time),
+                "solvetime" => nu ? puzzles.OrderBy(p => p.Puzzle.PuzzleID) : asc ? puzzles.OrderBy(p => p.UserPuzzle.SolveTime) : puzzles.OrderByDescending(p => p.UserPuzzle.SolveTime),
                 "numconstr" => asc ? puzzles.OrderBy(p => p.Puzzle.NumConstraints) : puzzles.OrderByDescending(p => p.Puzzle.NumConstraints),
-                _ => puzzles
+                _ /* puzzleId */ => asc ? puzzles.OrderBy(p => p.Puzzle.PuzzleID) : puzzles.OrderByDescending(p => p.Puzzle.PuzzleID)
             };
 
 
             /* PAGINATION */
 
-            puzzles = puzzles.Skip(pageNum * numPuzzlesPerPage).Take(numPuzzlesPerPage);
+            puzzles = sortedPuzzles.Skip(pageNum * numPuzzlesPerPage).Take(numPuzzlesPerPage);
 
 
             /* GENERATE HTML */
