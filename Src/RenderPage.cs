@@ -29,6 +29,7 @@ namespace KyudosudokuWebsite
                 new A { class_ = "home", href = "/" }._("Kyudosudoku"),
                 opt.PuzzleID == null ? null : new DIV { class_ = "puzzle-id" }._($"Puzzle #{opt.PuzzleID.Value}"),
                 new DIV { class_ = "right" }._(
+                    loggedInUser == null ? null : new A { href = $"/profile/{loggedInUser.UserID}" }._("Profile"),
                     new A { href = "/help" }._("How to play"),
                     new A { href = "/auth" }._(loggedInUser == null ? "Log in" : "Settings")));
 
@@ -41,7 +42,7 @@ namespace KyudosudokuWebsite
 
             var footer = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
                 new P { class_ = "legal" }._(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")),
-                new P("Send feedback and suggestions to Timwi on Discord, or post a ticket to ", new A { href = "https://github.com/Timwi/Kyudosudoku/issues" }._("Kyudosudoku on GitHub"), "."));
+                new P(new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."));
 
             return HttpResponse.Html(Tag.ToString(new HTML(
                 new HEAD(

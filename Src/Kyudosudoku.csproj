@@ -106,6 +106,7 @@
     <Compile Include="Database\UserPuzzle.cs" />
     <Compile Include="Database\Puzzle.cs" />
     <Compile Include="DbSession.cs" />
+    <Compile Include="ProfilePage.cs" />
     <Compile Include="NewsItem.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="Kyudosudoku.cs" />

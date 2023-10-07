@@ -31,6 +31,7 @@ namespace KyudosudokuWebsite
             _resolver = new UrlResolver(
                 new UrlMapping(path: "/", specificPath: true, handler: mainPage),
                 new UrlMapping(path: "/news", specificPath: true, handler: newsPage),
+                new UrlMapping(path: "/profile", handler: profilePage),
                 new UrlMapping(path: "/help", specificPath: true, handler: helpPage),
                 new UrlMapping(path: "/constraints", specificPath: true, handler: constraintsPage),
                 new UrlMapping(path: "/find", specificPath: true, handler: findPuzzlesPage),
