@@ -23,16 +23,16 @@ namespace KyudosudokuWebsite
             if (!db.Users.Any(user => user.UserID == linkUserId))
                 return page404(req);
 
-            var solvedPuzzles = db.UserPuzzles.Where(puzzle => puzzle.UserID == linkUserId && puzzle.Solved);
-
             var recentPuzzles = db.UserPuzzles.Where(puzzle => puzzle.UserID == linkUserId && puzzle.Solved).OrderByDescending(n => n.SolveTime).Take(10)
-                .Select(up => db.Puzzles.FirstOrDefault(p => p.PuzzleID == up.PuzzleID)).ToArray();
-
-            object renderRecentPuzzles(Puzzle pz) => new TR(
-                new TD(pz.PuzzleID),
-                new TD(pz.AverageTime),
-                new TD(solvedPuzzles.First(puzzle => puzzle.PuzzleID == pz.PuzzleID).Time),
-                new TD(pz.ConstraintNames == null || pz.ConstraintNames.Length == 0 ? "(none)" : $"{pz.NumConstraints}: {pz.ConstraintNames.Substring(1, pz.ConstraintNames.Length - 2).Split("><").Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).JoinString(", ")}"));
+                .Select(up => new
+                {
+                    UserPuzzle = up,
+                    Puzzle = db.Puzzles.FirstOrDefault(p => p.PuzzleID == up.PuzzleID),
+                    SolveCount = db.UserPuzzles.Count(up2 => up2.PuzzleID == up.PuzzleID && up2.Solved)
+                })
+                .AsEnumerable()
+                .Select(inf => new PuzzleResultInfo(inf.Puzzle, inf.UserPuzzle, inf.SolveCount))
+                .ToArray();
 
             return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindCss } },
                 new DIV { class_ = "main" }._(
@@ -44,13 +44,7 @@ namespace KyudosudokuWebsite
                         new LI($"Puzzles equal the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}")),
                     new H2($"Latest puzzles:"),
                     new DIV { id = "results" }._(
-                        new TABLE { class_ = "big" }._(
-                            new TR { class_ = "headers" }._(
-                                new TH { class_ = "nowrap" }._("Puzzle"),
-                                new TH { class_ = "nowrap" }._("Average time"),
-                                new TH { class_ = "nowrap" }._("Time"),
-                                new TH { class_ = "nowrap" }._("Constraints")),
-                            recentPuzzles.Select(renderRecentPuzzles)))));
+                        GeneratePuzzleTable(recentPuzzles, recentPuzzles.Length, PuzzleTableType.Solved))));
         });
     }
 }

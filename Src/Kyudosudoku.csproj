@@ -106,8 +106,11 @@
     <Compile Include="Database\UserPuzzle.cs" />
     <Compile Include="Database\Puzzle.cs" />
     <Compile Include="DbSession.cs" />
+    <Compile Include="General.cs" />
     <Compile Include="ProfilePage.cs" />
     <Compile Include="NewsItem.cs" />
+    <Compile Include="PuzzleResultInfo.cs" />
+    <Compile Include="PuzzleTableType.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="Kyudosudoku.cs" />
     <Compile Include="KyudosudokuPropellerModule.cs" />

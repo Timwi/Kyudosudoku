@@ -124,60 +124,15 @@ namespace KyudosudokuWebsite
             /* PAGINATION */
 
             puzzles = sortedPuzzles.Skip(pageNum * numPuzzlesPerPage).Take(numPuzzlesPerPage);
+            var results = puzzles.AsEnumerable().Select(inf => new PuzzleResultInfo(inf.Puzzle, inf.UserPuzzle, inf.SolveCount));
 
 
             /* GENERATE HTML */
 
-            static object time(Puzzle puzzle) => Ut.NewArray<object>(
-                puzzle.AverageTime == null ? "🕛" : "🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚".Substring(((int) puzzle.AverageTime.Value) / 60 % 60 / 5 * 2, 2),
-                " ", formatTime(puzzle.AverageTime));
-
-            static object solveTime(UserPuzzle userPuzzle) => userPuzzle == null
-                ? "🕛 —"
-                : new[] { "🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚".Substring(userPuzzle.Time / 60 % 60 / 5 * 2, 2), " ", formatTime(userPuzzle.Time) };
-
-            static object lastSeen(UserPuzzle userPuzzle) => Ut.NewArray<object>(
-                "😎 ",
-                userPuzzle == null ? "—" : userPuzzle.SolveTime.Year == 1900 ? "(not recorded)" : userPuzzle.SolveTime.ToString("d MMM yyyy, H:mm"));
-
             return HttpResponse.Json(new JsonDict
             {
-                ["html"] = Tag.ToString(count == 0 ? new P("No results.") : Ut.NewArray(
-
-                    // Big version of the table for desktop view
-                    new TABLE { class_ = "big" }._(
-                        new TR { class_ = "headers" }._(
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Puzzle").Data("sort", "puzzleId")),
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg")),
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("# solves").Data("sort", "solves")),
-                            what != "solved" ? null : new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Your time").Data("sort", "your-time")),
-                            what == "not-seen" ? null : new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._(what == "solved" ? "When solved" : "Last seen").Data("sort", "solvetime")),
-                            new TH(new A { href = "#", class_ = "sorter" }._("Constraints").Data("sort", "numconstr"))),
-                        puzzles.AsEnumerable().Select(inf => new TR(
-                            new TD { class_ = "nowrap" }._("▶ ", new A { href = $"/puzzle/{inf.Puzzle.PuzzleID}" }._("Puzzle #", inf.Puzzle.PuzzleID)),
-                            new TD { class_ = "nowrap" }._(time(inf.Puzzle)),
-                            new TD { class_ = "nowrap" }._(inf.SolveCount),
-                            what != "solved" ? null : new TD { class_ = "nowrap" }._(solveTime(inf.UserPuzzle)),
-                            what == "not-seen" ? null : new TD { class_ = "nowrap" }._(lastSeen(inf.UserPuzzle)),
-                            new TD(inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(none)" : $"{inf.Puzzle.NumConstraints}: {inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><").Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).JoinString(", ")}")))),
-
-                    // Small version of the table for mobile view
-                    new TABLE { class_ = "small" }._(
-                        new TR { class_ = "headers" }._(
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Puzzle").Data("sort", "puzzleId")),
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg"))),
-                        puzzles.AsEnumerable().Select(inf => new TR(
-                            new TD("▶ ", new A { href = $"/puzzle/{inf.Puzzle.PuzzleID}" }._("Puzzle #", inf.Puzzle.PuzzleID),
-                                new DIV { class_ = "constraints" }._(
-                                    inf.Puzzle.ConstraintNames == null || inf.Puzzle.ConstraintNames.Length == 0 ? "(no constraints)" :
-                                    inf.Puzzle.ConstraintNames.Substring(1, inf.Puzzle.ConstraintNames.Length - 2).Split("><")
-                                        .Select(cn => SvgConstraint.Constraints.FirstOrDefault(tup => tup.type.Name == cn).name).Order().InsertBetween(", "))),
-                            new TD { class_ = "nowrap" }._(
-                                new DIV { class_ = "solve-count" }._("Solved: ", inf.SolveCount == 0 ? "never" : inf.SolveCount == 1 ? "once" : $"{inf.SolveCount} times"),
-                                new DIV { class_ = "avg" }._("Average time: ", time(inf.Puzzle)),
-                                what != "solved" ? null : new DIV { class_ = "solve-time" }._("Your time: ", solveTime(inf.UserPuzzle)),
-                                what == "not-seen" ? null : new DIV { class_ = "last-seen" }._(what == "solved" ? "When: " : "Seen: ", lastSeen(inf.UserPuzzle)))))))),
-
+                ["html"] = Tag.ToString(GeneratePuzzleTable(results, count,
+                    what switch { "solved" => PuzzleTableType.Solved, "started" => PuzzleTableType.Started, _ => PuzzleTableType.NotSeen })),
                 ["pageNum"] = pageNum,
                 ["pageCount"] = pageCount
             });
