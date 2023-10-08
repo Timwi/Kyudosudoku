@@ -132,7 +132,7 @@ namespace KyudosudokuWebsite
             return HttpResponse.Json(new JsonDict
             {
                 ["html"] = Tag.ToString(GeneratePuzzleTable(results, count,
-                    what switch { "solved" => PuzzleTableType.Solved, "started" => PuzzleTableType.Started, _ => PuzzleTableType.NotSeen })),
+                    what switch { "solved" => PuzzleTableType.Solved, "started" => PuzzleTableType.Started, _ => PuzzleTableType.NotSeen }, sortable: true)),
                 ["pageNum"] = pageNum,
                 ["pageCount"] = pageCount
             });

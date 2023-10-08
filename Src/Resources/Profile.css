@@ -1,0 +1,52 @@
+h1 {
+    margin: 0 !important;
+}
+
+.profileContainer {
+    display: grid;
+    grid-template-columns: 70% 30%;
+}
+
+    .profileContainer > .chartContainer {
+        width: 100%;
+        background-color: hsl(220, 70%, 80%);
+    }
+
+    .profileContainer > .chartContainer > .chart {
+        text-align: center;
+        white-space: nowrap;
+        margin: 5px;
+    }
+
+    .profileContainer > .chartContainer > .chart > table {
+        border: none;
+        border-collapse: separate;
+
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .profileContainer > .chartContainer > .chart > table > tbody {
+        width: 90%;
+    }
+
+    .profileContainer > .chartContainer > .chart > table > tbody > tr > .daySquare {
+        text-align: center;
+        color: white;
+
+        border: 1px solid black;
+        background-color: #f0f0f0;
+
+        width: 10%;
+        height: auto;
+    }
+
+    .profileContainer > .chartContainer > .chart > table > tbody > tr > .weekText {
+        font-size: 80%;
+    }
+
+@media only screen and (max-width: 860px) {
+    .profileContainer {
+        display: block;
+    }
+}

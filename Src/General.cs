@@ -10,10 +10,10 @@ namespace KyudosudokuWebsite
 {
     partial class KyudosudokuPropellerModule
     {
-        private object GeneratePuzzleTable(IEnumerable<PuzzleResultInfo> puzzles, int count, PuzzleTableType type)
+        private object GeneratePuzzleTable(IEnumerable<PuzzleResultInfo> puzzles, int count, PuzzleTableType type, bool sortable)
         {
             static object time(Puzzle puzzle) => Ut.NewArray<object>(
-                puzzle.AverageTime == null ? "🕛" : "🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚".Substring(((int) puzzle.AverageTime.Value) / 60 % 60 / 5 * 2, 2),
+                puzzle.AverageTime == null ? "🕛" : "🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚".Substring(((int)puzzle.AverageTime.Value) / 60 % 60 / 5 * 2, 2),
                 " ", formatTime(puzzle.AverageTime));
 
             static object solveTime(UserPuzzle userPuzzle) => userPuzzle == null
@@ -29,12 +29,12 @@ namespace KyudosudokuWebsite
                     // Big version of the table for desktop view
                     new TABLE { class_ = "big" }._(
                         new TR { class_ = "headers" }._(
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Puzzle").Data("sort", "puzzleId")),
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg")),
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("# solves").Data("sort", "solves")),
-                            type != PuzzleTableType.Solved ? null : new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Your time").Data("sort", "your-time")),
-                            type == PuzzleTableType.NotSeen ? null : new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._(type == PuzzleTableType.Solved ? "When solved" : "Last seen").Data("sort", "solvetime")),
-                            new TH(new A { href = "#", class_ = "sorter" }._("Constraints").Data("sort", "numconstr"))),
+                            new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._("Puzzle").Data("sort", "puzzleId") : "Puzzle"),
+                            new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg") : "Average time"),
+                            new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._("# solves").Data("sort", "solves") : "# solves"),
+                            type != PuzzleTableType.Solved ? null : new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._("Your time").Data("sort", "your-time") : "Your time"),
+                            type == PuzzleTableType.NotSeen ? null : new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._(type == PuzzleTableType.Solved ? "When solved" : "Last seen").Data("sort", "solvetime") : type == PuzzleTableType.Solved ? "When solved" : "Last seen"),
+                            new TH(sortable ? new A { href = "#", class_ = "sorter" }._("Constraints").Data("sort", "numconstr") : "Constraints")),
                         puzzles.AsEnumerable().Select(inf => new TR(
                             new TD { class_ = "nowrap" }._("▶ ", new A { href = $"/puzzle/{inf.Puzzle.PuzzleID}" }._("Puzzle #", inf.Puzzle.PuzzleID)),
                             new TD { class_ = "nowrap" }._(time(inf.Puzzle)),
@@ -46,8 +46,8 @@ namespace KyudosudokuWebsite
                     // Small version of the table for mobile view
                     new TABLE { class_ = "small" }._(
                         new TR { class_ = "headers" }._(
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Puzzle").Data("sort", "puzzleId")),
-                            new TH { class_ = "nowrap" }._(new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg"))),
+                            new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._("Puzzle").Data("sort", "puzzleId") : "Puzzle"),
+                            new TH { class_ = "nowrap" }._(sortable ? new A { href = "#", class_ = "sorter" }._("Average time").Data("sort", "avg") : "Average time")),
                         puzzles.AsEnumerable().Select(inf => new TR(
                             new TD("▶ ", new A { href = $"/puzzle/{inf.Puzzle.PuzzleID}" }._("Puzzle #", inf.Puzzle.PuzzleID),
                                 new DIV { class_ = "constraints" }._(

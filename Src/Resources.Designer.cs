@@ -150,35 +150,53 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to * {
+        ///
+        ///}.
+        /// </summary>
+        internal static string ProfileCss {
+            get {
+                return ResourceManager.GetString("ProfileCss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to body.is-puzzle {
-        ///    overflow: hidden;
+        ///	overflow: hidden;
         ///}
         ///
-        ///    body.is-puzzle div.warning {
-        ///        border-left: none;
-        ///        border-right: none;
-        ///        padding: .2cm .4cm;
-        ///        font-size: 12pt;
-        ///    }
+        ///	body.is-puzzle div.warning {
+        ///		border-left: none;
+        ///		border-right: none;
+        ///		padding: .2cm .4cm;
+        ///		font-size: 12pt;
+        ///	}
         ///
         ///.puzzle {
-        ///    outline: none;
-        ///    touch-action: none;
+        ///	outline: none;
+        ///	touch-action: none;
         ///}
         ///
-        ///    .puzzle svg {
-        ///        user-select: none;
-        ///        margin: 0 auto;
-        ///        display: block;
-        ///    }
+        ///	.puzzle svg {
+        ///		user-select: none;
+        ///		margin: 0 auto;
+        ///		display: block;
+        ///	}
         ///
-        ///        .puzzle svg .solve-glow {
-        ///            visibility: hidden;
-        ///        }
+        ///		.puzzle svg .solve-glow {
+        ///			visibility: hidden;
+        ///		}
         ///
-        ///        .puzzle svg * {
-        ///            pointer-events: none;
-        ///    [rest of string was truncated]&quot;;.
+        ///		.puzzle svg * {
+        ///			pointer-events: none;
+        ///			touch-action: none;
+        ///		}
+        ///
+        ///		.puzzle svg .clickable {
+        ///			pointer-events: all;
+        ///		}
+        ///
+        ///		.puzzle s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleCss {
             get {
@@ -187,7 +205,7 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to window.onload = (function ()
+        ///   Looks up a localized string similar to window.onload = (function()
         ///{
         ///    function remoteLog(msg)
         ///    {
@@ -199,7 +217,7 @@ namespace KyudosudokuWebsite {
         ///
         ///    function inRange(x) { return x &gt;= 0 &amp;&amp; x &lt; 9; }
         ///    function dx(dir) { return dir === &apos;Left&apos; ? -1 : dir === &apos;Right&apos; ? 1 : 0 }
-        ///    function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1 [rest of string was truncated]&quot;;.
+        ///    function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleJs {
             get {
