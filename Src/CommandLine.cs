@@ -51,7 +51,7 @@ namespace KyudosudokuWebsite
             return 0;
         }
 
-        public ConsoleColoredString Validate() => UserID == null ^ Username == null ? null : "Either UserID or UserName must be specified, but not both.";
+        public ConsoleColoredString Validate() => UserID == null ^ Username == null ? null : "Either UserID or UserName must be specified, but not both.".Color(ConsoleColor.Magenta);
     }
 
     [CommandName("reeval"), DocumentationLiteral("Re-evaluates puzzles to check for redundant constraints.")]
@@ -217,6 +217,90 @@ namespace KyudosudokuWebsite
             foreach (var puzzle in db.Puzzles.ToArray())
                 puzzle.AverageTime = db.CalculateAveragePuzzleTime(puzzle.PuzzleID);
             db.SaveChanges();
+            return 0;
+        }
+    }
+
+    [CommandName("stats"), Documentation("Generates some statistics continuously. Warning: uses full CPU and runs forever and is expected to be cancelled.")]
+    sealed class GenerateStatistics : CommandLineBase, ICommandLineValidatable
+    {
+        [IsPositional, IsMandatory, Documentation("JSON file to write statistics to.")]
+        public string OutputFile = null;
+
+        [Option("-s", "--start-seed"), Documentation("Specifies the starting seed at which to start generating puzzles. Default is 3000.")]
+        public int StartSeed = 3000;
+
+        [Option("-c", "--show-constraint"), Documentation("Outputs to the console puzzle IDs that contain a specified constraint.")]
+        public string ConstraintType;
+
+        public ConsoleColoredString Validate() => ConstraintType != null && !ConstraintGenerator.All.Any(cg => cg.type.Name == ConstraintType)
+            ? "The name {0} is not a valid constraint type. Valid constraint types are: {1}."
+                    .Color(ConsoleColor.Magenta)
+                    .Fmt(ConstraintType.Color(ConsoleColor.White), ConstraintGenerator.All.Select(cg => cg.type.Name.Color(ConsoleColor.Yellow)).JoinColoredString(", ".Color(ConsoleColor.DarkYellow)))
+            : null;
+
+        public override int Execute()
+        {
+            var lockObj = new object();
+            var seedCounter = 3000;
+            var stats = new Dictionary<string, int>();
+            var arrowLengthStats = new Dictionary<int, int>();
+            var inclusionNumStats = new Dictionary<int, int>();
+            var killerCageSizeStats = new Dictionary<int, int>();
+            var killerCageSumStats = new Dictionary<int, int>();
+            var renbanCageSizeStats = new Dictionary<int, int>();
+            var palindromeSizeStats = new Dictionary<int, int>();
+            var thermometerSizeStats = new Dictionary<int, int>();
+            var cappedLineSizeStats = new Dictionary<int, int>();
+            var germanWhisperSizeStats = new Dictionary<int, int>();
+            var meansStats = new Dictionary<(int arith, int geom), int>();
+
+            Enumerable.Range(0, Environment.ProcessorCount).ParallelForEach(proc =>
+            {
+                var seed = 0;
+                while (true)
+                {
+                    lock (lockObj)
+                    {
+                        seed = seedCounter++;
+                        Console.WriteLine($"Generating {seed}");
+                    }
+                    var puzzle = Kyudosudoku.Generate(seed);
+                    lock (lockObj)
+                    {
+                        foreach (var constr in puzzle.Constraints)
+                        {
+                            stats.IncSafe(constr.GetType().Name);
+                            if (constr is Arrow a) arrowLengthStats.IncSafe(a.Cells.Length - 1);
+                            else if (constr is Inclusion i) inclusionNumStats.IncSafe(i.Digits.Length);
+                            else if (constr is KillerCage kc) { killerCageSizeStats.IncSafe(kc.Cells.Length); killerCageSumStats.IncSafe(kc.Sum ?? -1); }
+                            else if (constr is RenbanCage rc) renbanCageSizeStats.IncSafe(rc.Cells.Length);
+                            else if (constr is Palindrome p) palindromeSizeStats.IncSafe(p.Cells.Length);
+                            else if (constr is Thermometer t) thermometerSizeStats.IncSafe(t.Cells.Length);
+                            else if (constr is CappedLine cl) cappedLineSizeStats.IncSafe(cl.Cells.Length);
+                            else if (constr is GermanWhisper gw) germanWhisperSizeStats.IncSafe(gw.Cells.Length);
+                            else if (constr is Means m) meansStats.IncSafe((m.NumArithmetic, m.NumGeometric));
+
+                            if (ConstraintType != null && constr.GetType().Name == ConstraintType)
+                                ConsoleUtil.WriteLine($"Puzzle {seed} has constraint {ConstraintType}.".Color(ConsoleColor.Green));
+                        }
+                        ClassifyJson.SerializeToFile(new
+                        {
+                            Stats = stats,
+                            ArrowLengths = arrowLengthStats,
+                            InclusionNums = inclusionNumStats,
+                            KillerCageSizes = killerCageSizeStats,
+                            KillerCageSums = killerCageSumStats,
+                            RenbanCageSizes = renbanCageSizeStats,
+                            PalindromeSizes = palindromeSizeStats,
+                            ThermometerSizes = thermometerSizeStats,
+                            CappedLineSizeStats = cappedLineSizeStats,
+                            GermanWhisperSizeStats = germanWhisperSizeStats,
+                            MeansStats = meansStats
+                        }, OutputFile);
+                    }
+                }
+            });
             return 0;
         }
     }

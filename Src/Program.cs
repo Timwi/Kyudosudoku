@@ -5,7 +5,6 @@ using KyudosudokuWebsite.Database;
 using PuzzleSolvers;
 using RT.CommandLine;
 using RT.Json;
-using RT.Serialization;
 using RT.Util;
 using RT.Util.Consoles;
 using RT.Util.ExtensionMethods;
@@ -61,64 +60,6 @@ namespace KyudosudokuWebsite
                 }
             }
             Console.WriteLine($"count = {count}, puzzles = {puzzleIds.Count}");
-        }
-
-        private static void RunStatistics()
-        {
-            var lockObj = new object();
-            var seedCounter = 3000;
-            var stats = new Dictionary<string, int>();
-            var arrowLengthStats = new Dictionary<int, int>();
-            var inclusionNumStats = new Dictionary<int, int>();
-            var killerCageSizeStats = new Dictionary<int, int>();
-            var killerCageSumStats = new Dictionary<int, int>();
-            var renbanCageSizeStats = new Dictionary<int, int>();
-            var palindromeSizeStats = new Dictionary<int, int>();
-            var thermometerSizeStats = new Dictionary<int, int>();
-            var cappedLineSizeStats = new Dictionary<int, int>();
-            var germanWhisperSizeStats = new Dictionary<int, int>();
-
-            Enumerable.Range(0, Environment.ProcessorCount).ParallelForEach(proc =>
-            {
-                var seed = 0;
-                while (true)
-                {
-                    lock (lockObj)
-                    {
-                        seed = seedCounter++;
-                        Console.WriteLine($"Generating {seed}");
-                    }
-                    var puzzle = Kyudosudoku.Generate(seed);
-                    lock (lockObj)
-                    {
-                        foreach (var constr in puzzle.Constraints)
-                        {
-                            stats.IncSafe(constr.GetType().Name);
-                            if (constr is Arrow a) arrowLengthStats.IncSafe(a.Cells.Length - 1);
-                            if (constr is Inclusion i) inclusionNumStats.IncSafe(i.Digits.Length);
-                            if (constr is KillerCage kc) { killerCageSizeStats.IncSafe(kc.Cells.Length); killerCageSumStats.IncSafe(kc.Sum ?? -1); }
-                            if (constr is RenbanCage rc) renbanCageSizeStats.IncSafe(rc.Cells.Length);
-                            if (constr is Palindrome p) palindromeSizeStats.IncSafe(p.Cells.Length);
-                            if (constr is Thermometer t) thermometerSizeStats.IncSafe(t.Cells.Length);
-                            if (constr is CappedLine cl) cappedLineSizeStats.IncSafe(cl.Cells.Length);
-                            if (constr is GermanWhisper gw) germanWhisperSizeStats.IncSafe(gw.Cells.Length);
-                        }
-                        ClassifyJson.SerializeToFile(new
-                        {
-                            Stats = stats,
-                            ArrowLengths = arrowLengthStats,
-                            InclusionNums = inclusionNumStats,
-                            KillerCageSizes = killerCageSizeStats,
-                            KillerCageSums = killerCageSumStats,
-                            RenbanCageSizes = renbanCageSizeStats,
-                            PalindromeSizes = palindromeSizeStats,
-                            ThermometerSizes = thermometerSizeStats,
-                            CappedLineSizeStats = cappedLineSizeStats,
-                            GermanWhisperSizeStats = germanWhisperSizeStats
-                        }, @"D:\temp\kyudo-stats.json");
-                    }
-                }
-            });
         }
 
         private static int FindPuzzleWithConstraint()
