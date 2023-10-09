@@ -74,9 +74,15 @@ namespace KyudosudokuWebsite
             var filteravgmin = json["filteravgmin"].GetIntSafe();
             var filteravgmax = json["filteravgmax"].GetIntSafe();
             if (filteravgmin != null)
-                puzzles = puzzles.Where(inf => inf.Puzzle.AverageTime == null || inf.Puzzle.AverageTime.Value >= filteravgmin.Value * 60);
+            {
+                var min = filteravgmin.Value.ClipMin(0).ClipMax(86400) * 60;
+                puzzles = puzzles.Where(inf => inf.Puzzle.AverageTime == null || inf.Puzzle.AverageTime.Value >= min);
+            }
             if (filteravgmax != null)
-                puzzles = puzzles.Where(inf => inf.Puzzle.AverageTime == null || inf.Puzzle.AverageTime.Value < (filteravgmax.Value + 1) * 60);
+            {
+                var max = (filteravgmax.Value.ClipMin(0).ClipMax(86400) + 1) * 60;
+                puzzles = puzzles.Where(inf => inf.Puzzle.AverageTime == null || inf.Puzzle.AverageTime.Value < max);
+            }
 
             JsonList lst;
             if ((lst = json.Safe["constraints"].Safe["include-constraints"].GetListSafe()) != null)
