@@ -15,6 +15,17 @@ namespace KyudosudokuWebsite
         (
             new NewsItem
             {
+                Date = new DateTime(2023, 10, 9),
+                Title = "Two new constraints: German Whisper and Means",
+                MessageHtml = Ut.NewArray<object>(
+                    new P("We have introduced two new variety Sudoku constraints!"),
+                    new P("The German Whisper line may well be familiar to seasoned Sudoku solvers. Simply keep adjacent digits at a difference of at least 5! Sounds simple, but can give rise to deceptively intricate deductions."),
+                    new P("The Means constraint is a novel idea. It regulates how many of the digits surrounding a cell can cause the constrained cell to be their arithmetic mean ((a+b)/2) or geometric mean (√(ab)). Something for the maths enthusiasts!"),
+                    new P("To try out these new constraints, check out puzzles #", new A { href = "/puzzle/3034" }._("3034"), " and #", new A { href = "/puzzle/3045" }._("3045"), "."))
+            },
+
+            new NewsItem
+            {
                 Date = new DateTime(2021, 6, 15),
                 Title = "Graphics changes and a new constraint",
                 MessageHtml = Ut.NewArray<object>(
