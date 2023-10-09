@@ -29,19 +29,25 @@ namespace KyudosudokuWebsite
             }
 
             _resolver = new UrlResolver(
+                // HTML pages
                 new UrlMapping(path: "/", specificPath: true, handler: mainPage),
                 new UrlMapping(path: "/news", specificPath: true, handler: newsPage),
                 new UrlMapping(path: "/profile", handler: profilePage),
                 new UrlMapping(path: "/help", specificPath: true, handler: helpPage),
                 new UrlMapping(path: "/constraints", specificPath: true, handler: constraintsPage),
                 new UrlMapping(path: "/find", specificPath: true, handler: findPuzzlesPage),
-                new UrlMapping(path: "/find-puzzles", specificPath: true, handler: findPuzzlesHandler),
                 new UrlMapping(path: "/auth", handler: getAuthResolver().Handle),
                 new UrlMapping(path: "/puzzle", handler: req => withSession(req, (session, db) => PuzzlePage(req, session, db))),
-                new UrlMapping(path: "/logo", handler: req => HttpResponse.Create(Resources.Logo, "image/png")),
 #if DEBUG
                 new UrlMapping(path: "/remote-log", handler: remoteLog),
 #endif
+
+                // AJAX handlers
+                new UrlMapping(path: "/find-puzzles", specificPath: true, handler: findPuzzlesHandler),
+                new UrlMapping(path: "/profile-table", specificPath: true, handler: profilePageActivity),
+
+                // Image
+                new UrlMapping(path: "/logo", specificPath: true, handler: req => HttpResponse.Create(Resources.Logo, "image/png")),
 
                 // Catch-all 404
                 new UrlMapping(path: null, handler: page404));

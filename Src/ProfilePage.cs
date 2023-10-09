@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Windows.Forms;
 using KyudosudokuWebsite.Database;
 using RT.Json;
 using RT.Servers;
 using RT.TagSoup;
-using RT.Util;
 using RT.Util.ExtensionMethods;
-using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
@@ -23,7 +19,9 @@ namespace KyudosudokuWebsite
             if (!int.TryParse(linkUserIdStr, out int linkUserId) || linkUserId < 0)
                 return page404(req);
 
-            if (!db.Users.Any(user => user.UserID == linkUserId))
+            var linkUser = db.Users.FirstOrDefault(user => user.UserID == linkUserId);
+
+            if (linkUser == null)
                 return page404(req);
 
             var recentPuzzles = db.UserPuzzles.Where(puzzle => puzzle.UserID == linkUserId && puzzle.Solved).OrderByDescending(n => n.SolveTime).Take(10)
@@ -37,116 +35,73 @@ namespace KyudosudokuWebsite
                 .Select(inf => new PuzzleResultInfo(inf.Puzzle, inf.UserPuzzle, inf.SolveCount))
                 .ToArray();
 
-            string getColorValue(int dbQuery)
-            {
-                string tempString = "background-color: rgba(0, 100, 0, ";
-                int solvedPuzzlesToday = dbQuery;
-
-                tempString += (solvedPuzzlesToday / 10 + 0.5).ToString() + ")";
-
-                if (solvedPuzzlesToday == 0) tempString = "background-color: hsl(220, 50%, 90%); color: black;";
-
-                return tempString;
-            }
-
-            DateTime dayIndex = new DateTime(2023, 10, 1);
-            IEnumerable<object> createDayTableRow(int week)
-            {
-                yield return new TD { class_ = "weekText" }._($"Week {week}");
-
-                for (int i = 0; i < 7; i++)
-                {
-                    int dbQuery = db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.SolveTime.Year == DateTime.Now.Year && puzzle.SolveTime.Month == DateTime.Now.Month && puzzle.SolveTime.Day == dayIndex.Day);
-                    yield return new TD() { class_ = "daySquare", style = getColorValue(dbQuery) }._(dbQuery.ToString());
-                    dayIndex = dayIndex.AddDays(1);
-                }
-            }
-
-            IEnumerable<object> createLastDayTableRow()
-            {
-                int currentMonth = DateTime.Now.Month;
-                int loopEnd;
-                
-                switch(currentMonth)
-                {
-                    case 1:
-                    case 3:
-                    case 5:
-                    case 7:
-                    case 8:
-                    case 10:
-                    case 12:
-                        loopEnd = 3;
-                        break;
-                    case 2:
-                        loopEnd = 1;
-                        break;
-                    default:
-                        loopEnd = 2;
-                        break;
-                }
-
-                yield return new TD { class_ = "weekText" }._("Week 5");
-
-                for(int i = 0; i < loopEnd; i++)
-                {
-                    int dbQuery = db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.SolveTime.Year == DateTime.Now.Year && puzzle.SolveTime.Month == DateTime.Now.Month && puzzle.SolveTime.Day == dayIndex.Day);
-                    yield return new TD() { class_ = "daySquare", style = getColorValue(dbQuery) }._(dbQuery.ToString());
-                    dayIndex = dayIndex.AddDays(1);
-                }
-            }
-
-            return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindCss, Resource.ProfileCSS } },
+            return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindCss, Resource.ProfileCss } },
                 new DIV { class_ = "main" }._(
-                    new DIV { class_ = "profileContainer" }._(
+                    new DIV { class_ = "profile-container" }._(
                         new DIV { class_ = "left" }._(
-                            new H1($"{db.Users.First(user => user.UserID == linkUserId).Username}'s profile"),
+                            new H1($"{linkUser.Username}’s profile"),
                             new H2($"Puzzles solved: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved)}"),
                             new UL(
                                 new LI($"Puzzles above average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time > db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
                                 new LI($"Puzzles below average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time < db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
-                                new LI($"Puzzles equal the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}")
-                            )
-                        ),
-                        new DIV { class_ = "chartContainer" }._(
-                            new DIV { class_ = "chart" }._(
-                                new H1("Recent activity"),
-                                new TABLE(
-                                    new TR(
-                                        new TH(),
-                                        new TH("Mo"),
-                                        new TH("Tu"),
-                                        new TH("We"),
-                                        new TH("Th"),
-                                        new TH("Fr"),
-                                        new TH("Sa"),
-                                        new TH("Su")
-                                    ),
-                                    new TR(
-                                        createDayTableRow(1)
-                                    ),
-                                    new TR(
-                                        createDayTableRow(2)
-                                    ),
-                                    new TR(
-                                        createDayTableRow(3)
-                                    ),
-                                    new TR(
-                                        createDayTableRow(4)
-                                    ),
-                                    DateTime.Now.Year % 4 != 0 ? new TR(
-                                        createLastDayTableRow()
-                                    ) : null
-                                )
-                            )
-                        )
-                    ),
-                    recentPuzzles.Count() != 0 ? new H2($"Latest puzzles:") : null,
-                    recentPuzzles.Count() != 0 ? new DIV { id = "results" }._(
-                        GeneratePuzzleTable(recentPuzzles, recentPuzzles.Length, PuzzleTableType.Solved, sortable: false)
-                    ) : null
-                )
-            );
+                                new LI($"Puzzles equal the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"))),
+                        new DIV { class_ = "chart-container" }._(
+                            new H1(DateTime.UtcNow.ToString("MMMM yyyy")),
+                            new DIV { class_ = "chart" }._(profileActivityTable(db, DateTime.UtcNow.Year, DateTime.UtcNow.Month, linkUserId)))),
+                    recentPuzzles.Length == 0 ? null : new H2("Latest puzzles:"),
+                    recentPuzzles.Length == 0 ? null : new DIV { id = "results" }._(GeneratePuzzleTable(recentPuzzles, recentPuzzles.Length, PuzzleTableType.Solved, sortable: false))));
         });
+
+        private static readonly string[] _monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+        private object profileActivityTable(Db db, int year, int month, int linkUserId)
+        {
+            int dowInt(DayOfWeek dow) => dow switch { DayOfWeek.Sunday => 6, _ => (int) dow - 1 };
+
+            var startDate = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var endDate = startDate.AddMonths(1);
+
+            var data = db.UserPuzzles.Where(up => up.UserID == linkUserId)
+                .Where(up => up.SolveTime >= startDate && up.SolveTime < endDate)
+                .GroupBy(up => new { up.SolveTime.Day, up.SolveTime.Month, up.SolveTime.Year })
+                .Select(gr => new { gr.Key.Day, Count = gr.Count() })
+                .ToArray();
+
+            var calendar = new GregorianCalendar(GregorianCalendarTypes.USEnglish);
+            var firstDowInMonth = dowInt(calendar.GetDayOfWeek(new DateTime(year, month, 1)));
+            var numDays = calendar.GetDaysInMonth(year, month);
+            var numRows = (numDays + firstDowInMonth + 6) / 7;
+
+            var table = new int?[7 * numRows];
+            for (int cell = firstDowInMonth, day = 1; day <= numDays; cell++, day++)
+                table[cell] = data.FirstOrDefault(inf => inf.Day == day)?.Count ?? 0;
+
+            string getColorValue(int numSolvedToday) => numSolvedToday == 0
+                ? "background-color: hsl(220, 50%, 90%); color: black;"
+                : $"background-color: rgba(0, 100, 0, {(numSolvedToday * .1 + .5).ClipMax(1)})";
+
+            return new TABLE(
+                new TR(
+                    new TH(),
+                    new TH("Mo"),
+                    new TH("Tu"),
+                    new TH("We"),
+                    new TH("Th"),
+                    new TH("Fr"),
+                    new TH("Sa"),
+                    new TH("Su")),
+                Enumerable.Range(0, numRows).Select(wk => new TR(
+                    new TD { class_ = "week-text" }._($"Week {wk + 1}"),
+                    Enumerable.Range(0, 7)
+                        .Select(day => table[7 * wk + day])
+                        .Select(numSolved => numSolved == null ? new TD { class_ = "non-day" } : new TD { class_ = "day-square", style = getColorValue(numSolved.Value) }._(numSolved)))));
+        }
+
+        private HttpResponse profilePageActivity(HttpRequest req) => withSession(req, (session, db) => HttpResponse.Json(new JsonDict
+        {
+            ["month"] = int.Parse(req.Post["month"].Value),
+            ["year"] = int.Parse(req.Post["year"].Value),
+            ["html"] = Tag.ToString(profileActivityTable(db, int.Parse(req.Post["year"].Value), int.Parse(req.Post["month"].Value), int.Parse(req.Post["userid"].Value)))
+        }));
     }
 }
