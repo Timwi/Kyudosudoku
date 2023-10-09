@@ -61,7 +61,7 @@ namespace KyudosudokuWebsite
             var startDate = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
             var endDate = startDate.AddMonths(1);
 
-            var data = db.UserPuzzles.Where(up => up.UserID == linkUserId)
+            var data = db.UserPuzzles.Where(up => up.UserID == linkUserId && up.Solved)
                 .Where(up => up.SolveTime >= startDate && up.SolveTime < endDate)
                 .GroupBy(up => new { up.SolveTime.Day, up.SolveTime.Month, up.SolveTime.Year })
                 .Select(gr => new { gr.Key.Day, Count = gr.Count() })
