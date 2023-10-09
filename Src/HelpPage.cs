@@ -134,6 +134,7 @@ namespace KyudosudokuWebsite
                         NoConsecutive.Example,
                         MaximumCell.Example,
                         FindThe9.Example,
+                        Means.Example,
 
                         // Two cells
                         ConsecutiveNeighbors.Example,
