@@ -150,13 +150,41 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to * {
+        ///   Looks up a localized string similar to h1 {
+        ///    margin: 0 !important;
+        ///}
         ///
-        ///}.
+        ///.profile-container {
+        ///    display: grid;
+        ///    grid-template-columns: 1fr auto;
+        ///}
+        ///
+        ///    .profile-container &gt; .chart-container {
+        ///        display: grid;
+        ///        grid-template-columns: 1fr auto 1fr;
+        ///        grid-template-rows: auto auto;
+        ///        background-color: hsl(220, 70%, 80%);
+        ///        text-align: center;
+        ///        padding-top: .5em;
+        ///    }
+        ///
+        ///        .profile-container &gt; .chart-container &gt; h1 {
+        ///            display: flex;
+        ///            justify-content: center;
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ProfileCss {
             get {
                 return ResourceManager.GetString("ProfileCss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string ProfileJs {
+            get {
+                return ResourceManager.GetString("ProfileJs", resourceCulture);
             }
         }
         
@@ -207,17 +235,20 @@ namespace KyudosudokuWebsite {
         /// <summary>
         ///   Looks up a localized string similar to window.onload = (function()
         ///{
-        ///    function remoteLog(msg)
-        ///    {
-        ///        //let req = new XMLHttpRequest();
-        ///        //req.open(&apos;POST&apos;, &apos;/remote-log&apos;, true);
-        ///        //req.setRequestHeader(&apos;Content-Type&apos;, &apos;application/x-www-form-urlencoded&apos;);
-        ///        //req.send(`msg=${encodeURIComponent(msg)}`);
-        ///    }
+        ///	function remoteLog(msg)
+        ///	{
+        ///		//let req = new XMLHttpRequest();
+        ///		//req.open(&apos;POST&apos;, &apos;/remote-log&apos;, true);
+        ///		//req.setRequestHeader(&apos;Content-Type&apos;, &apos;application/x-www-form-urlencoded&apos;);
+        ///		//req.send(`msg=${encodeURIComponent(msg)}`);
+        ///	}
         ///
-        ///    function inRange(x) { return x &gt;= 0 &amp;&amp; x &lt; 9; }
-        ///    function dx(dir) { return dir === &apos;Left&apos; ? -1 : dir === &apos;Right&apos; ? 1 : 0 }
-        ///    function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1  [rest of string was truncated]&quot;;.
+        ///	function inRange(x) { return x &gt;= 0 &amp;&amp; x &lt; 9; }
+        ///	function dx(dir) { return dir === &apos;Left&apos; ? -1 : dir === &apos;Right&apos; ? 1 : 0; }
+        ///	function dy(dir) { return dir === &apos;Up&apos; ? -1 : dir === &apos;Down&apos; ? 1 : 0; }
+        ///	function Adjacent(cell)
+        ///	{
+        ///		l [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PuzzleJs {
             get {

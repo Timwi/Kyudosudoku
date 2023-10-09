@@ -162,6 +162,7 @@
     </Content>
     <Content Include="Resources\Invalid.ogg" />
     <Content Include="Resources\Profile.css" />
+    <Content Include="Resources\Profile.js" />
     <Content Include="Resources\Puzzle.css">
       <LastGenOutput>Kyudosudoku.Designer.cs</LastGenOutput>
     </Content>

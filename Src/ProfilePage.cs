@@ -35,28 +35,28 @@ namespace KyudosudokuWebsite
                 .Select(inf => new PuzzleResultInfo(inf.Puzzle, inf.UserPuzzle, inf.SolveCount))
                 .ToArray();
 
-            return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindCss, Resource.ProfileCss } },
+            return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindCss, Resource.ProfileCss, Resource.ProfileJs } },
                 new DIV { class_ = "main" }._(
-                    new DIV { class_ = "profile-container" }._(
+                    new DIV { class_ = "profile-container" }.Data("userid", linkUser.UserID).Data("month", DateTime.UtcNow.Month).Data("year", DateTime.UtcNow.Year)._(
                         new DIV { class_ = "left" }._(
                             new H1($"{linkUser.Username}’s profile"),
                             new H2($"Puzzles solved: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved)}"),
                             new UL(
-                                new LI($"Puzzles above average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time > db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
-                                new LI($"Puzzles below average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time < db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
-                                new LI($"Puzzles equal the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"))),
+                                new LI($"Puzzle solve times better than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time < db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
+                                new LI($"Puzzle solve times worse than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time > db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
+                                new LI($"Puzzle solve times equal to the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"))),
                         new DIV { class_ = "chart-container" }._(
-                            new H1(DateTime.UtcNow.ToString("MMMM yyyy")),
+                            new BUTTON { class_ = "btn", id = "leftArrow" }._("◀"),
+                            new H1 { id = "date-text" }._(DateTime.UtcNow.ToString("MMMM yyyy")),
+                            new BUTTON { class_ = "btn", id = "rightArrow" }._("▶"),
                             new DIV { class_ = "chart" }._(profileActivityTable(db, DateTime.UtcNow.Year, DateTime.UtcNow.Month, linkUserId)))),
                     recentPuzzles.Length == 0 ? null : new H2("Latest puzzles:"),
                     recentPuzzles.Length == 0 ? null : new DIV { id = "results" }._(GeneratePuzzleTable(recentPuzzles, recentPuzzles.Length, PuzzleTableType.Solved, sortable: false))));
         });
 
-        private static readonly string[] _monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-
         private object profileActivityTable(Db db, int year, int month, int linkUserId)
         {
-            int dowInt(DayOfWeek dow) => dow switch { DayOfWeek.Sunday => 6, _ => (int) dow - 1 };
+            int dowInt(DayOfWeek dow) => dow switch { DayOfWeek.Sunday => 6, _ => (int)dow - 1 };
 
             var startDate = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
             var endDate = startDate.AddMonths(1);
@@ -97,11 +97,17 @@ namespace KyudosudokuWebsite
                         .Select(numSolved => numSolved == null ? new TD { class_ = "non-day" } : new TD { class_ = "day-square", style = getColorValue(numSolved.Value) }._(numSolved)))));
         }
 
-        private HttpResponse profilePageActivity(HttpRequest req) => withSession(req, (session, db) => HttpResponse.Json(new JsonDict
+        private HttpResponse profilePageActivity(HttpRequest req) => withSession(req, (session, db) =>
         {
-            ["month"] = int.Parse(req.Post["month"].Value),
-            ["year"] = int.Parse(req.Post["year"].Value),
-            ["html"] = Tag.ToString(profileActivityTable(db, int.Parse(req.Post["year"].Value), int.Parse(req.Post["month"].Value), int.Parse(req.Post["userid"].Value)))
-        }));
+            var linkUser = int.Parse(req.Post["userId"].Value);
+            var month = int.Parse(req.Post["month"].Value);
+            var year = int.Parse(req.Post["year"].Value);
+
+            return HttpResponse.Json(new JsonDict
+            {
+                ["dateText"] = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc).ToString("MMMM yyyy"),
+                ["html"] = Tag.ToString(profileActivityTable(db, year, month, linkUser))
+            });
+        });
     }
 }
