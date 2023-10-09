@@ -170,7 +170,7 @@ namespace KyudosudokuWebsite
             var puzzle = Kyudosudoku.Generate(newPuzzleId);
             var took = (int) (DateTime.UtcNow - start).TotalSeconds;
             puzzle.SaveToDb(newPuzzleId, took);
-            Console.WriteLine($"Took {took} seconds.");
+            Console.WriteLine($"Took {took} seconds. Constraints used: {puzzle.Constraints.Select(c => c.Name).JoinString(", ")}");
             return 0;
         }
     }

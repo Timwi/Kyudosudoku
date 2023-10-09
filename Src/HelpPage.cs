@@ -151,6 +151,7 @@ namespace KyudosudokuWebsite
                         Arrow.Example,
                         Palindrome.Example,
                         CappedLine.Example,
+                        GermanWhisper.Example,
                         Snowball.Example,
 
                         // Other

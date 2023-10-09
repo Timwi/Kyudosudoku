@@ -66,7 +66,7 @@ namespace KyudosudokuWebsite
         private static void RunStatistics()
         {
             var lockObj = new object();
-            var seedCounter = 1000;
+            var seedCounter = 3000;
             var stats = new Dictionary<string, int>();
             var arrowLengthStats = new Dictionary<int, int>();
             var inclusionNumStats = new Dictionary<int, int>();
@@ -76,11 +76,7 @@ namespace KyudosudokuWebsite
             var palindromeSizeStats = new Dictionary<int, int>();
             var thermometerSizeStats = new Dictionary<int, int>();
             var cappedLineSizeStats = new Dictionary<int, int>();
-
-            //var json = JsonValue.Parse(File.ReadAllText(@"D:\temp\kyudo-stats.json"));
-            //var strings = @"AntiBishop,AntiKing,AntiKnight,NoConsecutive,OddEven,,,Arrow,KillerCage,Palindrome,RenbanCage,Snowball,Thermometer,,,Battlefield,Binairo,Sandwich,Skyscraper,ToroidalSandwich,XSum,,,Battenburg,Clockface,ConsecutiveNeighbors,DoubleNeighbors,Inclusion,LittleKiller".Split(',');
-            //Clipboard.SetText(strings.Select(s => string.IsNullOrWhiteSpace(s) ? "" : json["Stats"][s].GetInt().ToString()).JoinString("\n"));
-            //return;
+            var germanWhisperSizeStats = new Dictionary<int, int>();
 
             Enumerable.Range(0, Environment.ProcessorCount).ParallelForEach(proc =>
             {
@@ -105,6 +101,7 @@ namespace KyudosudokuWebsite
                             if (constr is Palindrome p) palindromeSizeStats.IncSafe(p.Cells.Length);
                             if (constr is Thermometer t) thermometerSizeStats.IncSafe(t.Cells.Length);
                             if (constr is CappedLine cl) cappedLineSizeStats.IncSafe(cl.Cells.Length);
+                            if (constr is GermanWhisper gw) germanWhisperSizeStats.IncSafe(gw.Cells.Length);
                         }
                         ClassifyJson.SerializeToFile(new
                         {
@@ -116,7 +113,8 @@ namespace KyudosudokuWebsite
                             RenbanCageSizes = renbanCageSizeStats,
                             PalindromeSizes = palindromeSizeStats,
                             ThermometerSizes = thermometerSizeStats,
-                            CappedLineSizeStats = cappedLineSizeStats
+                            CappedLineSizeStats = cappedLineSizeStats,
+                            GermanWhisperSizeStats = germanWhisperSizeStats
                         }, @"D:\temp\kyudo-stats.json");
                     }
                 }

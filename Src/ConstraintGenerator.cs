@@ -26,6 +26,7 @@ namespace KyudosudokuWebsite
             (20, typeof(RenbanCage), RenbanCage.Generate),
             (17, typeof(Snowball), (s, ur) => Snowball.Generate(s)),
             (30, typeof(Thermometer), (s, ur) => Thermometer.Generate(s)),
+            (15, typeof(GermanWhisper), (s, ur) => GermanWhisper.Generate(s)),
 
             // Row/column constraints
             (37, typeof(Battlefield), (s, ur) => Battlefield.Generate(s)),
