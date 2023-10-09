@@ -912,31 +912,6 @@
 			}
 		}
 
-		function autofill()
-		{
-			var anyChanges = false;
-			for (let cell of selectedCells)
-				if (!getDisplayedSudokuDigit(state, cell))
-				{
-					let poss = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-					for (let otherCell = 0; otherCell < 81; otherCell++)
-					{
-						let dd = getDisplayedSudokuDigit(state, otherCell);
-						if (dd && poss.includes(dd) && (cell % 9 === otherCell % 9 || ((cell / 9) | 0) === ((otherCell / 9) | 0) || ((((cell % 9) / 3) | 0) === (((otherCell % 9) / 3) | 0) && ((((cell / 9) | 0) / 3) | 0) === ((((otherCell / 9) | 0) / 3) | 0))))
-							poss.splice(poss.indexOf(dd), 1);
-					}
-
-					if (!anyChanges && poss.join(',') !== state.centerNotation[cell].join(','))
-					{
-						anyChanges = true;
-						saveUndo();
-					}
-					state.centerNotation[cell] = poss;
-				}
-			if (anyChanges)
-				updateVisuals(true);
-		}
-
 		Array.from(puzzleDiv.getElementsByClassName('kyudo-cell')).forEach(cellRect =>
 		{
 			let corner = cellRect.dataset.corner | 0;
@@ -1157,7 +1132,6 @@
 		setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-undo-left>rect`), undo);
 		setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo>rect`), redo);
 		setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-redo-left>rect`), redo);
-		setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-fill>rect`), autofill);
 		setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch>rect`), function() { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
 		setButtonHandler(puzzleDiv.querySelector(`#p-${puzzleId}-btn-switch-left>rect`), function() { mobileLeft = !mobileLeft; resetClearButton(); setView(); });
 
@@ -1375,7 +1349,6 @@
 					break;
 
 				case 'Delete': clearCells(); break;
-				case 'KeyF': autofill(); break;
 
 				case 'KeyQ':
 				case 'KeyW':

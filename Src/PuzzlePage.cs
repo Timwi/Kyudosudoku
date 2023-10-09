@@ -45,14 +45,12 @@ namespace KyudosudokuWebsite
                 <text class='label' x='50' y='33.4' font-size='24' text-anchor='middle' transform='translate(0 5.66)'>???</text>
                 <path fill='white' stroke='black' stroke-width='2' d='M53.238 33.237V73.17l9.513-9.513 7.499 18.106 5.272-2.184-7.38-17.818h13.62z'/>
             </g>";
-            const string fillSvg = @"<text x='.45' y='.4' font-size='.25'>Auto</text><text x='.45' y='.65' font-size='.25' fill='hsl(217, 80%, 50%)'>123</text>";
 
             var buttonsRight = Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(9, btn => ((btn + 1).ToString(), false, (btn + 1).ToString(), .9, 0))
                 .Concat(Ut.NewArray<(string label, bool isSvg, string id, double width, int row)>(
-                    ("Normal", false, "normal", 2.6, 1),
-                    ("Corner", false, "corner", 2.6, 1),
-                    ("Center", false, "center", 2.6, 1),
-                    (fillSvg, true, "fill", .9, 1),
+                    ("Normal", false, "normal", 2.93, 1),
+                    ("Corner", false, "corner", 2.93, 1),
+                    ("Center", false, "center", 2.93, 1),
 
                     ("<path d='m 0.65,0.25 v 0.4 l -0.4,-0.2 z' />", true, "switch", .9, 2),
                     ("Clear", false, "clear", 2.55, 2),
