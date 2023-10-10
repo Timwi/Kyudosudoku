@@ -42,7 +42,7 @@ namespace KyudosudokuWebsite
 
             var footer = opt.IsPuzzlePage ? null : Ut.NewArray<object>(
                 new P { class_ = "legal" }._(new A { href = "https://legal.timwi.de" }._("Legal stuff · Impressum · Datenschutzerklärung")),
-                new P(new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub"), "."));
+                new P(new A { href = "https://github.com/Timwi/Kyudosudoku" }._("Kyudosudoku on GitHub")));
 
             return HttpResponse.Html(Tag.ToString(new HTML(
                 new HEAD(
