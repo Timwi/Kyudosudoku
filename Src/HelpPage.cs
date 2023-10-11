@@ -172,27 +172,32 @@ namespace KyudosudokuWebsite
 
         private IEnumerable<object> renderExamples(params Example[] examples)
         {
+            yield return new P(examples
+                .Select(ex => new A { href = $"#constraint-{ex.Constraints.First().GetType().Name}" }._(ex.Constraints.First().Name))
+                .InsertBetween<object>(" | "));
             foreach (var example in examples)
             {
+                yield return new HR();
+                var constraintName = example.Constraints.First().Name;
+                var constraintId = example.Constraints.First().GetType().Name;
                 var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(example.Constraints, glowRed: true, givens: example.BadGivens, wide: example.Wide),
                     new DIV(new SPAN("✗ Invalid", example.Reason == null ? "." : ":"), example.Reason.NullOr(r => new DIV(r))));
                 var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(example.Constraints, glowRed: false, givens: example.GoodGivens, wide: example.Wide),
                     new DIV(new SPAN("✓ Valid.")));
                 if (example.Wide)
-                    yield return new TABLE { class_ = "example" }._(
+                    yield return new TABLE { class_ = "example", id = $"constraint-{constraintId}" }._(
                         new TR(
                             new TD { rowspan = 2 }._(clippedSudokuGrid(example.Constraints)),
-                            new TD { rowspan = 2, class_ = "explanation" }._(new H4(example.Constraints.First().Name), example.Constraints.Select(c => new P(c.Description))),
+                            new TD { rowspan = 2, class_ = "explanation" }._(new H4(constraintName), example.Constraints.Select(c => new P(c.Description))),
                             invalidTd),
                         new TR(validTd));
                 else
-                    yield return new TABLE { class_ = "example" }._(
+                    yield return new TABLE { class_ = "example", id = $"constraint-{constraintId}" }._(
                         new TR(
                             new TD(clippedSudokuGrid(example.Constraints)),
-                            new TD { class_ = "explanation" }._(new H4(example.Constraints.First().Name), example.Constraints.Select(c => new P(c.Description))),
+                            new TD { class_ = "explanation" }._(new H4(constraintName), example.Constraints.Select(c => new P(c.Description))),
                             invalidTd,
                             validTd));
-                yield return new HR();
             }
         }
 
