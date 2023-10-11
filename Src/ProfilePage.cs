@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
@@ -56,7 +55,7 @@ namespace KyudosudokuWebsite
 
         private object profileActivityTable(Db db, int year, int month, int linkUserId)
         {
-            int dowInt(DayOfWeek dow) => dow switch { DayOfWeek.Sunday => 6, _ => (int)dow - 1 };
+            int dowInt(DayOfWeek dow) => dow switch { DayOfWeek.Sunday => 6, _ => (int) dow - 1 };
 
             var startDate = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
             var endDate = startDate.AddMonths(1);
