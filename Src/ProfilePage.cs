@@ -104,7 +104,7 @@ namespace KyudosudokuWebsite
 
             return HttpResponse.Json(new JsonDict
             {
-                ["dateText"] = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc).ToString("MMMM yyyy"),
+                ["dateText"] = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc).ToString("MMMM yyy"),
                 ["html"] = Tag.ToString(profileActivityTable(db, year, month, linkUser))
             });
         });

@@ -29,6 +29,10 @@ window.addEventListener('DOMContentLoaded', function()
 
 	leftArrow.addEventListener("click", function()
 	{
+		// Do not move left from January of the year 1
+		if (year === 1 && month === 1)
+			return;
+
 		month--;
 		if (month < 1)
 		{
