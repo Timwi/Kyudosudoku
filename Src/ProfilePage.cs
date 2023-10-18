@@ -45,9 +45,9 @@ namespace KyudosudokuWebsite
                                 new LI($"Puzzle solve times worse than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time > db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
                                 new LI($"Puzzle solve times equal to the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"))),
                         new DIV { class_ = "chart-container" }._(
-                            new BUTTON { class_ = "btn", id = "leftArrow" }._("◀"),
+                            new BUTTON { class_ = "btn", id = "leftArrow", accesskey = "," }._("◀"),
                             new H1 { id = "date-text" }._(DateTime.UtcNow.ToString("MMMM yyyy")),
-                            new BUTTON { class_ = "btn", id = "rightArrow" }._("▶"),
+                            new BUTTON { class_ = "btn", id = "rightArrow", accesskey = "." }._("▶"),
                             new DIV { class_ = "chart" }._(profileActivityTable(db, DateTime.UtcNow.Year, DateTime.UtcNow.Month, linkUserId)))),
                     recentPuzzles.Length == 0 ? null : new H2("Latest puzzles:"),
                     recentPuzzles.Length == 0 ? null : new DIV { id = "results" }._(GeneratePuzzleTable(recentPuzzles, recentPuzzles.Length, PuzzleTableType.Solved, sortable: false))));
