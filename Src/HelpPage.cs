@@ -76,7 +76,6 @@ namespace KyudosudokuWebsite
                         new TR(new TH("Z"), new TD("Switches to “normal” mode: full-size digits are entered into the Sudoku grid. Use this to enter digits that you have fully deduced.")),
                         new TR(new TH("X"), new TD("Switches to “corner” mode: multiple digits can be notated in the corners of Sudoku cells. This is usually used to notate which cells within a 3×3 box a digit can go.")),
                         new TR(new TH("C"), new TD("Switches to “center” mode: multiple digits can be notated in the centers of Sudoku cells. This is usually used to notate the possible digits for a particular cell.")),
-                        new TR(new TH("F"), new TD("Replaces center-notated digits with all those that aren’t excluded by other digits in the same row, column or 3×3 box.")),
                         new TR(new TH("Q"), new TD("While hovering the mouse over a Kyudoku cell, circles that cell.")),
                         new TR(new TH("W"), new TD("While hovering the mouse over a Kyudoku cell, crosses that cell out.")),
                         new TR(new TH("E"), new TD("While hovering the mouse over a Kyudoku cell, removes the circle or cross.")),
