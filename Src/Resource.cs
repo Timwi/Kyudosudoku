@@ -23,13 +23,15 @@ namespace KyudosudokuWebsite
             Raw;
 #endif
 
-        public static readonly Resource PuzzleJs = new Resource(Resources.PuzzleJs, "Puzzle.js", isJs: true);
-        public static readonly Resource FindJs = new Resource(Resources.FindJs, "Find.js", isJs: true);
-        public static readonly Resource ProfileJs = new Resource(Resources.ProfileJs, "Profile.js", isJs: true);
+        public static readonly Resource PuzzleJs = new(Resources.PuzzleJs, "Puzzle.js", isJs: true);
+        public static readonly Resource FindJs = new(Resources.FindJs, "Find.js", isJs: true);
+        public static readonly Resource ProfileJs = new(Resources.ProfileJs, "Profile.js", isJs: true);
 
-        public static readonly Resource GeneralCss = new Resource(Resources.GeneralCss, "General.css", isJs: false);
-        public static readonly Resource PuzzleCss = new Resource(Resources.PuzzleCss, "Puzzle.css", isJs: false);
-        public static readonly Resource FindCss = new Resource(Resources.FindCss, "Find.css", isJs: false);
-        public static readonly Resource ProfileCss = new Resource(Resources.ProfileCss, "Profile.css", isJs: false);
+        public static readonly Resource GeneralCss = new(Resources.GeneralCss, "General.css", isJs: false);
+        public static readonly Resource PuzzleCss = new(Resources.PuzzleCss, "Puzzle.css", isJs: false);
+        public static readonly Resource FindCss = new(Resources.FindCss, "Find.css", isJs: false);
+        public static readonly Resource ProfileCss = new(Resources.ProfileCss, "Profile.css", isJs: false);
+
+        public static readonly Resource EnglishJson = new(Resources.EnglishJson, "English.json", isJs: false);
     }
 }

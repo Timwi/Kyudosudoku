@@ -134,6 +134,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Translations\English.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\PuzzleSolvers\Src\PuzzleSolvers.csproj">

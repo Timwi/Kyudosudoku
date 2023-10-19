@@ -61,6 +61,28 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;kyudosudoku&quot;: &quot;kyudosudoku&quot;,
+        ///  &quot;profile&quot;: &quot;Profile&quot;,
+        ///  &quot;howToPlay&quot;: &quot;How to play&quot;,
+        ///  &quot;settings&quot;: &quot;Settings&quot;,
+        ///  &quot;puzzlesSolved1&quot;: &quot;You&apos;ve solved&quot;,
+        ///  &quot;puzzlesSolved2&quot;: &quot;puzzles.&quot;,
+        ///  &quot;findPuzzles&quot;: &quot;Find puzzles&quot;,
+        ///  &quot;github&quot;: &quot;Kyudosudoku on GitHub&quot;,
+        ///  &quot;news&quot;: &quot;News&quot;,
+        ///  &quot;news1&quot;: &quot;News section started&quot;,
+        ///  &quot;news1_1&quot;: &quot;This is the beginning of this News page.&quot;,
+        ///  &quot;news2&quot;: &quot;Graphics changes and a new constraint&quot;,
+        ///  &quot;news2_1&quot;: &quot;Hello everyone! I’m proud to announce the following changes and enhanc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EnglishJson {
+            get {
+                return ResourceManager.GetString("EnglishJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .controls {
         ///    font-size: 18pt;
         ///    margin: .5cm 0;
@@ -180,7 +202,24 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to window.addEventListener(&apos;DOMContentLoaded&apos;, function()
+        ///{
+        ///	var dateText = document.getElementById(&quot;date-text&quot;);
+        ///
+        ///	var chartDiv = document.querySelector(&quot;.chart&quot;);
+        ///	var leftArrow = document.getElementById(&quot;leftArrow&quot;);
+        ///	var rightArrow = document.getElementById(&quot;rightArrow&quot;);
+        ///	var data = document.querySelector(&quot;.profile-container&quot;).dataset;
+        ///
+        ///	var userId = data.userid | 0;
+        ///	var month = data.month | 0;
+        ///	var year = data.year | 0;
+        ///
+        ///	function sendReq()
+        ///	{
+        ///
+        ///		let req = new XMLHttpRequest();
+        ///		req.op [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ProfileJs {
             get {

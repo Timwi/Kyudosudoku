@@ -62,33 +62,41 @@ namespace KyudosudokuWebsite
         	1 = Password 1
         	2 = Password 2
         */
-        private HttpResponse userPage(HttpRequest req, IHttpUrl url, User user, Db db, string updateUserError = null, IEnumerable<string> updateUserSuccess = null, string teamError = null) => RenderPage(
-            user.Username, user, null,
-            new DIV { class_ = "main" }._(
-                new H1("Welcome, ", new BDI(user.Username), "!"),
-                new FORM { action = url.WithPath("/logout").ToHref(), method = method.post, class_ = "logout" }._(
-                    new BUTTON { type = btype.submit, accesskey = "o" }._("Log out".Accel('o'))),
-                new H2("Options"),
-                updateUserError.NullOr(msg => new DIV { class_ = "error" }._(msg)),
-                updateUserSuccess.NullOr(msgs => new DIV { class_ = "success" }._(msgs.Count() == 1 ? (object) msgs.First() : new UL(msgs.Select(msg => new LI(msg))))),
-                new FORM { action = url.WithPath("/update-user").ToHref(), method = method.post }._(
-                    new INPUT { type = itype.hidden, name = "user", value = user.UserID.ToString() },
-                    new TABLE { class_ = "options" }._(
-                        new TR(
-                            new TH { rowspan = 4 }._("Game options"),
-                            new TD(new INPUT { type = itype.checkbox, name = "opt-show-errors", value = "1", checked_ = user.ShowErrors, id = "opt-show-errors", accesskey = "s" }, new LABEL { for_ = "opt-show-errors" }._(" Show a red glow around grids with errors".Accel('S')))),
-                        new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-semitransparent-xs", value = "1", checked_ = user.SemitransparentXs, id = "opt-semitransparent-xs", accesskey = "x" }, new LABEL { for_ = "opt-semitransparent-xs" }._(" Show semitransparent X’s so you can still see the digits underneath".Accel('X')))),
-                        new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-show-solve-time", value = "1", checked_ = user.ShowSolveTime, id = "opt-show-solve-time", accesskey = "t" }, new LABEL { for_ = "opt-show-solve-time" }._(" Show time when puzzle is solved".Accel('t')))),
-                        new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-play-invalid-sound", value = "1", checked_ = user.PlayInvalidSound, id = "opt-play-invalid-sound", accesskey = "l" }, new LABEL { for_ = "opt-play-invalid-sound" }._(" Play a sound when a constraint is violated".Accel('l')))),
-                        new TR(
-                            new TH("Personal info"),
-                            new TD(
-                                new TABLE(
-                                    new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changeusername", accesskey = "n" }._("Username: ".Accel('n'))), new TD(new INPUT { id = "changeusername", name = "username", type = itype.text, value = req?.Post["username"].Value ?? user.Username })),
-                                    new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changeemail", accesskey = "e" }._("Email address: ".Accel('E'))), new TD(new INPUT { id = "changeemail", name = "email", type = itype.email, value = req?.Post["email"].Value ?? user.EmailAddress })),
-                                    new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changepassword-old", accesskey = "p" }._("Old password: ".Accel('p'))), new TD(new INPUT { id = "changepassword-old", name = "oldpassword", type = itype.password, value = req?.Post["oldpassword"].Value })),
-                                    new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changepassword-new-1", accesskey = "1" }._("New password 1: ".Accel('1'))), new TD(new INPUT { id = "changepassword-new-1", name = "password1", type = itype.password, value = req?.Post["password1"].Value })),
-                                    new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changepassword-new-2", accesskey = "2" }._("New password 2: ".Accel('2'))), new TD(new INPUT { id = "changepassword-new-2", name = "password2", type = itype.password, value = req?.Post["password2"].Value })),
-                                    new TR(new TD { class_ = "label" }._(new BUTTON { type = btype.submit, accesskey = "u" }._("Update".Accel('U')))))))))));
+
+        private HttpResponse userPage(HttpRequest req, IHttpUrl url, User user, Db db, string updateUserError = null, IEnumerable<string> updateUserSuccess = null, string teamError = null) => withSession(req, (session, db) =>
+        {
+            return RenderPage(user.Username, user, null,
+                new DIV { class_ = "main" }._(
+                    new H1("Welcome, ", new BDI(user.Username), "!"),
+                    new FORM { action = url.WithPath("/logout").ToHref(), method = method.post, class_ = "logout" }._(
+                        new BUTTON { type = btype.submit, accesskey = "o" }._("Log out".Accel('o'))),
+                    new H2("Options"),
+                    updateUserError.NullOr(msg => new DIV { class_ = "error" }._(msg)),
+                    updateUserSuccess.NullOr(msgs => new DIV { class_ = "success" }._(msgs.Count() == 1 ? (object)msgs.First() : new UL(msgs.Select(msg => new LI(msg))))),
+                    new FORM { action = url.WithPath("/update-user").ToHref(), method = method.post }._(
+                        new INPUT { type = itype.hidden, name = "user", value = user.UserID.ToString() },
+                        new TABLE { class_ = "options" }._(
+                            new TR(
+                                new TH { rowspan = 4 }._("Game options"),
+                                new TD(new INPUT { type = itype.checkbox, name = "opt-show-errors", value = "1", checked_ = user.ShowErrors, id = "opt-show-errors", accesskey = "s" }, new LABEL { for_ = "opt-show-errors" }._(" Show a red glow around grids with errors".Accel('S')))),
+                            new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-semitransparent-xs", value = "1", checked_ = user.SemitransparentXs, id = "opt-semitransparent-xs", accesskey = "x" }, new LABEL { for_ = "opt-semitransparent-xs" }._(" Show semitransparent X’s so you can still see the digits underneath".Accel('X')))),
+                            new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-show-solve-time", value = "1", checked_ = user.ShowSolveTime, id = "opt-show-solve-time", accesskey = "t" }, new LABEL { for_ = "opt-show-solve-time" }._(" Show time when puzzle is solved".Accel('t')))),
+                            new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-play-invalid-sound", value = "1", checked_ = user.PlayInvalidSound, id = "opt-play-invalid-sound", accesskey = "l" }, new LABEL { for_ = "opt-play-invalid-sound" }._(" Play a sound when a constraint is violated".Accel('l')))),
+                            new TR(
+                                new TH("Personal info"),
+                                new TD(
+                                    new TABLE(
+                                        new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changeusername", accesskey = "n" }._("Username: ".Accel('n'))), new TD(new INPUT { id = "changeusername", name = "username", type = itype.text, value = req?.Post["username"].Value ?? user.Username })),
+                                        new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changeemail", accesskey = "e" }._("Email address: ".Accel('E'))), new TD(new INPUT { id = "changeemail", name = "email", type = itype.email, value = req?.Post["email"].Value ?? user.EmailAddress })),
+                                        new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changepassword-old", accesskey = "p" }._("Old password: ".Accel('p'))), new TD(new INPUT { id = "changepassword-old", name = "oldpassword", type = itype.password, value = req?.Post["oldpassword"].Value })),
+                                        new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changepassword-new-1", accesskey = "1" }._("New password 1: ".Accel('1'))), new TD(new INPUT { id = "changepassword-new-1", name = "password1", type = itype.password, value = req?.Post["password1"].Value })),
+                                        new TR(new TD { class_ = "label" }._(new LABEL { for_ = "changepassword-new-2", accesskey = "2" }._("New password 2: ".Accel('2'))), new TD(new INPUT { id = "changepassword-new-2", name = "password2", type = itype.password, value = req?.Post["password2"].Value })),
+                                        new TR(new TD { class_ = "label" }._(new BUTTON { type = btype.submit, accesskey = "u" }._("Update".Accel('U'))))))),
+                            new TR(
+                                new TH("Translation"),
+                                new TD(
+                                    new SELECT(
+                                        )))))));
+        });
     }
 }
