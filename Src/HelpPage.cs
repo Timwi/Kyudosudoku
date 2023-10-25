@@ -132,6 +132,7 @@ namespace KyudosudokuWebsite
                         AntiKing.Example,
                         NoConsecutive.Example,
                         MaximumCell.Example,
+                        MinimumCell.Example,
                         FindThe9.Example,
                         Means.Example,
 

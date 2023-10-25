@@ -79,6 +79,10 @@
 				return grid[constr.Cell] !== null && Orthogonal(constr.Cell).some(c => grid[c] !== null && grid[c] >= grid[constr.Cell]) ? false :
 					grid[constr.Cell] === null || Orthogonal(constr.Cell).some(c => grid[c] === null) ? null : true;
 
+			case 'MinimumCell':
+				return grid[constr.Cell] !== null && Orthogonal(constr.Cell).some(c => grid[c] !== null && grid[c] <= grid[constr.Cell]) ? false :
+					grid[constr.Cell] === null || Orthogonal(constr.Cell).some(c => grid[c] === null) ? null : true;
+
 			case 'FindThe9':
 				return grid[constr.Cell] === null || grid[constr.Cell + (dx(constr.Direction) + 9 * dy(constr.Direction)) * grid[constr.Cell]] === null ? null :
 					grid[constr.Cell + (dx(constr.Direction) + 9 * dy(constr.Direction)) * grid[constr.Cell]] === 9;

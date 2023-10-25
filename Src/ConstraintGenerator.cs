@@ -15,6 +15,7 @@ namespace KyudosudokuWebsite
             (null, typeof(AntiKnight), (s, ur) => AntiKnight.Generate(s)),
             (null, typeof(NoConsecutive), (s, ur) => NoConsecutive.Generate(s)),
             (null, typeof(MaximumCell), (s, ur) => MaximumCell.Generate(s)),
+            (null, typeof(MinimumCell), (s, ur) => MinimumCell.Generate(s)),
             (null, typeof(FindThe9), (s, ur) => FindThe9.Generate(s)),
             (null, typeof(OddEven), (s, ur) => OddEven.Generate(s)),
             (null, typeof(Means), (s, ur) => Means.Generate(s)),
