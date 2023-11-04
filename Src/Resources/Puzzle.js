@@ -1352,7 +1352,32 @@
 					}
 					break;
 
-				case 'Delete': clearCells(); break;
+				case 'Delete':
+				case 'Backspace':
+					clearCells();
+					break;
+
+				case 'Ctrl+Delete':
+				case 'Ctrl+Backspace':
+					if (selectedCells.some(c => state.enteredDigits[c] === null && state.centerNotation[c].length > 0))
+					{
+						saveUndo();
+						for (let cell of selectedCells)
+							state.centerNotation[cell] = [];
+						updateVisuals(true);
+					}
+					break;
+
+				case 'Shift+Delete':
+				case 'Shift+Backspace':
+					if (selectedCells.some(c => state.enteredDigits[c] === null && state.cornerNotation[c].length > 0))
+					{
+						saveUndo();
+						for (let cell of selectedCells)
+							state.cornerNotation[cell] = [];
+						updateVisuals(true);
+					}
+					break;
 
 				case 'KeyQ':
 				case 'KeyW':
