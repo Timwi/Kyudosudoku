@@ -8,13 +8,11 @@ using SessionBase = RT.Servers.Session;
 
 namespace KyudosudokuWebsite
 {
-    sealed class DbSession : SessionBase
+    sealed class DbSession(Db db) : SessionBase
     {
-        private readonly Db _db;
         private Session _session;
         private User _user;
 
-        public DbSession(Db db) { _db = db; }
         public User User
         {
             get => _user;
@@ -28,10 +26,10 @@ namespace KyudosudokuWebsite
 
         protected override bool ReadSession()
         {
-            _session = _db.Sessions.FirstOrDefault(s => s.SessionID == SessionID);
+            _session = db.Sessions.FirstOrDefault(s => s.SessionID == SessionID);
             if (_session == null)
                 return false;
-            User = _db.Users.FirstOrDefault(u => u.UserID == _session.UserID);
+            User = db.Users.FirstOrDefault(u => u.UserID == _session.UserID);
             return true;
         }
 
@@ -40,24 +38,24 @@ namespace KyudosudokuWebsite
             if (_user == null)
             {
                 if (_session != null)
-                    _db.Sessions.Remove(_session);
+                    db.Sessions.Remove(_session);
             }
             else if (_session == null)
-                _db.Sessions.Add(new Session { UserID = _user.UserID, SessionID = SessionID, LastLogin = DateTime.UtcNow });
+                db.Sessions.Add(new Session { UserID = _user.UserID, SessionID = SessionID, LastLogin = DateTime.UtcNow });
             else
             {
                 _session.UserID = _user.UserID;
                 _session.SessionID = SessionID;
             }
-            _db.SaveChanges();
+            db.SaveChanges();
         }
 
         protected override void DeleteSession()
         {
             if (_session != null)
             {
-                _db.Sessions.Remove(_session);
-                _db.SaveChanges();
+                db.Sessions.Remove(_session);
+                db.SaveChanges();
             }
         }
     }

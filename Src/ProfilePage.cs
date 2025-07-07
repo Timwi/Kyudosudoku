@@ -6,6 +6,7 @@ using KyudosudokuWebsite.Database;
 using RT.Json;
 using RT.Servers;
 using RT.TagSoup;
+using RT.Util;
 using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
@@ -34,16 +35,17 @@ namespace KyudosudokuWebsite
                 .Select(inf => new PuzzleResultInfo(inf.Puzzle, inf.UserPuzzle, inf.SolveCount))
                 .ToArray();
 
+            var totalSolved = db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved);
             return RenderPage(null, session.User, new PageOptions { AddFooter = true, Db = db, Resources = { Resource.FindCss, Resource.ProfileCss, Resource.ProfileJs } },
                 new DIV { class_ = "main" }._(
                     new DIV { class_ = "profile-container" }.Data("userid", linkUser.UserID).Data("month", DateTime.UtcNow.Month).Data("year", DateTime.UtcNow.Year)._(
                         new DIV { class_ = "left" }._(
                             new H1($"{linkUser.Username}’s profile"),
-                            new H2($"Puzzles solved: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved)}"),
-                            new UL(
-                                new LI($"Puzzle solve times better than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time < db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
-                                new LI($"Puzzle solve times worse than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time > db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"),
-                                new LI($"Puzzle solve times equal to the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime)}"))),
+                            new H2($"Puzzles solved: {totalSolved}"),
+                            totalSolved == 0 ? null : new UL(
+                                new LI($"Puzzle solve times better than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time < db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime).Apply(v => $"{v} ({(double) v * 100 / totalSolved:0}%)")}"),
+                                new LI($"Puzzle solve times worse than the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time > db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime).Apply(v => $"{v} ({(double) v * 100 / totalSolved:0}%)")}"),
+                                new LI($"Puzzle solve times equal to the average: {db.UserPuzzles.Count(puzzle => puzzle.UserID == linkUserId && puzzle.Solved && puzzle.Time == db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzle.PuzzleID).AverageTime).Apply(v => $"{v} ({(double) v * 100 / totalSolved:0}%)")}"))),
                         new DIV { class_ = "chart-container" }._(
                             new BUTTON { class_ = "btn", id = "leftArrow", accesskey = "," }._("◀"),
                             new H1 { id = "date-text" }._(DateTime.UtcNow.ToString("MMMM yyyy")),

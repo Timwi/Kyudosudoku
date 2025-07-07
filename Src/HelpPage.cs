@@ -13,11 +13,11 @@ namespace KyudosudokuWebsite
         private HttpResponse helpPage(HttpRequest req) => withSession(req, (session, db) =>
         {
             var kyudoExampleGrid1 = new[] { 3, 1, 5, 7, 1, 5, 1, 2, 1, 9, 2, 5, 4, 8, 2, 6, 6, 2, 3, 7, 3, 5, 4, 8, 1, 2, 4, 6, 7, 2, 2, 6, 5, 1, 3, 6 };
-            var kyudoExample = Ut.NewArray(
-                new[] { 1, 9, 9, 4, 6, 9, 1, 7, 7, 5, 4, 7, 9, 5, 8, 1, 9, 7, 3, 8, 3, 5, 5, 8, 8, 4, 6, 6, 5, 2, 4, 9, 1, 5, 5, 3 },
-                new[] { 8, 3, 9, 1, 4, 1, 6, 6, 2, 2, 8, 2, 8, 4, 6, 5, 4, 4, 8, 1, 2, 7, 1, 4, 8, 3, 5, 9, 3, 5, 2, 6, 9, 9, 5, 3 },
-                new[] { 7, 8, 5, 1, 3, 2, 4, 1, 5, 6, 5, 2, 4, 5, 9, 9, 8, 8, 7, 8, 7, 9, 9, 8, 5, 3, 4, 3, 6, 6, 3, 8, 7, 6, 9, 2 },
-                new[] { 8, 3, 8, 8, 1, 9, 6, 2, 9, 4, 3, 7, 1, 3, 5, 2, 9, 3, 5, 4, 3, 5, 2, 5, 9, 5, 8, 7, 1, 9, 2, 8, 7, 2, 7, 2 });
+            var kyudoExample = Ut.NewArray<int[]>(
+                [1, 9, 9, 4, 6, 9, 1, 7, 7, 5, 4, 7, 9, 5, 8, 1, 9, 7, 3, 8, 3, 5, 5, 8, 8, 4, 6, 6, 5, 2, 4, 9, 1, 5, 5, 3],
+                [8, 3, 9, 1, 4, 1, 6, 6, 2, 2, 8, 2, 8, 4, 6, 5, 4, 4, 8, 1, 2, 7, 1, 4, 8, 3, 5, 9, 3, 5, 2, 6, 9, 9, 5, 3],
+                [7, 8, 5, 1, 3, 2, 4, 1, 5, 6, 5, 2, 4, 5, 9, 9, 8, 8, 7, 8, 7, 9, 9, 8, 5, 3, 4, 3, 6, 6, 3, 8, 7, 6, 9, 2],
+                [8, 3, 8, 8, 1, 9, 6, 2, 9, 4, 3, 7, 1, 3, 5, 2, 9, 3, 5, 4, 3, 5, 2, 5, 9, 5, 8, 7, 1, 9, 2, 8, 7, 2, 7, 2]);
 
             static object kyudokuGrid(int[] grid, bool? glowRed = null, int[] highlight = null, int[] circled = null, int[] xed = null, int corner = 0) =>
                 new RawTag($@"<svg style='width: 7cm' viewBox='{-.5 + 6.75 * (corner % 2)} {-.5 + 6.75 * (corner / 2)} 7 7' text-anchor='middle' font-family='Bitter' font-size='.65'>{kyudokuGridSvg(corner, 1, grid, highlight, circled, xed, glowRed)}</svg>");
@@ -39,20 +39,20 @@ namespace KyudosudokuWebsite
                     new H2("The Kyudoku part"),
                     new P("In each Kyudoku grid, exactly one of each digit 1–9 must be circled in such a way that the circled digits in each row or column never add up to more than 9."),
                     new TABLE { style = "width:100%", class_ = "examples" }._(
-                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 14, 23, 28, 30, 31 })), new TD(new P("Invalid: two 2’s are circled."))),
-                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 23, 28, 30, 31 })), new TD(new P("Invalid: none of the 4’s are circled."))),
-                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 29, 31 })), new TD(new P("Invalid: the last column has 2 and 8 circled, which add up to 10, which is more than 9."))),
-                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: false, circled: new[] { 0, 1, 2, 9, 12, 23, 28, 30, 31 })), new TD(new P("Valid example.")))),
+                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: [0, 1, 2, 9, 12, 14, 23, 28, 30, 31])), new TD(new P("Invalid: two 2’s are circled."))),
+                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: [0, 1, 2, 9, 23, 28, 30, 31])), new TD(new P("Invalid: none of the 4’s are circled."))),
+                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: true, circled: [0, 1, 2, 9, 12, 23, 28, 29, 31])), new TD(new P("Invalid: the last column has 2 and 8 circled, which add up to 10, which is more than 9."))),
+                        new TR(new TD(kyudokuGrid(kyudoExampleGrid1, glowRed: false, circled: [0, 1, 2, 9, 12, 23, 28, 30, 31])), new TD(new P("Valid example.")))),
                     new H2("The Sudoku part"),
                     new P("The Sudoku grid must be filled with digits 1–9 in such a way that every row, every column and every outlined 3×3 box contains the digits 1–9 exactly once."),
                     new P("Furthermore, each Kyudoku grid is linked with a 6×6 “corner” of the Sudoku grid (the coloring helps to visualize this). Every circled digit in a Kyudoku grid transfers that digit to the equivalent location on the Sudoku grid, as shown below:"),
                     new P(new RawTag($@"<svg viewBox='-.25 -.25 23 13.25' font-family='Bitter' font-size='.65' text-anchor='middle'>
                         <defs><marker id='marker4663' orient='auto' overflow='visible'><path fill='#e33838' d='M-1.926-1.21L1.352-.005l-3.278 1.206a2.05 2.05 0 000-2.411z'/></marker></defs>
-                        {kyudokuGridSvg(0, 0, "273651445176484965991291788391968623".Select(ch => ch - '0').ToArray(), circled: new[] { 18 })}
-                        {kyudokuGridSvg(1, 0, "713137114328375481938675988428919599".Select(ch => ch - '0').ToArray(), circled: new[] { 25 })}
-                        {kyudokuGridSvg(2, 0, "331754629723365946582838679862457848".Select(ch => ch - '0').ToArray(), circled: new[] { 35 })}
-                        {kyudokuGridSvg(3, 0, "428935481829776637922249136259183762".Select(ch => ch - '0').ToArray(), circled: new[] { 13 })}
-                        <g transform='translate(13.5, 0)'>{sudokuGridSvg(0, Enumerable.Empty<SvgConstraint>(), forHelpPage: true, givens: new Dictionary<int, int?> { [27] = 9, [40] = 8, [77] = 8, [49] = 7 })}</g>
+                        {kyudokuGridSvg(0, 0, "273651445176484965991291788391968623".Select(ch => ch - '0').ToArray(), circled: [18])}
+                        {kyudokuGridSvg(1, 0, "713137114328375481938675988428919599".Select(ch => ch - '0').ToArray(), circled: [25])}
+                        {kyudokuGridSvg(2, 0, "331754629723365946582838679862457848".Select(ch => ch - '0').ToArray(), circled: [35])}
+                        {kyudokuGridSvg(3, 0, "428935481829776637922249136259183762".Select(ch => ch - '0').ToArray(), circled: [13])}
+                        <g transform='translate(13.5, 0)'>{sudokuGridSvg(0, [], forHelpPage: true, givens: new Dictionary<int, int?> { [27] = 9, [40] = 8, [77] = 8, [49] = 7 })}</g>
                         <g fill='none' stroke='#e33838' stroke-width='.3' transform='translate(-.25 -.25)'>
                             <path marker-end='url(#marker4663)' d='M1.46 3.45c4.028-1.6 8.054-1.6 12.081.001'/>
                             <path marker-end='url(#marker4663)' d='M9.242 4.592a21.327 21.327 0 018.264 0'/>
@@ -95,23 +95,23 @@ namespace KyudosudokuWebsite
                     new H1 { id = "strategies" }._("Common strategies"),
                     new P("To get started, here are some common deductions that can help you get started on a Kyudosudoku puzzle:"),
                     new TABLE { class_ = "examples" }._(
-                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, highlight: new[] { 6 })), new TD(new P("There is only a single 6 in this Kyudoku grid, so it must be circled."))),
-                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: new[] { 6 }, highlight: new[] { 0, 8, 9, 11, 18, 24 })), new TD(new P("All values in the same row or column that would bring the sum above 9 can now be crossed out."))),
-                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: new[] { 6 }, xed: new[] { 0, 8, 9, 11, 18, 24 }, highlight: new[] { 4, 12, 16, 28 })), new TD(new P("All of the 1’s in the grid are in a row or column with the highlighted 9. This means the 9 can be crossed out because circling it would rule out all of the 1’s."))),
-                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: new[] { 6 }, xed: new[] { 0, 8, 9, 11, 16, 18, 24 }, highlight: new[] { 5, 29 })), new TD(new P("All of the remaining 9’s are in the same column. No matter which one ends up getting circled, the other digits in the same column would bring the column’s sum above 9, so they can all be crossed out.")))),
+                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, highlight: [6])), new TD(new P("There is only a single 6 in this Kyudoku grid, so it must be circled."))),
+                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: [6], highlight: [0, 8, 9, 11, 18, 24])), new TD(new P("All values in the same row or column that would bring the sum above 9 can now be crossed out."))),
+                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: [6], xed: [0, 8, 9, 11, 18, 24], highlight: [4, 12, 16, 28])), new TD(new P("All of the 1’s in the grid are in a row or column with the highlighted 9. This means the 9 can be crossed out because circling it would rule out all of the 1’s."))),
+                        new TR(new TD(kyudokuGrid(kyudoExample[3], corner: 3, circled: [6], xed: [0, 8, 9, 11, 16, 18, 24], highlight: [5, 29])), new TD(new P("All of the remaining 9’s are in the same column. No matter which one ends up getting circled, the other digits in the same column would bring the column’s sum above 9, so they can all be crossed out.")))),
                     new TABLE { class_ = "examples" }._(
                         new TR(new TD(kyudokuGrids(
-                            circled: new[] { null, null, null, new[] { 6 } },
-                            xed: new[] { null, null, null, new[] { 0, 8, 9, 11, 16, 18, 24, 17, 23, 35 } },
-                            highlight: new[] { new[] { 26 }, new[] { 6, 31 }, new[] { 33 }, null })), new TD(new P("Remember that the 6 we circled is transferred to the Sudoku grid. Any 6 in the other Kyudoku grids can be crossed out if it would place another 6 within the same row, column, or 3×3 box of the Sudoku grid."))),
+                            circled: [null, null, null, [6]],
+                            xed: [null, null, null, [0, 8, 9, 11, 16, 18, 24, 17, 23, 35]],
+                            highlight: [[26], [6, 31], [33], null])), new TD(new P("Remember that the 6 we circled is transferred to the Sudoku grid. Any 6 in the other Kyudoku grids can be crossed out if it would place another 6 within the same row, column, or 3×3 box of the Sudoku grid."))),
                         new TR(new TD(kyudokuGrids(
-                            circled: new[] { null, null, null, new[] { 6 } },
-                            xed: new[] { new[] { 26 }, new[] { 6, 31 }, new[] { 33 }, new[] { 0, 8, 9, 11, 16, 18, 24, 17, 23, 35 } },
-                            highlight: new[] { null, new[] { 24 }, null, null })), new TD(new P("Similarly, this 8 can be crossed out because we now know that the corresponding Sudoku cell is already a 6."))),
+                            circled: [null, null, null, [6]],
+                            xed: [[26], [6, 31], [33], [0, 8, 9, 11, 16, 18, 24, 17, 23, 35]],
+                            highlight: [null, [24], null, null])), new TD(new P("Similarly, this 8 can be crossed out because we now know that the corresponding Sudoku cell is already a 6."))),
                         new TR(new TD(kyudokuGrids(
-                            circled: new[] { null, null, null, new[] { 6 } },
-                            xed: new[] { new[] { 26 }, new[] { 6, 24, 31 }, new[] { 33 }, new[] { 0, 8, 9, 11, 16, 18, 24, 17, 23, 35 } },
-                            highlight: new[] { new[] { 27 }, null, new[] { 9 }, null })), new TD(new P("However, these 6’s cannot be crossed out (", new EM("nor"), " circled) as they correspond to the exact same cell in the Sudoku grid. Transferring the same digit into the same Sudoku cell multiple times is allowed.")))),
+                            circled: [null, null, null, [6]],
+                            xed: [[26], [6, 24, 31], [33], [0, 8, 9, 11, 16, 18, 24, 17, 23, 35]],
+                            highlight: [[27], null, [9], null])), new TD(new P("However, these 6’s cannot be crossed out (", new EM("nor"), " circled) as they correspond to the exact same cell in the Sudoku grid. Transferring the same digit into the same Sudoku cell multiple times is allowed.")))),
 
                     new P("These strategies should get you through some of the easiest puzzles. For some of the harder puzzles, many more advanced strategies can be discovered."),
                     new P("Enjoy!")));

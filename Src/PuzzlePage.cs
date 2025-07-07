@@ -32,7 +32,7 @@ namespace KyudosudokuWebsite
                 return page404(req);
 
             var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
-                dbPuzzle.Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
+                dbPuzzle.Constraints == null ? [] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 

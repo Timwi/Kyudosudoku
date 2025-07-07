@@ -9,7 +9,7 @@ namespace KyudosudokuWebsite
 {
     partial class KyudosudokuPropellerModule
     {
-        private HttpResponse authPage(HttpRequest req) => withSession(req, (session, db) => session.User == null ? loginPage(req, req.Url) : userPage(req, req.Url, session.User, db));
+        private HttpResponse authPage(HttpRequest req) => withSession(req, (session, db) => session.User == null ? loginPage(req, req.Url) : userPage(req, req.Url, session.User));
 
         private HttpResponse loginPage(HttpRequest req, IHttpUrl url, string loginErrorMessage = null, string registerErrorMessage = null) => RenderPage(
             "Log in", null, null,
@@ -62,7 +62,7 @@ namespace KyudosudokuWebsite
         	1 = Password 1
         	2 = Password 2
         */
-        private HttpResponse userPage(HttpRequest req, IHttpUrl url, User user, Db db, string updateUserError = null, IEnumerable<string> updateUserSuccess = null, string teamError = null) => RenderPage(
+        private HttpResponse userPage(HttpRequest req, IHttpUrl url, User user, string updateUserError = null, IEnumerable<string> updateUserSuccess = null) => RenderPage(
             user.Username, user, null,
             new DIV { class_ = "main" }._(
                 new H1("Welcome, ", new BDI(user.Username), "!"),
@@ -70,7 +70,7 @@ namespace KyudosudokuWebsite
                     new BUTTON { type = btype.submit, accesskey = "o" }._("Log out".Accel('o'))),
                 new H2("Options"),
                 updateUserError.NullOr(msg => new DIV { class_ = "error" }._(msg)),
-                updateUserSuccess.NullOr(msgs => new DIV { class_ = "success" }._(msgs.Count() == 1 ? (object) msgs.First() : new UL(msgs.Select(msg => new LI(msg))))),
+                updateUserSuccess.NullOr(msgs => new DIV { class_ = "success" }._(msgs.Count() == 1 ? msgs.First() : new UL(msgs.Select(msg => new LI(msg))))),
                 new FORM { action = url.WithPath("/update-user").ToHref(), method = method.post }._(
                     new INPUT { type = itype.hidden, name = "user", value = user.UserID.ToString() },
                     new TABLE { class_ = "options" }._(

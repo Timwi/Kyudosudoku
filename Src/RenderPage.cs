@@ -17,7 +17,7 @@ namespace KyudosudokuWebsite
             public int? PuzzleID;
             public bool AddFooter;
             public Db Db;
-            public List<Resource> Resources = new();
+            public List<Resource> Resources = [];
         }
 
         private HttpResponse RenderPage(string title, User loggedInUser, PageOptions opt, params object[] body)
@@ -48,7 +48,7 @@ namespace KyudosudokuWebsite
                 new HEAD(
                     new META { name = "viewport", content = "width=device-width,initial-scale=1.0" },
                     new TITLE($"{fullTitle}"),
-                    opt.Resources.Concat(new[] { Resource.GeneralCss }).Select(r => r.ToTag(Settings)),
+                    opt.Resources.Concat([Resource.GeneralCss]).Select(r => r.ToTag(Settings)),
                     new LINK { rel = "shortcut icon", type = "image/png", href = "/logo" }),
                 new BODY { class_ = opt.IsPuzzlePage ? "is-puzzle" : null }._(
                     opt.IsPuzzlePage

@@ -81,7 +81,7 @@ namespace KyudosudokuWebsite
                 Console.Write($"Puzzle {dbPuzzle.PuzzleID} ({exIx}/{examine.Length})\r");
 
                 var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
-                    dbPuzzle.Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(dbPuzzle.Constraints));
+                    dbPuzzle.Constraints == null ? [] : ClassifyJson.Deserialize<SvgConstraint[]>(dbPuzzle.Constraints));
 
                 try
                 {
@@ -231,7 +231,7 @@ namespace KyudosudokuWebsite
         public int StartSeed = 3000;
 
         [Option("-c", "--show-constraint"), Documentation("Outputs to the console puzzle IDs that contain a specified constraint.")]
-        public string ConstraintType;
+        public string ConstraintType = null;
 
         public ConsoleColoredString Validate() => ConstraintType != null && !ConstraintGenerator.All.Any(cg => cg.type.Name == ConstraintType)
             ? "The name {0} is not a valid constraint type. Valid constraint types are: {1}."

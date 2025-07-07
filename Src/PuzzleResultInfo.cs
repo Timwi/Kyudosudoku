@@ -2,16 +2,10 @@
 
 namespace KyudosudokuWebsite
 {
-    sealed class PuzzleResultInfo
+    sealed class PuzzleResultInfo(Puzzle puzzle, UserPuzzle userPuzzle, int solveCount)
     {
-        public Puzzle Puzzle { get; private set; }
-        public UserPuzzle UserPuzzle { get; private set; }
-        public int SolveCount { get; private set; }
-        public PuzzleResultInfo(Puzzle puzzle, UserPuzzle userPuzzle, int solveCount)
-        {
-            Puzzle = puzzle;
-            UserPuzzle = userPuzzle;
-            SolveCount = solveCount;
-        }
+        public Puzzle Puzzle { get; private set; } = puzzle;
+        public UserPuzzle UserPuzzle { get; private set; } = userPuzzle;
+        public int SolveCount { get; private set; } = solveCount;
     }
 }

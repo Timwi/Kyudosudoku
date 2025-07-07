@@ -71,15 +71,15 @@ namespace KyudosudokuWebsite
             if (session.User == null)
                 return HttpResponse.Redirect(redirectTo);
             if (req.Post["user"].Value != session.User.UserID.ToString())
-                return userPage(req, redirectTo, session.User, db, updateUserError: "It appears that you logged out and back in as someone else. Please try again.");
+                return userPage(req, redirectTo, session.User, updateUserError: "It appears that you logged out and back in as someone else. Please try again.");
 
             var changingPassword = !string.IsNullOrWhiteSpace(req.Post["password1"].Value);
             if (changingPassword)
             {
                 if (!verifyPasswordHash(req.Post["oldpassword"].Value, session.User.PasswordHash))
-                    return userPage(req, redirectTo, session.User, db, updateUserError: "The specified old password was not correct.");
+                    return userPage(req, redirectTo, session.User, updateUserError: "The specified old password was not correct.");
                 if (req.Post["password1"].Value != req.Post["password2"].Value)
-                    return userPage(req, redirectTo, session.User, db, updateUserError: "The two new passwords do not match.");
+                    return userPage(req, redirectTo, session.User, updateUserError: "The two new passwords do not match.");
             }
 
             var messages = new List<string>();
@@ -88,7 +88,7 @@ namespace KyudosudokuWebsite
             if (!string.IsNullOrWhiteSpace(newUsername) && newUsername != session.User.Username)
             {
                 if (db.Users.Any(u => u.UserID != session.User.UserID && (u.Username == newUsername || u.EmailAddress == newUsername)))
-                    return userPage(req, redirectTo, session.User, db, updateUserError: "I’m afraid that username is already taken!");
+                    return userPage(req, redirectTo, session.User, updateUserError: "I’m afraid that username is already taken!");
 
                 session.User.Username = newUsername;
                 messages.Add("Username updated.");
@@ -98,7 +98,7 @@ namespace KyudosudokuWebsite
             if (!string.IsNullOrWhiteSpace(newEmail) && newEmail != session.User.EmailAddress)
             {
                 if (db.Users.Any(u => u.UserID != session.User.UserID && (u.Username == newEmail || u.EmailAddress == newEmail)))
-                    return userPage(req, redirectTo, session.User, db, updateUserError: "I’m afraid that email address is already taken!");
+                    return userPage(req, redirectTo, session.User, updateUserError: "I’m afraid that email address is already taken!");
 
                 session.User.EmailAddress = newEmail;
                 messages.Add("Email address updated.");
@@ -132,7 +132,7 @@ namespace KyudosudokuWebsite
                 messages.Add("No changes were made.");
 
             db.SaveChanges();
-            return userPage(req, redirectTo, session.User, db, updateUserSuccess: messages);
+            return userPage(req, redirectTo, session.User, updateUserSuccess: messages);
         });
 
         public static string CreatePasswordHash(string password)

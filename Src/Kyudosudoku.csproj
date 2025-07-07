@@ -107,6 +107,7 @@
     <Compile Include="Database\Puzzle.cs" />
     <Compile Include="DbSession.cs" />
     <Compile Include="General.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ProfilePage.cs" />
     <Compile Include="NewsItem.cs" />
     <Compile Include="PuzzleResultInfo.cs" />
