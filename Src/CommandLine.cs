@@ -231,18 +231,26 @@ namespace KyudosudokuWebsite
         public int StartSeed = 3000;
 
         [Option("-c", "--show-constraint"), Documentation("Outputs to the console puzzle IDs that contain a specified constraint.")]
-        public string ConstraintType = null;
+        public string[] ConstraintTypes = null;
 
-        public ConsoleColoredString Validate() => ConstraintType != null && !ConstraintGenerator.All.Any(cg => cg.type.Name == ConstraintType)
-            ? "The name {0} is not a valid constraint type. Valid constraint types are: {1}."
-                    .Color(ConsoleColor.Magenta)
-                    .Fmt(ConstraintType.Color(ConsoleColor.White), ConstraintGenerator.All.Select(cg => cg.type.Name.Color(ConsoleColor.Yellow)).JoinColoredString(", ".Color(ConsoleColor.DarkYellow)))
-            : null;
+        public ConsoleColoredString Validate()
+        {
+            if (ConstraintTypes != null)
+                foreach (var ct in ConstraintTypes)
+                    if (!ConstraintGenerator.All.Any(cg => cg.type.Name == ct))
+                        return "The name {0} is not a valid constraint type. Valid constraint types are: {1}."
+                            .Color(ConsoleColor.Magenta)
+                            .Fmt(ct.Color(ConsoleColor.White), ConstraintGenerator.All.Select(cg => cg.type.Name.Color(ConsoleColor.Yellow)).JoinColoredString(", ".Color(ConsoleColor.DarkYellow)));
+            return null;
+        }
 
         public override int Execute()
         {
+            if (ConstraintTypes != null)
+                ConsoleUtil.WriteLine($"Looking for constraint(s): {ConstraintTypes.Select(ct => ct.Color(ConsoleColor.Yellow)).JoinColoredString(", ".Color(ConsoleColor.Cyan))}", ConsoleColor.Cyan);
+
             var lockObj = new object();
-            var seedCounter = 3000;
+            var seedCounter = StartSeed;
             var stats = new Dictionary<string, int>();
             var arrowLengthStats = new Dictionary<int, int>();
             var inclusionNumStats = new Dictionary<int, int>();
@@ -281,8 +289,8 @@ namespace KyudosudokuWebsite
                             else if (constr is GermanWhisper gw) germanWhisperSizeStats.IncSafe(gw.Cells.Length);
                             else if (constr is Means m) meansStats.IncSafe((m.NumArithmetic, m.NumGeometric));
 
-                            if (ConstraintType != null && constr.GetType().Name == ConstraintType)
-                                ConsoleUtil.WriteLine($"Puzzle {seed} has constraint {ConstraintType}.".Color(ConsoleColor.Green));
+                            if (ConstraintTypes != null && ConstraintTypes.Contains(constr.GetType().Name))
+                                ConsoleUtil.WriteLine($"Puzzle {seed} has constraint {constr.GetType().Name}.".Color(ConsoleColor.Green));
                         }
                         ClassifyJson.SerializeToFile(new
                         {
