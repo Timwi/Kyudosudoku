@@ -219,7 +219,7 @@ namespace KyudosudokuWebsite
                     already.Solved = req.Post["progress"].Value != null && puzzle.IsSolved(req.Post["progress"].Value);
                     already.SolveTime = DateTime.UtcNow;
                     already.Progess = req.Post["progress"].Value;
-                    already.Time += req.Post["time"].Value == null || !int.TryParse(req.Post["time"].Value, out int time) ? 10 : time;
+                    already.Time += req.Post["time"].Value != null && int.TryParse(req.Post["time"].Value, out int time) ? time : 10;
                     db.SaveChanges();
 
                     if (already.Solved)

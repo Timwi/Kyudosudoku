@@ -159,6 +159,13 @@
 				return constr.Clue === numbers.slice(0, numbers[0]).reduce((p, n) => p + n, 0);
 			}
 
+			case 'YSum': {
+				let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
+				if (numbers[0] === null || numbers[numbers[0] - 1] === null || numbers.slice(0, numbers[numbers[0] - 1]).some(n => n === null))
+					return null;
+				return constr.Clue === numbers.slice(0, numbers[numbers[0] - 1]).reduce((p, n) => p + n, 0);
+			}
+
 			case 'Battlefield': {
 				let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * x) : (x + 9 * constr.RowCol)]);
 				if (numbers[0] === null || numbers[8] === null)
@@ -307,16 +314,36 @@
 				return affectedCells.some(c => grid[c] === null) ? null : affectedCells.reduce((p, n) => p + grid[n], 0) === constr.Clue;
 			}
 
-
-			// EXOTIC CONSTRAINTS
-
-			case 'YSum': {
-				let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
-				if (numbers[0] === null || numbers[numbers[0] - 1] === null || numbers.slice(0, numbers[numbers[0] - 1]).some(n => n === null))
+			case 'LittleSandwich': {
+				let affectedCells = [];
+				switch (constr.Direction)
+				{
+					case 'SouthEast': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => constr.Offset + 10 * i); break;
+					case 'SouthWest': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 8 + 9 * constr.Offset + 8 * i); break;
+					case 'NorthWest': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 80 - constr.Offset - 10 * i); break;
+					case 'NorthEast': affectedCells = Array(9 - constr.Offset).fill(null).map((_, i) => 72 - 9 * constr.Offset - 8 * i); break;
+				};
+				if (affectedCells.some(c => grid[c] === null))
 					return null;
-				return constr.Clue === numbers.slice(0, numbers[numbers[0] - 1]).reduce((p, n) => p + n, 0);
+				let p1 = affectedCells.findIndex(ix => grid[ix] === constr.Digit1);
+				let p2 = affectedCells.findIndex(ix => grid[ix] === constr.Digit2);
+				if (p1 === -1 || p2 === -1 || affectedCells.findLastIndex(ix => grid[ix] === constr.Digit1) !== p1 || affectedCells.findLastIndex(ix => grid[ix] === constr.Digit2) !== p2)
+					return false;
+				[p1, p2] = [Math.min(p1, p2), Math.max(p1, p2)];
+				return affectedCells.slice(p1 + 1, p2).reduce((prev, cell) => prev + grid[cell], 0) == constr.Clue;
 			}
 
+			case 'ASum': {
+				let value = grid[constr.Cell];
+				if (value === null)
+					return null;
+				if (!inRange(constr.Cell % 9 + dx(constr.Direction) * value) || !inRange(constr.Cell / 9 + dy(constr.Direction) * value))
+					return false;
+				let values = Array(value).fill(null).map((_, d) => grid[constr.Cell % 9 + dx(constr.Direction) * (d + 1) + 9 * (constr.Cell / 9 + dy(constr.Direction) * (d + 1))]);
+				if (values.some(v => v === null))
+					return null;
+				return values.reduce((prev, v) => prev + v, 0) == constr.Sum;
+			}
 		}
 	}
 

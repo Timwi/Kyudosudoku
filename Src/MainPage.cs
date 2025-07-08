@@ -15,10 +15,21 @@ namespace KyudosudokuWebsite
         (
             new NewsItem
             {
+                Date = new DateTime(2025, 7, 8),
+                Title = "Two new constraints: Diagonal sandwich and A-sums",
+                MessageHtml = Ut.NewArray<object>(
+                    new P("We have once again introduced two more ", new A { href = "/constraints" }._("variety Sudoku constraints"), "!"),
+                    new P("The diagonal sandwich constraint is exactly what it sounds like: a sandwich, but diagonal. What makes it alluring is that it includes the stipulation that the crust digits occur exactly once along the diagonal, so you can rule out duplicates!"),
+                    new P("A-sums are an interesting evolution of X-sums/Y-sums. Instead of the first digit in a row/column, it’s now a digit anywhere in the grid that tells you how many cells to sum up!"),
+                    new P("To try out these new constraints, check out puzzles #", new A { href = "/puzzle/5135" }._("5135"), " (A-sum), #", new A { href = "/puzzle/5238" }._("5238"), " (diagonal sandwich), #", new A { href = "/puzzle/5224" }._("5224"), " (both in one!), or #", new A { href = "/puzzle/5207" }._("5207"), " (diagonal sandwich and a lot more)."))
+            },
+
+            new NewsItem
+            {
                 Date = new DateTime(2023, 10, 9),
                 Title = "Two new constraints: German Whisper and Means",
                 MessageHtml = Ut.NewArray<object>(
-                    new P("We have introduced two new variety Sudoku constraints!"),
+                    new P("We have introduced two new ", new A { href = "/constraints" }._("variety Sudoku constraints"), "!"),
                     new P("The German Whisper line may well be familiar to seasoned Sudoku solvers. Simply keep adjacent digits at a difference of at least 5! Sounds simple, but can give rise to deceptively intricate deductions."),
                     new P("The Means constraint is a novel idea. It regulates how many of the digits surrounding a cell can cause the constrained cell to be their arithmetic mean ((a+b)/2) or geometric mean (√(ab)). Something for the maths enthusiasts!"),
                     new P("To try out these new constraints, check out puzzles #", new A { href = "/puzzle/3034" }._("3034"), " and #", new A { href = "/puzzle/3045" }._("3045"), "."))

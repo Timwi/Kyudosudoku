@@ -154,9 +154,7 @@ namespace KyudosudokuWebsite
                         CappedLine.Example,
                         GermanWhisper.Example,
                         Snowball.Example,
-
-                        // Other
-                        LittleKiller.Example,
+                        ASum.Example,
 
                         // Rows/columns
                         Sandwich.Example,
@@ -166,7 +164,11 @@ namespace KyudosudokuWebsite
                         Battlefield.Example,
                         Binairo.Example,
                         XSum.Example,
-                        YSum.Example
+                        YSum.Example,
+
+                        // Other
+                        LittleKiller.Example,
+                        LittleSandwich.Example
                     )));
         });
 
@@ -180,28 +182,28 @@ namespace KyudosudokuWebsite
                 yield return new HR();
                 var constraintName = example.Constraints.First().Name;
                 var constraintId = example.Constraints.First().GetType().Name;
-                var invalidTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(example.Constraints, glowRed: true, givens: example.BadGivens, wide: example.Wide),
+                var invalidTd = new TD { class_ = $"{(example.Layout == ExampleLayout.Wide ? "wide " : null)}incorrect" }._(clippedSudokuGrid(example.Constraints, example.Layout, glowRed: true, givens: example.BadGivens),
                     new DIV(new SPAN("✗ Invalid", example.Reason == null ? "." : ":"), example.Reason.NullOr(r => new DIV(r))));
-                var validTd = new TD { class_ = $"{(example.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(example.Constraints, glowRed: false, givens: example.GoodGivens, wide: example.Wide),
+                var validTd = new TD { class_ = $"{(example.Layout == ExampleLayout.Wide ? "wide " : null)}correct" }._(clippedSudokuGrid(example.Constraints, example.Layout, glowRed: false, givens: example.GoodGivens),
                     new DIV(new SPAN("✓ Valid.")));
-                if (example.Wide)
+                if (example.Layout == ExampleLayout.Wide)
                     yield return new TABLE { class_ = "example", id = $"constraint-{constraintId}" }._(
                         new TR(
-                            new TD { rowspan = 2 }._(clippedSudokuGrid(example.Constraints)),
+                            new TD { rowspan = 2 }._(clippedSudokuGrid(example.Constraints, example.Layout == ExampleLayout.Wide ? ExampleLayout.TopLeft3x3 : example.Layout)),
                             new TD { rowspan = 2, class_ = "explanation" }._(new H4(constraintName), example.Constraints.Select(c => new P(c.Description))),
                             invalidTd),
                         new TR(validTd));
                 else
                     yield return new TABLE { class_ = "example", id = $"constraint-{constraintId}" }._(
                         new TR(
-                            new TD(clippedSudokuGrid(example.Constraints)),
+                            new TD(clippedSudokuGrid(example.Constraints, example.Layout == ExampleLayout.Wide ? ExampleLayout.TopLeft3x3 : example.Layout)),
                             new TD { class_ = "explanation" }._(new H4(constraintName), example.Constraints.Select(c => new P(c.Description))),
                             invalidTd,
                             validTd));
             }
         }
 
-        private object clippedSudokuGrid(IEnumerable<SvgConstraint> constraints, bool? glowRed = null, Dictionary<int, int?> givens = null, bool wide = false) =>
-            new RawTag($@"<svg viewBox='-1 {(wide ? -.5 : -1)} {(wide ? 10.5 : 5.5)} {(wide ? 2 : 4.5)}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'><defs>{constraints.SelectMany(c => c.SvgDefs).Distinct().JoinString()}</defs>{sudokuGridSvg(1, constraints, true, givens, glowRed)}</svg>");
+        private object clippedSudokuGrid(IEnumerable<SvgConstraint> constraints, ExampleLayout layout, bool? glowRed = null, Dictionary<int, int?> givens = null) =>
+            new RawTag($@"<svg viewBox='-1 {(layout == ExampleLayout.Wide ? -.5 : -1)} {(layout == ExampleLayout.Wide ? 10.5 : 5.5)} {layout switch { ExampleLayout.Wide => 2, ExampleLayout.TopLeft3x3 => 4.5, _ => 5.5 }}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'><defs>{constraints.SelectMany(c => c.SvgDefs).Distinct().JoinString()}</defs>{sudokuGridSvg(1, constraints, true, givens, glowRed)}</svg>");
     }
 }
