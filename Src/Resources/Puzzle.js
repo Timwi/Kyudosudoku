@@ -337,9 +337,9 @@
 				let value = grid[constr.Cell];
 				if (value === null)
 					return null;
-				if (!inRange(constr.Cell % 9 + dx(constr.Direction) * value) || !inRange(constr.Cell / 9 + dy(constr.Direction) * value))
+				if (!inRange(constr.Cell % 9 + dx(constr.Direction) * value) || !inRange(((constr.Cell / 9) | 0) + dy(constr.Direction) * value))
 					return false;
-				let values = Array(value).fill(null).map((_, d) => grid[constr.Cell % 9 + dx(constr.Direction) * (d + 1) + 9 * (constr.Cell / 9 + dy(constr.Direction) * (d + 1))]);
+				let values = Array(value).fill(null).map((_, d) => grid[constr.Cell % 9 + dx(constr.Direction) * (d + 1) + 9 * (((constr.Cell / 9) | 0) + dy(constr.Direction) * (d + 1))]);
 				if (values.some(v => v === null))
 					return null;
 				return values.reduce((prev, v) => prev + v, 0) == constr.Sum;
