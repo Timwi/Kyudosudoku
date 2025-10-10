@@ -15,5 +15,6 @@ namespace KyudosudokuWebsite.Database
         public bool SemitransparentXs { get; set; }
         public bool ShowSolveTime { get; set; }
         public bool PlayInvalidSound { get; set; }
+        public int BackspaceOption { get; set; }
     }
 }

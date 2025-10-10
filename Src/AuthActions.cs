@@ -53,7 +53,8 @@ namespace KyudosudokuWebsite
                 ShowErrors = true,
                 SemitransparentXs = false,
                 ShowSolveTime = true,
-                PlayInvalidSound = false
+                PlayInvalidSound = false,
+                BackspaceOption = 0
             });
             db.SaveChanges();
             session.User = newUser;
@@ -124,9 +125,14 @@ namespace KyudosudokuWebsite
                     changingGameOptions = true;
                 }
             }
+            if (int.TryParse(req.Post["opt-backspace-option"].Value, out var backspaceOption) && session.User.BackspaceOption != backspaceOption)
+            {
+                session.User.BackspaceOption = backspaceOption;
+                changingGameOptions = true;
+            }
+
             if (changingGameOptions)
                 messages.Add("Game options updated.");
-
 
             if (messages.Count == 0)
                 messages.Add("No changes were made.");

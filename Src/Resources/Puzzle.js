@@ -408,6 +408,7 @@
 		let showErrors = puzzleDiv.dataset.showerrors === '1';
 		let playSound = puzzleDiv.dataset.playinvalidsound === '1';
 		let semitransparentXs = puzzleDiv.dataset.semitransparentxs === '1';
+		let backspaceOption = +(puzzleDiv.dataset.backspaceoption || 0);
 		let mobileLeft = true;
 
 		function remoteLog2(msg)
@@ -1330,6 +1331,10 @@
 				updateVisuals();
 			}
 
+			// Add the backspace option to the key
+			if (str === 'Backspace' || str === 'Shift+Backspace')
+				str += backspaceOption;
+
 			switch (str)
 			{
 				// Keys that change something
@@ -1380,7 +1385,7 @@
 					break;
 
 				case 'Delete':
-				case 'Backspace':
+				case 'Backspace0':
 					clearCells();
 					break;
 
@@ -1396,7 +1401,7 @@
 					break;
 
 				case 'Shift+Delete':
-				case 'Shift+Backspace':
+				case 'Shift+Backspace0':
 					if (selectedCells.some(c => state.enteredDigits[c] === null && state.cornerNotation[c].length > 0))
 					{
 						saveUndo();
@@ -1466,12 +1471,14 @@
 					break;
 
 				// Undo/redo
-				case 'Backspace':
+				case 'Backspace1':
+				case 'Alt+Backspace':
 				case 'Ctrl+KeyZ':
 					undo();
 					break;
 
-				case 'Shift+Backspace':
+				case 'Shift+Backspace1':
+				case 'Alt+Shift+Backspace':
 				case 'Ctrl+KeyY':
 					redo();
 					break;

@@ -92,6 +92,7 @@ namespace KyudosudokuWebsite
                     .Data("showerrors", (session?.User?.ShowErrors ?? true) ? "1" : "0")
                     .Data("playinvalidsound", (session?.User?.PlayInvalidSound ?? false) ? "1" : "0")
                     .Data("semitransparentxs", (session?.User?.SemitransparentXs ?? false) ? "1" : "0")
+                    .Data("backspaceoption", session?.User?.BackspaceOption)
                     ._(new RawTag($@"<svg viewBox='-.5 {-.5 - extraTop} {23.25 + extraRight + extraLeft} {13.75 + extraTop}' stroke-width='0' text-anchor='middle' font-family='Bitter' font-size='.65'
                                                         data-extratop='{extraTop}' data-extraright='{extraRight}' data-extraleft='{extraLeft}'
                                                         class='puzzle-svg{((session?.User?.SemitransparentXs ?? false) ? " semitransparent-xs" : null)}'>
