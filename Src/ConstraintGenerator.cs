@@ -18,7 +18,6 @@ namespace KyudosudokuWebsite
             (null, typeof(MinimumCell), (s, _) => MinimumCell.Generate(s)),
             (null, typeof(FindThe9), (s, _) => FindThe9.Generate(s)),
             (null, typeof(OddEven), (s, _) => OddEven.Generate(s)),
-            (null, typeof(Means), (s, _) => Means.Generate(s)),
 
             // Area constraints
             (20, typeof(Arrow), (s, _) => Arrow.Generate(s)),

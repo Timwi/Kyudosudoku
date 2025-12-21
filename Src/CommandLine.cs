@@ -261,7 +261,6 @@ namespace KyudosudokuWebsite
             var thermometerSizeStats = new Dictionary<int, int>();
             var cappedLineSizeStats = new Dictionary<int, int>();
             var germanWhisperSizeStats = new Dictionary<int, int>();
-            var meansStats = new Dictionary<(int arith, int geom), int>();
 
             Enumerable.Range(0, Environment.ProcessorCount).ParallelForEach(proc =>
             {
@@ -287,7 +286,6 @@ namespace KyudosudokuWebsite
                             else if (constr is Thermometer t) thermometerSizeStats.IncSafe(t.Cells.Length);
                             else if (constr is CappedLine cl) cappedLineSizeStats.IncSafe(cl.Cells.Length);
                             else if (constr is GermanWhisper gw) germanWhisperSizeStats.IncSafe(gw.Cells.Length);
-                            else if (constr is Means m) meansStats.IncSafe((m.NumArithmetic, m.NumGeometric));
 
                             if (ConstraintTypes != null && ConstraintTypes.Contains(constr.GetType().Name))
                                 ConsoleUtil.WriteLine($"Puzzle {seed} has constraint {constr.GetType().Name}.".Color(ConsoleColor.Green));
@@ -303,8 +301,7 @@ namespace KyudosudokuWebsite
                             PalindromeSizes = palindromeSizeStats,
                             ThermometerSizes = thermometerSizeStats,
                             CappedLineSizeStats = cappedLineSizeStats,
-                            GermanWhisperSizeStats = germanWhisperSizeStats,
-                            MeansStats = meansStats
+                            GermanWhisperSizeStats = germanWhisperSizeStats
                         }, OutputFile);
                     }
                 }

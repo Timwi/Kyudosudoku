@@ -15,6 +15,17 @@ namespace KyudosudokuWebsite
         (
             new NewsItem
             {
+                Date = new DateTime(2025, 12, 21),
+                Title = "Broken constraint removed",
+                MessageHtml = Ut.NewArray<object>(
+                    new P("Unfortunately, the Means constraint, which we introduced over two years ago, has been found to contain a bug."),
+                    new P("As a result, puzzles that included this constraint had multiple possible solutions."),
+                    new P("For this reason, we’ve removed the constraint as well as all puzzles that use it."),
+                    new P("Apologies for the fact that this reduces your puzzle solve count slightly."))
+            },
+
+            new NewsItem
+            {
                 Date = new DateTime(2025, 7, 8),
                 Title = "Two new constraints: Diagonal sandwich and A-sums",
                 MessageHtml = Ut.NewArray<object>(
