@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net.Mail;
-using RT.Util;
+﻿using RT.Util;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         //private void sendMail(string subject, string body, params MailAddress[] to) => sendMail(to, subject, body);
         //private void sendMail(IEnumerable<MailAddress> to, string subject, string body)
@@ -14,7 +12,7 @@ namespace KyudosudokuWebsite
         //}
     }
 
-    sealed class SmtpSettings : RTSmtpSettings
+    internal sealed class SmtpSettings : RTSmtpSettings
     {
         protected override string DecryptPassword(string encrypted) => encrypted;
         protected override string EncryptPassword(string decrypted) => decrypted;

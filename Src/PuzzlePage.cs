@@ -13,7 +13,7 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         private readonly string _invalidAudioUrl = "data:audio/ogg;base64," + Convert.ToBase64String(Resources.Invalid);
 
@@ -24,7 +24,7 @@ namespace KyudosudokuWebsite
                 return dbUpdate(req, session, db, int.Parse(m.Groups[1].Value));
 
             var puzzleIdStr = req.Url.Path.Length == 0 ? "" : req.Url.Path.Substring(1);
-            if (!int.TryParse(puzzleIdStr, out int puzzleId) || puzzleId < 0)
+            if (!int.TryParse(puzzleIdStr, out var puzzleId) || puzzleId < 0)
                 return page404(req);
 
             var dbPuzzle = db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzleId);
@@ -220,7 +220,7 @@ namespace KyudosudokuWebsite
                     already.Solved = req.Post["progress"].Value != null && puzzle.IsSolved(req.Post["progress"].Value);
                     already.SolveTime = DateTime.UtcNow;
                     already.Progess = req.Post["progress"].Value;
-                    already.Time += req.Post["time"].Value != null && int.TryParse(req.Post["time"].Value, out int time) ? time : 10;
+                    already.Time += req.Post["time"].Value != null && int.TryParse(req.Post["time"].Value, out var time) ? time : 10;
                     db.SaveChanges();
 
                     if (already.Solved)

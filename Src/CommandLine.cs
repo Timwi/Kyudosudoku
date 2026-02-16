@@ -15,18 +15,15 @@ using SvgPuzzleConstraints;
 namespace KyudosudokuWebsite
 {
     [CommandLine]
-    abstract class CommandLineBase
+    internal abstract class CommandLineBase
     {
         public abstract int Execute();
 
-        public static void PostBuildCheck(IPostBuildReporter rep)
-        {
-            CommandLineParser.PostBuildStep<CommandLineBase>(rep, null);
-        }
+        public static void PostBuildCheck(IPostBuildReporter rep) => CommandLineParser.PostBuildStep<CommandLineBase>(rep, null);
     }
 
     [CommandName("resetpassword"), DocumentationLiteral("Resets a user’s password.")]
-    sealed class ResetPassword : CommandLineBase, ICommandLineValidatable
+    internal sealed class ResetPassword : CommandLineBase, ICommandLineValidatable
     {
         [IsMandatory, IsPositional, DocumentationLiteral("The new password for the user.")]
         public string NewPassword = null;
@@ -55,7 +52,7 @@ namespace KyudosudokuWebsite
     }
 
     [CommandName("reeval"), DocumentationLiteral("Re-evaluates puzzles to check for redundant constraints.")]
-    sealed class Reeval : CommandLineBase, ICommandLineValidatable
+    internal sealed class Reeval : CommandLineBase, ICommandLineValidatable
     {
         [IsPositional, IsMandatory, DocumentationLiteral("Database connection string.")]
         public string DbConnectionString = null;
@@ -73,7 +70,7 @@ namespace KyudosudokuWebsite
                 ? db.Puzzles.Where(p => !p.Invalid).ToArray()
                 : db.Puzzles.Where(p => !p.Invalid && p.Generated != null && p.Generated.Value >= since).ToArray();
             Console.WriteLine($"Examining {examine.Length} puzzles:");
-            string escape(string str) => str.Select(c => c == '\'' ? "''" : c.ToString()).JoinString();
+            static string escape(string str) => str.Select(c => c == '\'' ? "''" : c.ToString()).JoinString();
             var sql = new List<string>();
             for (var exIx = 0; exIx < examine.Length; exIx++)
             {
@@ -125,7 +122,7 @@ namespace KyudosudokuWebsite
     }
 
     [CommandName("generate"), Documentation("Can be used by a scheduled task to generate new puzzles in the background. Each invocation will only generate at most one puzzle. Through repeated invocation, the number of unsolved puzzles can be kept at a desired number.")]
-    sealed class GeneratePuzzles : CommandLineBase
+    internal sealed class GeneratePuzzles : CommandLineBase
     {
         [IsPositional, IsMandatory, Documentation("If -s is not specified, maximum number of unsolved puzzles to keep in the database. The process will not generate any new puzzles if this number of unsolved puzzles is already in the database.")]
         public int MaxNumber = 100;
@@ -176,7 +173,7 @@ namespace KyudosudokuWebsite
     }
 
     [CommandName("postbuild"), Undocumented]
-    sealed class PostBuild : CommandLineBase
+    internal sealed class PostBuild : CommandLineBase
     {
         [IsPositional, IsMandatory, Undocumented]
         public string SourcePath = null;
@@ -185,7 +182,7 @@ namespace KyudosudokuWebsite
     }
 
     [CommandName("run"), Documentation("Runs a standalone Kyudosudoku server.")]
-    sealed class Run : CommandLineBase
+    internal sealed class Run : CommandLineBase
     {
         [IsPositional]
         public string ConfigFile = null;
@@ -204,7 +201,7 @@ namespace KyudosudokuWebsite
     }
 
     [CommandName("avg"), Documentation("Recalculates all average times for all puzzles.")]
-    sealed class RecalculateAverages : CommandLineBase
+    internal sealed class RecalculateAverages : CommandLineBase
     {
         [IsPositional, IsMandatory, Documentation("Database connection string.")]
         public string DbConnectionString = null;
@@ -222,7 +219,7 @@ namespace KyudosudokuWebsite
     }
 
     [CommandName("stats"), Documentation("Generates some statistics continuously. Warning: uses full CPU and runs forever and is expected to be cancelled.")]
-    sealed class GenerateStatistics : CommandLineBase, ICommandLineValidatable
+    internal sealed class GenerateStatistics : CommandLineBase, ICommandLineValidatable
     {
         [IsPositional, IsMandatory, Documentation("JSON file to write statistics to.")]
         public string OutputFile = null;

@@ -12,10 +12,10 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    class Program
+    internal class Program
     {
         [STAThread]
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             try
             {
@@ -67,7 +67,6 @@ namespace KyudosudokuWebsite
             var lockObj = new object();
 
             Db.ConnectionString = @"Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;";
-            //var notFound = new HashSet<string> { "SkyscraperSum" };
             var stats = new Dictionary<string, int>();
             Enumerable.Range(2000, 3000).ParallelForEach(Environment.ProcessorCount, (seed, ix) =>
             {
@@ -78,8 +77,6 @@ namespace KyudosudokuWebsite
                             return;
                     lock (lockObj)
                     {
-                        //if (notFound.Count == 0)
-                        //    return;
                         Console.CursorTop = 0;
                         Console.CursorLeft = 6 * ix;
                         Console.Write(seed);
@@ -93,19 +90,11 @@ namespace KyudosudokuWebsite
                         {
                             var str = lk.GetType().Name;
                             stats.IncSafe(str);
-                            //if (notFound.Contains(str))
-                            //{
-                            //    puz.SaveToDb(seed, null);
-                            //    ConsoleUtil.WriteLine($" — {seed} has {str}".Color(ConsoleColor.White, ConsoleColor.DarkGreen));
-                            //    notFound.Remove(str);
-                            //}
                         }
                         Console.CursorTop = 2;
                         Console.CursorLeft = 0;
                         foreach (var kvp in stats.OrderByDescending(kvp => kvp.Value))
                             Console.WriteLine($"{kvp.Key} = {kvp.Value}{new string(' ', 100)}");
-                        //if (notFound.Count == 0)
-                        //    return;
                     }
                 }
                 catch (Exception e)

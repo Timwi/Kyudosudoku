@@ -7,7 +7,7 @@ using RT.Util;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         private HttpResponse authPage(HttpRequest req) => withSession(req, (session, db) => session.User == null ? loginPage(req, req.Url) : userPage(req, req.Url, session.User));
 

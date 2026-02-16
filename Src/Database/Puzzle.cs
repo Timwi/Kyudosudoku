@@ -31,7 +31,7 @@ namespace KyudosudokuWebsite.Database
 
             // Check that all cells in the Sudoku grid have a digit
             var sudokuDigits = new int[81];
-            for (int cell = 0; cell < 81; cell++)
+            for (var cell = 0; cell < 81; cell++)
             {
                 var kyCells = Enumerable.Range(0, 4)
                     .Where(c => cell % 9 >= 3 * (c % 2) && cell % 9 < 6 + 3 * (c % 2) && cell / 9 >= 3 * (c / 2) && cell / 9 < 6 + 3 * (c / 2))

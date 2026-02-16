@@ -212,9 +212,9 @@ namespace KyudosudokuWebsite
                 var generated = gen.generator(sudoku, uniquenessRegions);
 
                 // Variant of Fisher-Yates shuffle that stops once we have the required number of elements
-                for (int j = 0; j < generated.Count && (gen.probability == null || j < gen.probability.Value); j++)
+                for (var j = 0; j < generated.Count && (gen.probability == null || j < gen.probability.Value); j++)
                 {
-                    int item = rnd.Next(j, generated.Count);
+                    var item = rnd.Next(j, generated.Count);
                     if (item > j)
                         (generated[j], generated[item]) = (generated[item], generated[j]);
                     yield return generated[j];

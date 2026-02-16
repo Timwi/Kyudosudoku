@@ -1,6 +1,6 @@
 ﻿namespace KyudosudokuWebsite
 {
-    enum PuzzleTableType
+    internal enum PuzzleTableType
     {
         Solved,
         Started,

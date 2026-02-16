@@ -8,7 +8,7 @@ using SessionBase = RT.Servers.Session;
 
 namespace KyudosudokuWebsite
 {
-    sealed class DbSession(Db db) : SessionBase
+    internal sealed class DbSession(Db db) : SessionBase
     {
         private Session _session;
         private User _user;

@@ -3,7 +3,7 @@ using RT.TagSoup;
 
 namespace KyudosudokuWebsite
 {
-    sealed class Resource(string res, string filePath, bool isJs)
+    internal sealed class Resource(string res, string filePath, bool isJs)
     {
         public string Raw { get; private set; } = res;
         public string Filename { get; private set; } = filePath;

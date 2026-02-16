@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using System.Security.Cryptography;
 using KyudosudokuWebsite.Database;
 using RT.Servers;
@@ -11,14 +10,13 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         private object hiddens(params (string name, object value)[] items) => items.Select(item => new INPUT { type = itype.hidden, name = item.name, value = item.value.ToString() });
 
         private HttpResponse logout(HttpRequest req, IHttpUrl redirectTo) => withSession(req, (session, db) =>
         {
-            if (session != null)
-                session.Action = SessionAction.Delete;
+            session?.Action = SessionAction.Delete;
             return HttpResponse.Redirect(redirectTo);
         });
 

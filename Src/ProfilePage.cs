@@ -11,12 +11,12 @@ using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         private HttpResponse profilePage(HttpRequest req) => withSession(req, (session, db) =>
         {
             var linkUserIdStr = req.Url.Path.Length == 0 ? "" : req.Url.Path.Substring(1);
-            if (!int.TryParse(linkUserIdStr, out int linkUserId) || linkUserId < 0)
+            if (!int.TryParse(linkUserIdStr, out var linkUserId) || linkUserId < 0)
                 return page404(req);
 
             var linkUser = db.Users.FirstOrDefault(user => user.UserID == linkUserId);

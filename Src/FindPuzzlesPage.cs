@@ -11,7 +11,7 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         private HttpResponse findPuzzlesPage(HttpRequest req) => withSession(req, (session, db) =>
         {

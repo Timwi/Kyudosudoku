@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using KyudosudokuWebsite.Database;
 using RT.Servers;
@@ -8,9 +7,9 @@ using RT.Util;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
-        sealed class PageOptions
+        private sealed class PageOptions
         {
             public bool IsPuzzlePage = false;
             public HttpStatusCode StatusCode = HttpStatusCode._200_OK;

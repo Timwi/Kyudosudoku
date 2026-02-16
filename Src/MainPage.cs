@@ -9,7 +9,7 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    partial class KyudosudokuPropellerModule
+    public partial class KyudosudokuPropellerModule
     {
         private static readonly NewsItem[] _news = Ut.NewArray
         (
