@@ -5,7 +5,7 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    record struct ConstraintGenerator(int? probability, Type type, Func<int[], int[][], IList<SvgConstraint>> generator)
+    internal record struct ConstraintGenerator(int? probability, Type type, Func<int[], int[][], IList<SvgConstraint>> generator)
     {
         // The numbers balance the relative probabilities of each constraint occurring so that they each occur reasonably similarly often.
         public static readonly ConstraintGenerator[] All = Ut.NewArray<ConstraintGenerator>(
@@ -39,6 +39,7 @@ namespace KyudosudokuWebsite
             (20, typeof(ToroidalSandwich), (s, _) => ToroidalSandwich.Generate(s)),
             (20, typeof(XSum), (s, _) => XSum.Generate(s)),
             (15, typeof(YSum), (s, _) => YSum.Generate(s)),
+            (20, typeof(NumberedRoom), (s, _) => NumberedRoom.Generate(s)),
 
             // Four-cell constraints
             (50, typeof(Clockface), (s, _) => Clockface.Generate(s)),

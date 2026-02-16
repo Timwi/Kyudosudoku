@@ -198,6 +198,11 @@
 				return numbers.some(n => n === null) ? null : true;
 			}
 
+			case 'NumberedRoom': {
+				let numbers = Array(9).fill(null).map((_, x) => grid[constr.IsCol ? (constr.RowCol + 9 * (constr.Reverse ? 8 - x : x)) : ((constr.Reverse ? 8 - x : x) + 9 * constr.RowCol)]);
+				return numbers[0] === null || numbers[numbers[0] - 1] === null ? null : constr.Clue === numbers[numbers[0] - 1];
+			}
+
 			// REGION CONSTRAINTS
 
 			case 'Thermometer': {

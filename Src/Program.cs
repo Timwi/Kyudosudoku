@@ -17,6 +17,8 @@ namespace KyudosudokuWebsite
         [STAThread]
         private static int Main(string[] args)
         {
+            if (args.SequenceEqual(["find-puzzle-with-constraint"]))
+                return FindPuzzleWithConstraint();
             try
             {
                 return CommandLineParser.Parse<CommandLineBase>(args).Execute();
@@ -68,13 +70,11 @@ namespace KyudosudokuWebsite
 
             Db.ConnectionString = @"Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;";
             var stats = new Dictionary<string, int>();
-            Enumerable.Range(2000, 3000).ParallelForEach(Environment.ProcessorCount, (seed, ix) =>
+            Enumerable.Range(6000, 3000).ParallelForEach(Environment.ProcessorCount, (seed, ix) =>
             {
                 try
                 {
-                    using (var db = new Db())
-                        if (db.Puzzles.Any(p => p.PuzzleID == seed))
-                            return;
+                    using var db = new Db();
                     lock (lockObj)
                     {
                         Console.CursorTop = 0;
@@ -90,6 +90,9 @@ namespace KyudosudokuWebsite
                         {
                             var str = lk.GetType().Name;
                             stats.IncSafe(str);
+
+                            if (lk is NumberedRoom && !db.Puzzles.Any(p => p.PuzzleID == seed))
+                                puz.SaveToDb(seed, (int) took);
                         }
                         Console.CursorTop = 2;
                         Console.CursorLeft = 0;
