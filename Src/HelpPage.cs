@@ -164,6 +164,7 @@ namespace KyudosudokuWebsite
                         Binairo.Example,
                         XSum.Example,
                         YSum.Example,
+                        NumberedRoom.Example,
 
                         // Other
                         LittleKiller.Example,

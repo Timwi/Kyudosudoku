@@ -70,11 +70,13 @@ namespace KyudosudokuWebsite
 
             Db.ConnectionString = @"Server=CORNFLOWER;Database=Kyudosudoku;Trusted_Connection=True;";
             var stats = new Dictionary<string, int>();
-            Enumerable.Range(6000, 3000).ParallelForEach(Environment.ProcessorCount, (seed, ix) =>
+            Enumerable.Range(100, 3000).ParallelForEach(Environment.ProcessorCount, (seed, ix) =>
             {
                 try
                 {
                     using var db = new Db();
+                    if (db.Puzzles.Any(p => p.PuzzleID == seed))
+                        return;
                     lock (lockObj)
                     {
                         Console.CursorTop = 0;
@@ -84,15 +86,13 @@ namespace KyudosudokuWebsite
                     var start = DateTime.UtcNow;
                     var puz = Kyudosudoku.Generate(seed);
                     var took = (DateTime.UtcNow - start).TotalSeconds;
+                    puz.SaveToDb(seed, (int) took);
                     lock (lockObj)
                     {
                         foreach (var lk in puz.Constraints)
                         {
                             var str = lk.GetType().Name;
                             stats.IncSafe(str);
-
-                            if (lk is NumberedRoom && !db.Puzzles.Any(p => p.PuzzleID == seed))
-                                puz.SaveToDb(seed, (int) took);
                         }
                         Console.CursorTop = 2;
                         Console.CursorLeft = 0;

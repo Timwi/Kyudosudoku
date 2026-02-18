@@ -15,6 +15,16 @@ namespace KyudosudokuWebsite
         (
             new NewsItem
             {
+                Date = new DateTime(2026, 2, 16),
+                Title = "New constraint: Numbered rooms",
+                MessageHtml = Ut.NewArray<object>(
+                    new P("We have created a new ", new A { href = "/constraints" }._("variety Sudoku constraint"), "!"),
+                    new P("The numbered rooms constraint is similar to the familiar Find The 9 constraint, except that you’re no longer looking for just 9s, and you’re looking in from outside the grid!"),
+                    new P("To try out the new constraint, check out puzzle #", new A { href = "/puzzle/1493" }._("1493"), "."))
+            },
+
+            new NewsItem
+            {
                 Date = new DateTime(2025, 12, 21),
                 Title = "Broken constraint removed",
                 MessageHtml = Ut.NewArray<object>(
