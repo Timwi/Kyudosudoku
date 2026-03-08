@@ -1340,6 +1340,20 @@
 			if (str === 'Backspace' || str === 'Shift+Backspace')
 				str += backspaceOption;
 
+			function shiftDigit(digit)
+			{
+				if (selectedCells.length > 0)
+					enterCornerNotation(digit);
+				else
+				{
+					if (highlightedDigits.includes(digit))
+						highlightedDigits.splice(highlightedDigits.indexOf(digit), 1);
+					else
+						highlightedDigits.push(digit);
+					updateVisuals();
+				}
+			}
+
 			switch (str)
 			{
 				// Keys that change something
@@ -1352,7 +1366,12 @@
 				case 'Digit7': case 'Numpad7':
 				case 'Digit8': case 'Numpad8':
 				case 'Digit9': case 'Numpad9':
-					pressDigit(parseInt(str.substr(str.length - 1)));
+					let pressedDigit = parseInt(str.substr(str.length - 1));
+					// ev.shiftKey is wrong on Windows if Numlock is on and the numpad was used
+					if (/^Numpad/.test(str) && ev.getModifierState("NumLock") && /^(?:Arrow(?:Down|Left|Right|Up)|Clear|End|Home|Insert|Page(?:Down|Up))$/.test(ev.key))
+						shiftDigit(pressedDigit);
+					else
+						pressDigit(pressedDigit);
 					break;
 
 				case 'Ctrl+Digit1': case 'Ctrl+Numpad1':
@@ -1377,16 +1396,7 @@
 				case 'Shift+Digit8': case 'Shift+Numpad8':
 				case 'Shift+Digit9': case 'Shift+Numpad9':
 					let digit = parseInt(str.substr(str.length - 1));
-					if (selectedCells.length > 0)
-						enterCornerNotation(digit);
-					else
-					{
-						if (highlightedDigits.includes(digit))
-							highlightedDigits.splice(highlightedDigits.indexOf(digit), 1);
-						else
-							highlightedDigits.push(digit);
-						updateVisuals();
-					}
+					shiftDigit(digit);
 					break;
 
 				case 'Delete':
