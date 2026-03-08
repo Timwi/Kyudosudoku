@@ -82,7 +82,7 @@ namespace KyudosudokuWebsite
                         new TR(new TD(new INPUT { type = itype.checkbox, name = "opt-play-invalid-sound", value = "1", checked_ = user.PlayInvalidSound, id = "opt-play-invalid-sound", accesskey = "l" }, new LABEL { for_ = "opt-play-invalid-sound" }._(" Play a sound when a constraint is violated".Accel('l')))),
                         new TR(new TD(
                             new DIV("Backspace/Shift+Backspace key:"),
-                            new DIV(new INPUT { type = itype.radio, name = "opt-backspace-option", value = "0", checked_ = user.BackspaceOption == 0, id = "opt-backspace-option-0", accesskey = "d" }, new LABEL { for_ = "opt-backspace-option-0" }._(" Deletes numbers/corner nontation (same as Delete/Shift+Delete)".Accel('D'))),
+                            new DIV(new INPUT { type = itype.radio, name = "opt-backspace-option", value = "0", checked_ = user.BackspaceOption == 0, id = "opt-backspace-option-0", accesskey = "d" }, new LABEL { for_ = "opt-backspace-option-0" }._(" Deletes numbers/corner notation (same as Delete/Shift+Delete)".Accel('D'))),
                             new DIV(new INPUT { type = itype.radio, name = "opt-backspace-option", value = "1", checked_ = user.BackspaceOption == 1, id = "opt-backspace-option-1", accesskey = "r" }, new LABEL { for_ = "opt-backspace-option-1" }._(" Undo/redo (same as Ctrl+Z/Ctrl+Y)".Accel('r'))),
                             new DIV(new INPUT { type = itype.radio, name = "opt-backspace-option", value = "2", checked_ = user.BackspaceOption == 2, id = "opt-backspace-option-2", accesskey = "i" }, new LABEL { for_ = "opt-backspace-option-2" }._(" Disabled".Accel('i'))))),
                         new TR(
