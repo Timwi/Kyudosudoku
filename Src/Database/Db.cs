@@ -1,13 +1,12 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
-using System.Linq;
 
 namespace KyudosudokuWebsite.Database
 {
     public sealed class Db : DbContext
     {
-        public static string ConnectionString;
+        public static string ConnectionString { get; set; }
 
         public Db() : base(ConnectionString)
         {

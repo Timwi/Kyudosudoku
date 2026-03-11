@@ -12,8 +12,6 @@ namespace KyudosudokuWebsite
 {
     public partial class KyudosudokuPropellerModule
     {
-        private object hiddens(params (string name, object value)[] items) => items.Select(item => new INPUT { type = itype.hidden, name = item.name, value = item.value.ToString() });
-
         private HttpResponse logout(HttpRequest req, IHttpUrl redirectTo) => withSession(req, (session, db) =>
         {
             session?.Action = SessionAction.Delete;

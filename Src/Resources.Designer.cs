@@ -19,7 +19,7 @@ namespace KyudosudokuWebsite {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -39,7 +39,7 @@ namespace KyudosudokuWebsite {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KyudosudokuWebsite.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Kyudosudoku.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -180,7 +180,24 @@ namespace KyudosudokuWebsite {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to window.addEventListener(&apos;DOMContentLoaded&apos;, function()
+        ///{
+        ///	var dateText = document.getElementById(&quot;date-text&quot;);
+        ///
+        ///	var chartDiv = document.querySelector(&quot;.chart&quot;);
+        ///	var leftArrow = document.getElementById(&quot;leftArrow&quot;);
+        ///	var rightArrow = document.getElementById(&quot;rightArrow&quot;);
+        ///	var data = document.querySelector(&quot;.profile-container&quot;).dataset;
+        ///
+        ///	var userId = data.userid | 0;
+        ///	var month = data.month | 0;
+        ///	var year = data.year | 0;
+        ///
+        ///	function sendReq()
+        ///	{
+        ///
+        ///		let req = new XMLHttpRequest();
+        ///		req.op [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ProfileJs {
             get {

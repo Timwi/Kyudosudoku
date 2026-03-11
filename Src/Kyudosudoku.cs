@@ -14,8 +14,7 @@ namespace KyudosudokuWebsite
 
         public Kyudosudoku(int[][] grids, SvgConstraint[] constraints)
         {
-            if (grids == null)
-                throw new ArgumentNullException(nameof(grids));
+            ArgumentNullException.ThrowIfNull(grids, nameof(grids));
             if (grids.Length != 4)
                 throw new ArgumentException("There must be four grids.", nameof(grids));
             if (grids.Any(g => g.Length != 36))
@@ -27,7 +26,7 @@ namespace KyudosudokuWebsite
 
         private static (int[] topLeft, int[] topRight, int[] bottomLeft, int[] bottomRight)[] GetAllKyudokuCombinations(int[] sudoku)
         {
-            var emptyArray = new int[0][];
+            var emptyArray = Array.Empty<int[]>();
             IEnumerable<int[]> getDigits(int dx, int dy)
             {
                 for (var i = 0; i < 36; i++)
@@ -102,7 +101,7 @@ namespace KyudosudokuWebsite
                     continue;
 
                 // Check if the Sudoku works without any constraints.
-                var kyConstraints = new SvgConstraint[0];
+                var kyConstraints = Array.Empty<SvgConstraint>();
                 if (new Sudoku().AddConstraints(givensFromKyu, avoidColors: true).Solve().Take(2).Count() > 1)
                 {
                     // Remove constraints that would be redundant.

@@ -8,7 +8,7 @@ namespace KyudosudokuWebsite
 {
     public partial class KyudosudokuPropellerModule
     {
-        private object GeneratePuzzleTable(IEnumerable<PuzzleResultInfo> puzzles, int count, PuzzleTableType type, bool sortable)
+        private static object GeneratePuzzleTable(IEnumerable<PuzzleResultInfo> puzzles, int count, PuzzleTableType type, bool sortable)
         {
             static object time(Puzzle puzzle) => Ut.NewArray<object>(
                 puzzle.AverageTime == null ? "🕛" : "🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚".Substring(((int) puzzle.AverageTime.Value) / 60 % 60 / 5 * 2, 2),

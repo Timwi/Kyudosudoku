@@ -69,7 +69,7 @@ namespace KyudosudokuWebsite
 
         public override HttpResponse Handle(HttpRequest req) => _resolver.Handle(req);
 
-        private HttpResponse withSession(HttpRequest req, Func<DbSession, Db, HttpResponse> handler)
+        private static HttpResponse withSession(HttpRequest req, Func<DbSession, Db, HttpResponse> handler)
         {
             using var db = new Db();
             return new DbSession(db).EnableManual(req, session => handler(session, db));

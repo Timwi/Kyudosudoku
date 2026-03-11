@@ -25,7 +25,7 @@ namespace KyudosudokuWebsite.Database
         {
             var state = JsonValue.Parse(json);
             var kyudokuGrids = KyudokuGrids.Split(36).Select(grid => grid.Select(ch => ch - '0').ToArray()).ToArray();
-            var constraints = Constraints == null ? new SvgConstraint[0] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(Constraints));
+            var constraints = Constraints == null ? [] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(Constraints));
 
             // Check that all cells in the Sudoku grid have a digit
             var sudokuDigits = new int[81];

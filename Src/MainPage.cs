@@ -81,7 +81,7 @@ namespace KyudosudokuWebsite
         {
             var unfinishedPuzzles = session.User == null ? [] : db.Puzzles.Where(p => db.UserPuzzles.Any(up => up.UserID == session.User.UserID && up.PuzzleID == p.PuzzleID && !up.Solved)).ToArray();
             var unfinishedPuzzleIds = unfinishedPuzzles.Select(p => p.PuzzleID).ToArray();
-            var unsolvedPuzzles = (session.User == null ? db.Puzzles : db.Puzzles.Where(p => !db.UserPuzzles.Any(up => up.UserID == session.User.UserID && up.PuzzleID == p.PuzzleID))).Where(p => !unfinishedPuzzleIds.Contains(p.PuzzleID)).ToArray();
+            var unsolvedPuzzles = (session.User == null ? db.Puzzles : db.Puzzles.Where(p => !db.UserPuzzles.Any(up => up.UserID == session.User.UserID && up.PuzzleID == p.PuzzleID))).Where(p => !Enumerable.Contains(unfinishedPuzzleIds, p.PuzzleID)).ToArray();
             var tmpUnsolvedPuzzles = unsolvedPuzzles.Shuffle().OrderBy(p => !string.IsNullOrEmpty(p.ConstraintNames)).ToArray();
             var showUnsolvedPuzzles = tmpUnsolvedPuzzles.Take(1).Concat(tmpUnsolvedPuzzles.Subarray((tmpUnsolvedPuzzles.Length - 2).ClipMin(0))).Distinct().ToArray();
 

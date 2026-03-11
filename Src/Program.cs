@@ -21,6 +21,10 @@ namespace KyudosudokuWebsite
 
             if (args.SequenceEqual(["find-puzzle-with-constraint"]))
                 return FindPuzzleWithConstraint();
+
+            if (args.SequenceEqual([]))
+                args = ["run"];
+
             try
             {
                 return CommandLineParser.Parse<CommandLine>(args).Execute();

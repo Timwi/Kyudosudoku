@@ -180,15 +180,6 @@ namespace KyudosudokuWebsite
         }
     }
 
-    [CommandName("postbuild"), Undocumented]
-    internal sealed class PostBuild : CommandLineBase
-    {
-        [IsPositional, IsMandatory, Undocumented]
-        public string SourcePath = null;
-
-        public override int Execute() => PostBuildChecker.RunPostBuildChecks(SourcePath, Assembly.GetExecutingAssembly());
-    }
-
     [CommandName("run"), Documentation("Runs a standalone Kyudosudoku server.")]
     internal sealed class Run : CommandLineBase
     {

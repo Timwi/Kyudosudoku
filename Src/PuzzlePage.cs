@@ -16,8 +16,7 @@ namespace KyudosudokuWebsite
 
         private HttpResponse PuzzlePage(HttpRequest req, DbSession session, Db db)
         {
-            Match m;
-            if ((m = Regex.Match(req.Url.Path, @"^/db-update/(\d+)$")).Success && req.Method == RT.Servers.HttpMethod.Post)
+            if (req.Method == RT.Servers.HttpMethod.Post && req.Url.Path.RegexMatch(@"^/db-update/(\d+)$", out var m))
                 return dbUpdate(req, session, db, int.Parse(m.Groups[1].Value));
 
             var puzzleIdStr = req.Url.Path.Length == 0 ? "" : req.Url.Path.Substring(1);
@@ -141,12 +140,13 @@ namespace KyudosudokuWebsite
                     </svg>"), new AUDIO { src = _invalidAudioUrl, id = "invalid-audio" }));
         }
 
+        private static readonly bool[] falseTrue = [false, true];
         private static string sudokuGridSvg(int puzzleId, IEnumerable<SvgConstraint> constraints, bool forHelpPage = false, Dictionary<int, int?> givens = null, bool? glowRed = null) => $@"
             <filter id='p-{puzzleId}-blur'><feGaussianBlur stdDeviation='.1' /></filter>
             <rect class='solve-glow frame{(glowRed == null ? null : glowRed.Value ? " invalid" : " solved")}' id='p-{puzzleId}-sudoku-frame' x='0' y='0' width='9' height='9' stroke-width='.2' fill='none' filter='url(#p-{puzzleId}-blur)' />
-            {(forHelpPage ? null : (from ix in Enumerable.Range(-1, 11) from isCol in new[] { false, true } from topLeft in new[] { false, true } select (isCol, ix, topLeft))
-                .Where(inf => constraints.Any(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)))
-                .Select(inf => $@"<rect class='clickable edge-cell has-tooltip' x='{(inf.isCol ? inf.ix : inf.topLeft ? -1 : 9)}' y='{(inf.isCol ? inf.topLeft ? -1 : 9 : inf.ix)}' width='1' height='1'
+            {(forHelpPage ? null : (from ix in Enumerable.Range(-1, 11) from isCol in falseTrue from topLeft in falseTrue select (isCol, ix, topLeft))
+                            .Where(inf => constraints.Any(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)))
+                            .Select(inf => $@"<rect class='clickable edge-cell has-tooltip' x='{(inf.isCol ? inf.ix : inf.topLeft ? -1 : 9)}' y='{(inf.isCol ? inf.topLeft ? -1 : 9 : inf.ix)}' width='1' height='1'
                     data-name='{constraints.Where(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)).Select(c => c.Name).ToJsonList()}'
                     data-description='{constraints.Where(c => c.IncludesRowCol(inf.isCol, inf.ix, inf.topLeft)).Select(c => c.Description).ToJsonList()}' />").JoinString())}
             {Enumerable.Range(0, 81).Select(cell => (!forHelpPage && constraints.Any(c => c.IncludesCell(cell))).Apply(hasTooltip => $@"<g class='cell' id='p-{puzzleId}-sudoku-{cell}'>
@@ -194,7 +194,7 @@ namespace KyudosudokuWebsite
             <line x1='{6.75 * (corner % 2)}' y1='{3 + 6.75 * (corner / 2)}' x2='{6 + 6.75 * (corner % 2)}' y2='{3 + 6.75 * (corner / 2)}' stroke='black' stroke-width='.03' />
         ";
 
-        private HttpResponse dbUpdate(HttpRequest req, DbSession session, Db db, int puzzleId)
+        private static HttpResponse dbUpdate(HttpRequest req, DbSession session, Db db, int puzzleId)
         {
             var puzzle = db.Puzzles.FirstOrDefault(p => p.PuzzleID == puzzleId);
             if (puzzle == null)

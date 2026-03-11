@@ -31,6 +31,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RT.CommandLine", "..\RT.Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RT.TagSoup", "..\RT.TagSoup\Src\RT.TagSoup.csproj", "{76229D48-99C5-AAC0-C9CA-595B7AFD4BAD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{287E6D56-3FA2-4682-9E18-35F3F51A74A9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug-locallibs|Any CPU = Debug-locallibs|Any CPU
