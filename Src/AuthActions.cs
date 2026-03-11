@@ -141,10 +141,8 @@ namespace KyudosudokuWebsite
 
         public static string CreatePasswordHash(string password)
         {
-            var salt = new byte[8];
-            new RNGCryptoServiceProvider().GetBytes(salt);
-            using var sha = SHA256.Create();
-            return salt.ToHex().ToLowerInvariant() + ":" + sha.ComputeHash((salt.ToHex().ToLowerInvariant() + password).ToUtf8()).ToHex();
+            var salt = RandomNumberGenerator.GetBytes(8);
+            return salt.ToHex().ToLowerInvariant() + ":" + SHA256.HashData((salt.ToHex().ToLowerInvariant() + password).ToUtf8()).ToHex();
         }
 
         private static bool verifyPasswordHash(string password, string hash)
@@ -154,8 +152,7 @@ namespace KyudosudokuWebsite
             var parts = hash.Split(':');
             if (parts.Length != 2)
                 return false;
-            using var sha = SHA256.Create();
-            return string.Equals(parts[1], sha.ComputeHash((parts[0].ToLowerInvariant() + password).ToUtf8()).ToHex(), StringComparison.OrdinalIgnoreCase);
+            return string.Equals(parts[1], SHA256.HashData((parts[0].ToLowerInvariant() + password).ToUtf8()).ToHex(), StringComparison.OrdinalIgnoreCase);
         }
     }
 }

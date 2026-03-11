@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using KyudosudokuWebsite.Database;
+﻿using KyudosudokuWebsite.Database;
 using RT.TagSoup;
 using RT.Util;
 using RT.Util.ExtensionMethods;

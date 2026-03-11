@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using KyudosudokuWebsite.Database;
 using RT.Json;
 using RT.Serialization;
@@ -20,7 +17,7 @@ namespace KyudosudokuWebsite
         private HttpResponse PuzzlePage(HttpRequest req, DbSession session, Db db)
         {
             Match m;
-            if ((m = Regex.Match(req.Url.Path, @"^/db-update/(\d+)$")).Success && req.Method == HttpMethod.Post)
+            if ((m = Regex.Match(req.Url.Path, @"^/db-update/(\d+)$")).Success && req.Method == RT.Servers.HttpMethod.Post)
                 return dbUpdate(req, session, db, int.Parse(m.Groups[1].Value));
 
             var puzzleIdStr = req.Url.Path.Length == 0 ? "" : req.Url.Path.Substring(1);

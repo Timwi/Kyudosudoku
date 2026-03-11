@@ -1,6 +1,4 @@
 .vs/
-builds/
-packages/
 Src/*.user
 Src/bin/
 Src/obj/

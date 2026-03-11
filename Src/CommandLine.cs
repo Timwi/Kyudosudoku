@@ -14,12 +14,20 @@ using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite
 {
-    [CommandLine]
+    internal sealed class CommandLine
+    {
+        [IsMandatory, IsPositional]
+        public CommandLineBase Command = null;
+
+        public int Execute() => Command.Execute();
+    }
+
+    [CommandGroup]
     internal abstract class CommandLineBase
     {
         public abstract int Execute();
 
-        public static void PostBuildCheck(IPostBuildReporter rep) => CommandLineParser.PostBuildStep<CommandLineBase>(rep, null);
+        public static void PostBuildCheck(IPostBuildReporter rep) => CommandLineParser.PostBuildStep<CommandLineBase>(rep);
     }
 
     [CommandName("resetpassword"), DocumentationLiteral("Resets a user’s password.")]

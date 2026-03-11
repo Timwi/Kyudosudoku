@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Reflection;
 using KyudosudokuWebsite.Database;
 using PuzzleSolvers;
 using RT.CommandLine;
 using RT.Json;
+using RT.PostBuild;
 using RT.Util;
 using RT.Util.Consoles;
 using RT.Util.ExtensionMethods;
@@ -17,11 +16,14 @@ namespace KyudosudokuWebsite
         [STAThread]
         private static int Main(string[] args)
         {
+            if (args.Length == 2 && args[0] == "--post-build-check")
+                return PostBuildChecker.RunPostBuildChecks(args[1], Assembly.GetExecutingAssembly());
+
             if (args.SequenceEqual(["find-puzzle-with-constraint"]))
                 return FindPuzzleWithConstraint();
             try
             {
-                return CommandLineParser.Parse<CommandLineBase>(args).Execute();
+                return CommandLineParser.Parse<CommandLine>(args).Execute();
             }
             catch (CommandLineParseException ex)
             {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using RT.Util;
+﻿using RT.Util;
 using SvgPuzzleConstraints;
 
 namespace KyudosudokuWebsite

@@ -1,6 +1,4 @@
-﻿using RT.Util;
-
-namespace KyudosudokuWebsite
+﻿namespace KyudosudokuWebsite
 {
     public partial class KyudosudokuPropellerModule
     {
@@ -10,11 +8,5 @@ namespace KyudosudokuWebsite
         //    using var smtp = new RTSmtpClient(new SmtpSettings { Encryption = SmtpEncryption.Ssl, Host = Settings.SmtpServer, Password = Settings.SmtpPassword, Port = Settings.SmtpPort, Username = Settings.SmtpUsername }, Log);
         //    smtp.SendEmail(new MailAddress(Settings.SmtpFromAddress, "Kyudosudoku"), to, subject, null, body);
         //}
-    }
-
-    internal sealed class SmtpSettings : RTSmtpSettings
-    {
-        protected override string DecryptPassword(string encrypted) => encrypted;
-        protected override string EncryptPassword(string decrypted) => decrypted;
     }
 }

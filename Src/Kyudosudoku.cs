@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using KyudosudokuWebsite.Database;
+﻿using KyudosudokuWebsite.Database;
 using PuzzleSolvers;
 using RT.Serialization;
 using RT.Util;
