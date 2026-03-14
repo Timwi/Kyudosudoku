@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data.Entity;
-using System.Linq;
-using KyudosudokuWebsite.Database;
+﻿using KyudosudokuWebsite.Database;
 using RT.PropellerApi;
 using RT.Servers;
 using RT.TagSoup;
@@ -17,7 +14,6 @@ namespace KyudosudokuWebsite
 
         public override void Init()
         {
-            System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<Db, Configuration>());
             Db.ConnectionString = Settings.ConnectionString;
 
             // This also triggers any pending migrations. Without doing some DB stuff here, transactions that don’t commit mess up the migrations.

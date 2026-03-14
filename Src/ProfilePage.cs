@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data.Entity;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using KyudosudokuWebsite.Database;
 using RT.Json;
 using RT.Servers;

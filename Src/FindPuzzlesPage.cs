@@ -1,5 +1,5 @@
-﻿using System.Data.Entity;
-using KyudosudokuWebsite.Database;
+﻿using KyudosudokuWebsite.Database;
+using Microsoft.EntityFrameworkCore;
 using RT.Json;
 using RT.Servers;
 using RT.TagSoup;
@@ -88,14 +88,14 @@ namespace KyudosudokuWebsite
                 var strs = lst.Select(v => v.GetStringSafe().NullOr(s => $"%<{s}>%")).ToArray();
                 foreach (var val in strs)
                     if (val != null)
-                        puzzles = puzzles.Where(p => DbFunctions.Like(p.Puzzle.ConstraintNames, val));
+                        puzzles = puzzles.Where(p => EF.Functions.Like(p.Puzzle.ConstraintNames, val));
             }
             if ((lst = json.Safe["constraints"].Safe["exclude-constraints"].GetListSafe()) != null)
             {
                 var strs = lst.Select(v => v.GetStringSafe().NullOr(s => $"%<{s}>%")).ToArray();
                 foreach (var val in strs)
                     if (val != null)
-                        puzzles = puzzles.Where(p => p.Puzzle.ConstraintNames == null || !DbFunctions.Like(p.Puzzle.ConstraintNames, val));
+                        puzzles = puzzles.Where(p => p.Puzzle.ConstraintNames == null || !EF.Functions.Like(p.Puzzle.ConstraintNames, val));
             }
 
             var count = puzzles.Count();

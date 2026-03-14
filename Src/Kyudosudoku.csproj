@@ -8,6 +8,7 @@
     <Version>2.0.0</Version>
     <Authors>Timwi</Authors>
     <Description>Logic puzzle website with variety Sudokus.</Description>
+    <RootNamespace>KyudosudokuWebsite</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug-locallibs'">
@@ -27,7 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.5.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
   </ItemGroup>
 
   <ItemGroup>

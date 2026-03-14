@@ -12,7 +12,7 @@ namespace KyudosudokuWebsite
 {
     public partial class KyudosudokuPropellerModule
     {
-        private HttpResponse logout(HttpRequest req, IHttpUrl redirectTo) => withSession(req, (session, db) =>
+        private static HttpResponse logout(HttpRequest req, IHttpUrl redirectTo) => withSession(req, (session, db) =>
         {
             session?.Action = SessionAction.Delete;
             return HttpResponse.Redirect(redirectTo);
@@ -51,7 +51,7 @@ namespace KyudosudokuWebsite
                 ShowSolveTime = true,
                 PlayInvalidSound = false,
                 BackspaceOption = 0
-            });
+            }).Entity;
             db.SaveChanges();
             session.User = newUser;
             //if (!string.IsNullOrWhiteSpace(email) && email.Contains('@'))
