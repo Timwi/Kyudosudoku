@@ -1,5 +1,6 @@
-.vs/
-Src/*.user
-Src/bin/
-Src/obj/
+.vs
+bin
+obj
+publish
+*.user
 *.suo

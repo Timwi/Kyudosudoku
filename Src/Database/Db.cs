@@ -7,10 +7,6 @@ namespace KyudosudokuWebsite.Database
     {
         public static string ConnectionString { get; set; }
 
-        public Db() : base()
-        {
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlServer(ConnectionString);
 
@@ -21,14 +17,14 @@ namespace KyudosudokuWebsite.Database
 
         public double? CalculateAveragePuzzleTime(int puzzleId)
         {
-            var q = Database.SqlQueryRaw<int>(@"
+            var q = Database.SqlQueryRaw<int>("""
                 DECLARE @c BIGINT = (SELECT COUNT(*) FROM UserPuzzles WHERE PuzzleID=@puzzleId AND Solved=1);
                 SELECT Time FROM UserPuzzles
-	                WHERE PuzzleID=@puzzleId AND Solved=1
+                	WHERE PuzzleID=@puzzleId AND Solved=1
                     ORDER BY Time
                     OFFSET (@c - 1) / 2 ROWS
                     FETCH NEXT 1 + (1 - @c % 2) ROWS ONLY
-            ", new SqlParameter("@puzzleId", puzzleId)).ToArray();
+                """, new SqlParameter("@puzzleId", puzzleId)).ToArray();
             if (q.Length > 0)
                 return q.Average();
             return null;

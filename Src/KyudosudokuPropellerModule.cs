@@ -1,8 +1,8 @@
 ﻿using KyudosudokuWebsite.Database;
+using Microsoft.EntityFrameworkCore;
 using RT.PropellerApi;
 using RT.Servers;
 using RT.TagSoup;
-using RT.Util.ExtensionMethods;
 
 namespace KyudosudokuWebsite
 {
@@ -16,9 +16,9 @@ namespace KyudosudokuWebsite
         {
             Db.ConnectionString = Settings.ConnectionString;
 
-            // This also triggers any pending migrations. Without doing some DB stuff here, transactions that don’t commit mess up the migrations.
             using (var db = new Db())
             {
+                db.Database.Migrate();
                 foreach (var puzzle in db.Puzzles.Where(p => p.AverageTime == null && db.UserPuzzles.Any(up => up.Solved && up.PuzzleID == p.PuzzleID)).ToArray())
                     puzzle.AverageTime = db.CalculateAveragePuzzleTime(puzzle.PuzzleID);
                 db.SaveChanges();
