@@ -52,7 +52,7 @@ namespace KyudosudokuWebsite
                     recentPuzzles.Length == 0 ? null : new DIV { id = "results" }._(GeneratePuzzleTable(recentPuzzles, recentPuzzles.Length, PuzzleTableType.Solved, sortable: false))));
         });
 
-        private object profileActivityTable(Db db, int year, int month, int linkUserId)
+        private static object profileActivityTable(Db db, int year, int month, int linkUserId)
         {
             int dowInt(DayOfWeek dow) => dow switch { DayOfWeek.Sunday => 6, _ => (int) dow - 1 };
 
