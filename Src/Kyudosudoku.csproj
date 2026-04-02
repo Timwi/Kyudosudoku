@@ -12,15 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug-locallibs'">
-    <ProjectReference Include="..\..\RT.Util\RT.PostBuild\RT.PostBuild.csproj" />
     <ProjectReference Include="..\..\Propeller\API\PropellerApi.csproj" />
     <ProjectReference Include="..\..\RT.CommandLine\Src\RT.CommandLine.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' != 'Debug-locallibs'">
     <PackageReference Include="RT.CommandLine" Version="2.2.204" />
-    <PackageReference Include="RT.PostBuild" Version="2.0.1824" />
-    <PackageReference Include="PropellerApi" Version="2.4.2" />
+    <PackageReference Include="PropellerApi" Version="2.4.6" />
   </ItemGroup>
 
   <ItemGroup>
