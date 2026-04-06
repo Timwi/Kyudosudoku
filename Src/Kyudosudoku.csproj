@@ -18,7 +18,7 @@
 
   <ItemGroup Condition="'$(Configuration)' != 'Debug-locallibs'">
     <PackageReference Include="RT.CommandLine" Version="2.2.204" />
-    <PackageReference Include="PropellerApi" Version="2.4.6" />
+    <PackageReference Include="PropellerApi" Version="2.4.8" />
   </ItemGroup>
 
   <ItemGroup>
