@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Run under Propeller": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Daten\\Propeller\\Publish\\Propeller\\Propeller.exe",
+      "commandLineArgs": "-s D:\\Daten\\Config\\Propeller.config.json run",
+      "workingDirectory": "D:\\Daten\\Propeller\\Publish\\Propeller"
+    }
+  }
+}

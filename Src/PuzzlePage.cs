@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using KyudosudokuWebsite.Database;
+﻿using KyudosudokuWebsite.Database;
 using RT.Json;
 using RT.Serialization;
 using RT.Servers;
@@ -27,8 +26,7 @@ namespace KyudosudokuWebsite
             if (dbPuzzle == null || dbPuzzle.Invalid)
                 return page404(req);
 
-            var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
-                dbPuzzle.Constraints == null ? [] : ClassifyJson.Deserialize<SvgConstraint[]>(JsonValue.Parse(dbPuzzle.Constraints)));
+            var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(), dbPuzzle.Constraints);
 
             var userPuzzle = session.User == null ? null : db.UserPuzzles.FirstOrDefault(up => up.UserID == session.User.UserID && up.PuzzleID == puzzleId);
 

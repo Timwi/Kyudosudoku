@@ -85,8 +85,7 @@ namespace KyudosudokuWebsite
                 var dbPuzzle = examine[exIx];
                 Console.Write($"Puzzle {dbPuzzle.PuzzleID} ({exIx}/{examine.Length})\r");
 
-                var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(),
-                    dbPuzzle.Constraints == null ? [] : ClassifyJson.Deserialize<SvgConstraint[]>(dbPuzzle.Constraints));
+                var puzzle = new Kyudosudoku(dbPuzzle.KyudokuGrids.Split(36).Select(subgrid => subgrid.Select(ch => ch - '0').ToArray()).ToArray(), dbPuzzle.Constraints);
 
                 try
                 {

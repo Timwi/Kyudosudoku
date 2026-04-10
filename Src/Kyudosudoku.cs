@@ -1,5 +1,6 @@
 ﻿using KyudosudokuWebsite.Database;
 using PuzzleSolvers;
+using RT.Json;
 using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
@@ -11,6 +12,10 @@ namespace KyudosudokuWebsite
     {
         public int[][] Grids { get; private set; }
         public SvgConstraint[] Constraints { get; private set; }
+
+        public Kyudosudoku(int[][] grids, string constraints) : this(grids, DecodeConstraints(constraints))
+        {
+        }
 
         public Kyudosudoku(int[][] grids, SvgConstraint[] constraints)
         {
@@ -339,6 +344,28 @@ namespace KyudosudokuWebsite
             }).ToArray();
 
             return reqConstraints.Length == Constraints.Length ? null : new CanReduce { NewConstraints = reqConstraints.Select(c => Constraints[c]).ToArray() };
+        }
+
+        public static SvgConstraint[] DecodeConstraints(string puzzleConstraints)
+        {
+            //return ClassifyJson.Deserialize<SvgConstraint[]>(puzzleConstraints);
+
+            // Hacky workaround:
+            // * When running in Propeller, the SvgConstraint type is in a different AssemblyLoadContext than Propeller
+            // * However, RT.Util.Core + RT.Json is running under Propeller, and that means they load SvgConstraint into Propeller’s context
+            // * Because of that, ClassifyJson.Deserialize considers them different types and can’t put one into an array/list of the other
+
+            var constraints = new List<SvgConstraint>();
+            if (puzzleConstraints != null)
+                foreach (var constraint in JsonList.Parse(puzzleConstraints))
+                    if (constraint[":type"].GetStringSafe() is { } typeStr)
+                    {
+                        constraint.Remove(":type");
+                        var type = typeof(SvgConstraint).Assembly.GetType($"SvgPuzzleConstraints.{typeStr}");
+                        constraints.Add((SvgConstraint) ClassifyJson.Deserialize(type, constraint));
+                    }
+
+            return constraints.ToArray();
         }
     }
 }
