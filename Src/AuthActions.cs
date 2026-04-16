@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using KyudosudokuWebsite.Database;
 using RT.Servers;
-using RT.TagSoup;
 using RT.Util;
 using RT.Util.ExtensionMethods;
 
@@ -21,7 +17,12 @@ namespace KyudosudokuWebsite
         private HttpResponse login(HttpRequest req, IHttpUrl redirectTo) => withSession(req, (session, db) =>
         {
             var username = req.Post["username"].Value;
-            var user = db.Users.FirstOrDefault(u => u.Username == username) ?? db.Users.FirstOrDefault(u => u.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase) || u.EmailAddress.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+            if (string.IsNullOrWhiteSpace(username))
+                return loginPage(req, req.Url.WithPathParent(), "You must specify a username.");
+            var user = db.Users.FirstOrDefault(u => u.Username == username) ??
+                db.Users.AsEnumerable().FirstOrDefault(u =>
+                    username.Equals(u.Username, StringComparison.InvariantCultureIgnoreCase) ||
+                    username.Equals(u.EmailAddress, StringComparison.InvariantCultureIgnoreCase));
             if (user == null)
                 return loginPage(req, req.Url.WithPathParent(), "The specified username does not exist.");
             if (!verifyPasswordHash(req.Post["password"].Value, user.PasswordHash))
